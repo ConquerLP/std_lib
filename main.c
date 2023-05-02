@@ -21,8 +21,6 @@ int main(void) {
 		printf("%s\n", ss->objectIF->toString(ss));
 	}
 
-	printf("%zu\n", sizeof(char));
-	
 	Array* aa = a->objectIF->clone(a);
 
 	printf("%s\n", a->objectIF->toString(a));
