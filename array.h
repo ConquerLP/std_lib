@@ -9,8 +9,8 @@ typedef struct _ArrayIF {
 }ArrayIF;
 
 typedef struct _Array {
+	void* super; // must be first
 	void* self;
-	void* super;
 	ArrayIF* arrayIF;
 	ObjectIF* objectIF;
 }Array;

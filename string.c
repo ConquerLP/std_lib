@@ -9,9 +9,10 @@
 
 /* function prototypes */
 private_fun char* String_toString(void* obj);
-private_fun void String_setText(void* obj, const char* text);
 private_fun void* String_clone(void* obj);
 private_fun void String_dtor(void* obj);
+
+private_fun void String_setText(void* obj, const char* text);
 
 /* public functions */
 String* String_ctor(const char* text)
@@ -38,6 +39,7 @@ String* String_ctor(const char* text)
 	self->sub = NULL;
 	self->length = def_strlen(text);
 	self->str = def_strcpy(text);
+
 	return this;
 }
 
@@ -81,6 +83,7 @@ private_fun void String_setText(void* obj, const char* text)
 {
 	if (!obj) return;
 	String* this = obj;
-	FREE(((o_String*)this->self)->str);
-	((o_String*)this->self)->str = def_strcpy(text);
+	o_String* self = this->self;
+	FREE(self->str);
+	self->str = def_strcpy(text);
 }

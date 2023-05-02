@@ -87,10 +87,11 @@ private_fun char* Array_toString(void* obj)
 	if (!obj) return NULL;
 	Array* this = obj;
 	o_Array* self = this->self;
+	FREE(self->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
 	def_memset(tmp, '\0', 100);
-	snprintf(tmp, 100, "Array contains: '%s' as datatype with a length of %zu.\n", self->name, self->length);
+	snprintf(tmp, 100, "This array contains: %zu '%s's", self->length, self->name);
 	self->toString = def_strcpy(tmp);
 	FREE(tmp);
 	return self->toString;

@@ -8,9 +8,9 @@ typedef struct {
 	void (*setText)(void* obj, const char* text);
 }StringIF;
 
-typedef struct _String{
+typedef struct _String {
+	void* super; // must be first
 	void* self;	
-	void* super;
 	ObjectIF* objectIF;
 	StringIF* stringIF;
 }String;

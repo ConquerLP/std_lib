@@ -8,6 +8,12 @@ private_fun char* Object_toString(void* obj);
 private_fun void* Object_clone(void* obj);
 private_fun void Object_dtor(void* obj);
 
+void delete(void* obj)
+{
+	Object** this = obj;
+	(*this)->objectIF->dtor(obj);
+}
+
 /* protected functions */
 Object* Object_ctor(const char* name)
 {

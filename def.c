@@ -67,9 +67,9 @@ void def_pointerDebugList_print(void)
 	fprintf(stdout, "%*s%*s\n", -DEF_PADDING - 2, "Pointer address", -DEF_PADDING, " | Freed");
 	for (size_t i = 0, j = 0; i < def_pointerDebugListCount_index; i++) {
 		if (def_pointerDebugList_match(def_pointerDebugList[i], &j)) {
-			fprintf(stdout, "0x%0*p | yes\n", DEF_PADDING, def_pointerDebugList[i]);
+			fprintf(stdout, "#%zu.0x%0*p | yes\n", i, DEF_PADDING - 12, def_pointerDebugList[i]);
 		}
-		else fprintf(stdout, "0x%0*p | no\n", DEF_PADDING, def_pointerDebugList[i]);
+		else fprintf(stdout, "#%zu.0x%0*p | no\n", i, DEF_PADDING - 12, def_pointerDebugList[i]);
 	}
 	fprintf(stdout, "%s\n", def_line);
 }

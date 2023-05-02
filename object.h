@@ -9,8 +9,10 @@ typedef struct _ObjectIF {
 }ObjectIF;
 
 typedef struct _Object {
-	void* self;
+	void* self; 
 	ObjectIF* objectIF;
 }Object;
+
+void delete(void* obj);
 
 #endif // !OBJECT_H
