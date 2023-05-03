@@ -13,10 +13,6 @@
 *.vcxproj
 *.filters
 
-template.c
-template.r
-template.h
-
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
