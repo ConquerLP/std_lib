@@ -105,6 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,6 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,23 +132,29 @@
   <ItemGroup>
     <ClInclude Include="array.h" />
     <ClInclude Include="def.h" />
+    <ClInclude Include="list.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="std_lib.h" />
     <ClInclude Include="string.h" />
+    <ClInclude Include="template.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="array.r" />
     <None Include="basic.h" />
+    <None Include="list.r" />
     <None Include="object.r" />
     <None Include="string.r" />
+    <None Include="template.r" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="array.c" />
     <ClCompile Include="basic.c" />
     <ClCompile Include="def.c" />
+    <ClCompile Include="list.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="object.c" />
     <ClCompile Include="string.c" />
+    <ClCompile Include="template.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

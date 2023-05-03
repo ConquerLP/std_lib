@@ -2,10 +2,18 @@
 
 #define ARRAY_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "object.h"
+#include <stdlib.h>
+
 typedef struct _ArrayIF {
 	void (*set)(void* obj, void* data, size_t index);
 	void* (*get)(void* obj, size_t index);
-	size_t (*length)(void* obj);
+	size_t(*length)(void* obj);
 }ArrayIF;
 
 typedef struct _Array {
@@ -16,5 +24,9 @@ typedef struct _Array {
 }Array;
 
 Array* Array_ctor(const char* name, size_t length);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // !ARRAY_H

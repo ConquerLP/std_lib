@@ -30,7 +30,7 @@ Object* Object_ctor(const char* name)
 	thisIF->toString = &Object_toString;
 	thisIF->clone = &Object_clone;
 	thisIF->dtor = &Object_dtor;
-	self->name = def_strcpy(name);
+	self->name = basic_strcpy(name);
 	return this;
 }
 

@@ -30,6 +30,12 @@
     <ClInclude Include="array.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="list.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="template.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic.h">
@@ -42,6 +48,12 @@
       <Filter>Headerdateien</Filter>
     </None>
     <None Include="array.r">
+      <Filter>Headerdateien</Filter>
+    </None>
+    <None Include="list.r">
+      <Filter>Headerdateien</Filter>
+    </None>
+    <None Include="template.r">
       <Filter>Headerdateien</Filter>
     </None>
   </ItemGroup>
@@ -62,6 +74,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="array.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="list.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="template.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

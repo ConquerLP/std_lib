@@ -21,8 +21,25 @@ static void* def_pointerDebugList[DEF_MAX_DEBUG_LIST];
 static boolean def_flagList[DEF_MAX_DEBUG_LIST] = { false };
 static size_t def_pointerDebugListCount_index = 0;
 static size_t def_pointerDebugList_count = 0;
+static size_t counter = 0;
 
 char def_line[100] = { "*-------------------------------------------------------------------------------------------------*" };
+
+size_t def_counter(void)
+{
+	return ++counter;
+}
+
+char* def_trim_filename(char* filename)
+{
+	if (!filename) return NULL;
+	size_t i = 0, j = 0;
+	while (*(filename + i) != '\0') {
+		if(*(filename + i) == 92) j = i;
+		i++;
+	}
+	return (filename + j);
+}
 
 boolean def_pointerDebugList_match(void* address, size_t* index)
 {
@@ -64,12 +81,14 @@ void def_pointerDebugList_print(void)
 	fprintf(stdout, "PointerDebugList\n");
 	fprintf(stdout, "%zu of %zu possible allcated pointers were used\n", def_pointerDebugListCount_index, DEF_MAX_DEBUG_LIST);
 	fprintf(stdout, "%zu of %zu were freed\n", def_pointerDebugListCount_index - def_pointerDebugList_count, def_pointerDebugListCount_index);
-	fprintf(stdout, "%*s%*s\n", -DEF_PADDING - 2, "Pointer address", -DEF_PADDING, " | Freed");
+	fprintf(stdout, "%s\n", "---------------------------------------");
+	fprintf(stdout, "%*s%s%s\n", -DEF_PADDING - 2, "Pointer address", " | Freed", " | Index|");
+	fprintf(stdout, "%s\n", "---------------------------------------");
 	for (size_t i = 0, j = 0; i < def_pointerDebugListCount_index; i++) {
 		if (def_pointerDebugList_match(def_pointerDebugList[i], &j)) {
-			fprintf(stdout, "#%zu.0x%0*p | yes\n", i, DEF_PADDING - 12, def_pointerDebugList[i]);
+			fprintf(stdout, "0x%0*p | yes   | %zu\n", DEF_PADDING, def_pointerDebugList[i], i + 1);
 		}
-		else fprintf(stdout, "#%zu.0x%0*p | no\n", i, DEF_PADDING - 12, def_pointerDebugList[i]);
+		else fprintf(stdout, "0x%0*p | no    | %zu\n", DEF_PADDING, def_pointerDebugList[i], i + 1);
 	}
 	fprintf(stdout, "%s\n", def_line);
 }

@@ -13,25 +13,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/* list of allowed datatypes in the array */
-global_var char* array_datatype_list[] = {
-	"double",
-	"float",
-	"char",
-	"int",
-	"size_t",
-	// classes
-	"String"
-};
-
-size_t array_datatype_list_length = sizeof(array_datatype_list) / sizeof (*array_datatype_list);
-
 /* function prototypes */
 private_fun char* Array_toString(void* obj);
 private_fun void* Array_clone(void* obj);
 private_fun void Array_dtor(void* array);
-
-private_fun boolean Array_isAllowedType(const char* cmp);
 
 private_fun void* Array_get(void* obj, size_t index);
 private_fun void Array_set(void* obj, void* data, size_t index);
@@ -44,7 +29,7 @@ Array* Array_ctor(const char* name, size_t length)
 {
 	if (length <= 0) return NULL;
 	if (!name) return NULL;
-	if (!Array_isAllowedType(name)) return NULL;
+	if (!basic_isAllowedType(name)) return NULL;
 	Object* super = Object_ctor("Array");
 
 	Array* this;
@@ -74,8 +59,8 @@ Array* Array_ctor(const char* name, size_t length)
 	void** data;
 	MALLOC(void*, length, data);
 	self->arr = data;
-	self->name = def_strcpy(name);
-	self->toString = def_strcpy("");
+	self->name = basic_strcpy(name);
+	self->toString = basic_strcpy("");
 	return this;
 }
 
@@ -90,9 +75,9 @@ private_fun char* Array_toString(void* obj)
 	FREE(self->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
-	def_memset(tmp, '\0', 100);
+	basic_memset(tmp, '\0', 100);
 	snprintf(tmp, 100, "This array contains: %zu '%s's", self->length, self->name);
-	self->toString = def_strcpy(tmp);
+	self->toString = basic_strcpy(tmp);
 	FREE(tmp);
 	return self->toString;
 }
@@ -105,9 +90,8 @@ private_fun void Array_dtor(void* array)
 	void** ptr = self->arr;
 
 	for (size_t i = 0; i < this->arrayIF->length(array); ++i) {
-		if (def_strcmp(self->name, "String")) {
-			String* tmp = *(ptr + i);
-			tmp->objectIF->dtor(*(ptr + i));
+		if (basic_strcmp(self->name, "String")) {
+			delete(*(ptr + i));
 		}
 		//primitive types
 		else {
@@ -160,42 +144,42 @@ private_fun void Array_set(void* arr, void* data, size_t index)
 	o_Array* self = this->self;
 	if (index >= self->length) return;
 	void** ptr = self->arr;
-	if (def_strcmp(self->name, "double")) {
+	if (basic_strcmp(self->name, "double")) {
 		double* tmp;
 		MALLOC(double, 1, tmp);
-		def_bin_copy(tmp, data, sizeof(double), 0);
+		basic_bin_copy(tmp, data, sizeof(double), 0);
 		*(ptr + index) = tmp;
 		return;
 	}
-	if (def_strcmp(self->name, "float")) {
+	if (basic_strcmp(self->name, "float")) {
 		float* tmp;
 		MALLOC(float, 1, tmp);
-		def_bin_copy(tmp, data, sizeof(float), 0);
+		basic_bin_copy(tmp, data, sizeof(float), 0);
 		*(ptr + index) = tmp;
 		return;
 	}
-	if (def_strcmp(self->name, "char")) {
+	if (basic_strcmp(self->name, "char")) {
 		char* tmp;
 		MALLOC(char, 1, tmp);
-		def_bin_copy(tmp, data, sizeof(char), 0);
+		basic_bin_copy(tmp, data, sizeof(char), 0);
 		*(ptr + index) = tmp;
 		return;
 	}
-	if (def_strcmp(self->name, "int")) {
+	if (basic_strcmp(self->name, "int")) {
 		int* tmp;
 		MALLOC(int, 1, tmp);
-		def_bin_copy(tmp, data, sizeof(int), 0);
+		basic_bin_copy(tmp, data, sizeof(int), 0);
 		*(ptr + index) = tmp;
 		return;
 	}
-	if (def_strcmp(self->name, "size_t")) {
+	if (basic_strcmp(self->name, "size_t")) {
 		size_t* tmp;
 		MALLOC(size_t, 1, tmp);
-		def_bin_copy(tmp, data, sizeof(size_t), 0);
+		basic_bin_copy(tmp, data, sizeof(size_t), 0);
 		*(ptr + index) = tmp;
 		return;
 	}
-	if (def_strcmp(self->name, "String")) {
+	if (basic_strcmp(self->name, "String")) {
 		String* str = data;
 		*(ptr + index) = str->objectIF->clone(data);
 		return;
@@ -207,13 +191,4 @@ private_fun size_t Array_length(void* obj)
 	if (!obj) return 0;
 	o_Array* this = ((Array*)obj)->self;
 	return this->length;
-}
-
-/* array helper functions */
-private_fun boolean Array_isAllowedType(const char* cmp)
-{
-	for (size_t i = 0; i < array_datatype_list_length; ++i) {
-		if (def_strcmp(array_datatype_list[i], cmp)) return true;
-	}
-	return false;
 }

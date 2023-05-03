@@ -37,8 +37,8 @@ String* String_ctor(const char* text)
 
 	this->super = super;
 	self->sub = NULL;
-	self->length = def_strlen(text);
-	self->str = def_strcpy(text);
+	self->length = basic_strlen(text);
+	self->str = basic_strcpy(text);
 
 	return this;
 }
@@ -85,5 +85,5 @@ private_fun void String_setText(void* obj, const char* text)
 	String* this = obj;
 	o_String* self = this->self;
 	FREE(self->str);
-	self->str = def_strcpy(text);
+	self->str = basic_strcpy(text);
 }
