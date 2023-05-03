@@ -58,12 +58,14 @@ char* def_trim_filename(char* filename);
 #define DEBUG_MALLOC(data_type, size, ptr) (ptr) = malloc(sizeof(data_type) * (size)); \
 if(!ptr) mem_fail(); \
 def_pointerDebugList_add((void*)ptr); \
+fprintf(stdout, "%s\n", def_line); \
 fprintf(stdout, "#%zu.:\n", def_counter()); \
 fprintf(stdout, "Malloc: Datatype: '%s' Amount: %zu Bytes: %zu\nIn File: %s\nAt Line: '%d'\n", #data_type, size, sizeof(data_type), def_trim_filename(__FILE__), __LINE__); \
 fprintf(stdout, "Pointer adress: 0x%p\n", ptr); \
 fprintf(stdout, "%s\n", def_line); \
 
-#define DEBUG_REALLOC(data_type, size, old_ptr) fprintf(stdout, "#%zu.:\n", def_counter()); \
+#define DEBUG_REALLOC(data_type, size, old_ptr) fprintf(stdout, "%s\n", def_line); \
+fprintf(stdout, "#%zu.:\n", def_counter()); \
 fprintf(stdout, "Old Pointer address: 0x%p\n", old_ptr); \
 data_type* ptr0 = realloc((void*)old_ptr, sizeof(data_type) * (size)); \
 if(!ptr0) mem_fail(); \

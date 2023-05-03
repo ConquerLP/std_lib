@@ -12,6 +12,7 @@ char* basic_datatype_list[BASIC_DATATYPE_LENGTH] = {
 
 boolean basic_isAllowedType(const char* cmp)
 {
+	if (!cmp) return false;
 	for (size_t i = 0; i < BASIC_DATATYPE_LENGTH; ++i) {
 		if (basic_strcmp(basic_datatype_list[i], cmp)) return true;
 	}

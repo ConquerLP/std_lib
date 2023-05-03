@@ -55,10 +55,7 @@ private_fun void String_dtor(void* obj)
 	FREE(this->stringIF);
 	FREE(self->str);
 
-	Object* tmp = Object_ctor("");
-	tmp->objectIF->dtor(this->super);
-	tmp->objectIF->dtor(tmp);
-
+	Object_dtor(this->super);
 	FREE(self);
 	FREE(this);
 }
@@ -67,14 +64,16 @@ private_fun char* String_toString(void* obj)
 {
 	if (!obj) return NULL;
 	String* this = obj;
-	return ((o_String*)this->self)->str;
+	o_String* self = this->self;
+	return self->str;
 }
 
 private_fun void* String_clone(void* obj)
 {
 	if (!obj) return NULL;
 	String* this = obj;
-	String* new = String_ctor(((o_String*)this->self)->str);
+	o_String* self = this->self;
+	String* new = String_ctor(self->str);
 	return new;
 }
 

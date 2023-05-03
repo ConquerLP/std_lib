@@ -51,13 +51,24 @@ List* List_ctor(const char* name)
 	this->self = self;
 	this->listIF = thisIF;
 
-	//function links
-	//listIF->...
+	thisIF->get = &List_get;
+	thisIF->set = &List_set;
+	thisIF->append = &List_append;
+	thisIF->clear = &List_clear;
+	thisIF->insert = &List_insert;
+	thisIF->delete = &List_delete;
+	thisIF->find = &List_find;
+	thisIF->addAll = &List_addAll;
+	thisIF->isEmpty = &List_isEmpty;
+	thisIF->size = &List_size;
+	thisIF->subList = &List_subList;
 
 	this->objectIF = super->objectIF;
 	this->super = super;
 
-	//super functions links
+	super->objectIF->clone = &List_clone;
+	super->objectIF->dtor = &List_dtor;
+	super->objectIF->toString = &List_toString;
 
 	self->sub = NULL;
 	self->length = 0;
@@ -72,9 +83,50 @@ List* List_ctor(const char* name)
 /* List methods */
 
 /* overriding object methods */
-private_fun char* List_toString(void* obj);
-private_fun void List_dtor(void* obj);
-private_fun void* List_clone(void* obj);
+private_fun char* List_toString(void* obj)
+{
+	if (!obj) return NULL;
+	List* this = obj;
+	o_List* self = this->self;
+	FREE(self->toString);
+	char* tmp;
+	MALLOC(char, 100, tmp);
+	basic_memset(tmp, '\0', 100);
+	snprintf(tmp, 100, "This List contains: %zu '%s's", self->length, self->name);
+	self->toString = basic_strcpy(tmp);
+	FREE(tmp);
+	return self->toString;
+}
+
+private_fun void List_dtor(void* obj)
+{
+	if (!obj) return;
+	List* this = obj;
+	o_List* self = this->self;
+	List_clear(obj);
+	self->head = NULL;
+	self->tail = NULL;
+	FREE(self->name);
+	FREE(self->toString);
+	self->sub = NULL;
+	FREE(self);
+
+	FREE(this->listIF);
+	this->self = NULL;
+	Object_dtor(this->super);
+	FREE(this);
+}
+
+private_fun void* List_clone(void* obj)
+{
+	if (!obj) return NULL;
+	List* this = obj;
+	o_List* self = this->self;
+	List* clone = List_ctor(self->name);
+	if (!clone) return NULL;
+	List_addAll(clone, this);
+	return clone;
+}
 
 /* List only methods */
 private_fun void* List_get(void* obj, size_t index)
@@ -153,9 +205,10 @@ private_fun void List_append(void* obj, void* data)
 		tail->next = node;
 		node->prev = tail;
 		node->next = NULL;
+		self->tail = node;
 	}
 	self->length++;
-	List_set(obj, data, self->length);
+	List_set(obj, data, self->length - 1);
 }
 
 private_fun void List_clear(void* obj)
@@ -200,37 +253,59 @@ private_fun void List_delete(void* obj, size_t index)
 	else {
 		FREE(node->data);
 	}
+
 	//rearrange the nodes, head, tail
-	if (node == self->head) {
+	if (node->prev) {
 		if (node->next) {
-			node->next->prev = NULL;
-			self->head = node->next;
-			node->next = NULL;
-			node->prev = NULL;
+			node->prev->next = node->next;
+			node->next->prev = node->prev;
+		}
+		else {
+			node->prev->next = NULL;
+			self->tail = node->prev;
 		}
 	}
-	else if (node == self->tail) {
-		node->prev->next = NULL;
-		self->tail = node->prev;
-		node->next = NULL;
-		node->prev = NULL;
-	}
 	else {
-		node->prev->next = node->next;
-		node->next->prev = node->prev;
-		node->next = NULL;
-		node->prev = NULL;
+		self->head = node->next;
+		if(node->next) node->next->prev = NULL;
 	}
+	node->next = NULL;
+	node->prev = NULL;
 	FREE(node);
 	self->length--;
 }
 
 private_fun size_t List_find(void* obj, void* toFind)
 {
-	
+	if (!obj) return -1;
+	if (!toFind) return -1;
+	List* this = obj;
+	o_List* self = this->self;
+	if (self->length == 0) return -1;
+	Node* tmp = self->head;
+	if (toFind == tmp->data) return 0;
+	for (size_t i = 0; i < self->length; ++i) {
+		if (tmp->data == toFind) return i;
+	}
+	return -1;
 }
 
-private_fun void List_addAll(void* obj, void* listToAdd);
+private_fun void List_addAll(void* obj, void* listToAdd)
+{
+	if (!obj) return;
+	if (!listToAdd) return;
+	List* this = obj;
+	o_List* self = this->self;
+	List* list_add = listToAdd;
+	o_List* list_add_self = list_add->self;
+	if (list_add_self->length == 0) return;
+	if (!basic_strcmp(self->name, list_add_self->name)) return;
+	Node* tmp = list_add_self->head;
+	for (size_t i = 0; i < list_add_self->length; ++i) {
+		List_append(obj, tmp->data);
+		tmp = tmp->next;
+	}
+}
 
 private_fun boolean List_isEmpty(void* obj)
 {
@@ -249,7 +324,25 @@ private_fun size_t List_size(void* obj)
 	return self->length;
 }
 
-private_fun List* List_subList(void* obj, size_t start, size_t end);
+private_fun List* List_subList(void* obj, size_t start, size_t end)
+{
+	if (!obj) return NULL;
+	if (start < 0) return NULL;
+	if (start > end) return NULL;
+	List* this = obj;
+	o_List* self = this->self;
+	List* sub = List_ctor(self->name);
+	if (end > self->length) end = self->length;
+	if (start == end) {
+		List_append(sub, List_get(obj, start));
+	}
+	else {
+		for (size_t i = start; i < end; ++i) {
+			List_append(sub, List_get(obj, i));
+		}
+	}
+	return sub;
+}
 
 /* helper functions */
 private_fun Node* List_getNode(List* this, size_t index)
@@ -258,12 +351,12 @@ private_fun Node* List_getNode(List* this, size_t index)
 	if (index < 0) return NULL;
 	o_List* self = this->self;
 	if (self->length == 0) return NULL;
-	if (index == 0) self->head;
-	if (index >= self->length) return self->tail;
+	if (index == 0) return self->head;
+	if (index == self->length) return self->tail;
+	if (index > self->length) return NULL;
 	Node* tmp = self->head;
-	for (size_t i = 0; i < self->length; ++i) {
+	for (size_t i = 0; i < index; ++i) {
 		tmp = tmp->next;
 	}
 	return tmp;
-
 }

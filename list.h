@@ -22,7 +22,7 @@ typedef struct {
 	void (*addAll)(void* obj, void* listToAdd);
 	boolean (*isEmpty)(void* obj);
 	size_t (*size)(void* obj);
-	struct _List (*subList)(void* obj, size_t start, size_t end);
+	struct _List* (*subList)(void* obj, size_t start, size_t end);
 }ListIF;
 
 typedef struct _List {
