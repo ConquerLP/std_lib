@@ -265,4 +265,5 @@ private_fun Node* List_getNode(List* this, size_t index)
 		tmp = tmp->next;
 	}
 	return tmp;
+
 }
