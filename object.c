@@ -6,7 +6,6 @@
 /* methods prototypes */
 private_fun char* Object_toString(void* obj);
 private_fun void* Object_clone(void* obj);
-private_fun void Object_dtor(void* obj);
 
 void delete(void* obj)
 {
@@ -36,7 +35,7 @@ Object* Object_ctor(const char* name)
 
 /* Object methods */
 
-private_fun void Object_dtor(void* obj)
+void Object_dtor(void* obj)
 {
 	if (!obj) return;
 	Object* this = obj;

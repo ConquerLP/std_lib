@@ -9,4 +9,6 @@ typedef struct {
 	char* name;
 }o_Object;
 
+void Object_dtor(void* obj);
+
 #endif

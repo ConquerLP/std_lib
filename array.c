@@ -105,9 +105,7 @@ private_fun void Array_dtor(void* array)
 	FREE(self);
 
 	FREE(this->arrayIF);
-	Object* tmp = Object_ctor("");
-	tmp->objectIF->dtor(this->super);
-	tmp->objectIF->dtor(tmp);
+	Object_dtor(this->super);
 	FREE(this);
 }
 
