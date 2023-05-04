@@ -11,6 +11,7 @@
 private_fun char* String_toString(void* obj);
 private_fun void* String_clone(void* obj);
 private_fun void String_dtor(void* obj);
+private_fun boolean String_equals(void* obj, void* obj2);
 
 private_fun void String_setText(void* obj, const char* text);
 
@@ -33,6 +34,7 @@ String* String_ctor(const char* text)
 	super->objectIF->toString = &String_toString;
 	super->objectIF->clone = &String_clone;
 	super->objectIF->dtor = &String_dtor;
+	super->objectIF->equals = &String_equals;
 	thisIF->setText = &String_setText;
 
 	this->super = super;
@@ -48,9 +50,7 @@ String* String_ctor(const char* text)
 /* overriding object methods */
 private_fun void String_dtor(void* obj)
 {
-	if (!obj) return;
-	String* this = obj;
-	o_String* self = this->self;
+	CAST(String, obj, , );
 
 	FREE(this->stringIF);
 	FREE(self->str);
@@ -62,27 +62,29 @@ private_fun void String_dtor(void* obj)
 
 private_fun char* String_toString(void* obj)
 {
-	if (!obj) return NULL;
-	String* this = obj;
-	o_String* self = this->self;
+	CAST(String, obj, NULL, );
 	return self->str;
 }
 
 private_fun void* String_clone(void* obj)
 {
-	if (!obj) return NULL;
-	String* this = obj;
-	o_String* self = this->self;
+	CAST(String, obj, NULL, );
 	String* new = String_ctor(self->str);
 	return new;
+}
+
+private_fun boolean String_equals(void* obj, void* obj2)
+{
+	CAST(String, obj, false, );
+	CAST(String, obj2, false, 1);
+	if (basic_strcmp(self->str, self1->str)) return true;
+	return false;
 }
 
 /* string only methods */
 private_fun void String_setText(void* obj, const char* text)
 {
-	if (!obj) return;
-	String* this = obj;
-	o_String* self = this->self;
+	CAST(String, obj, , );
 	FREE(self->str);
 	self->str = basic_strcpy(text);
 }

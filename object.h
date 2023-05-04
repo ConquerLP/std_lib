@@ -2,10 +2,13 @@
 
 #define OBJECT_H
 
+#include "def.h"
+
 typedef struct _ObjectIF {
 	char* (*toString)(void* obj);
 	void* (*clone)(void* obj);
 	void (*dtor)(void* obj);
+	boolean (*equals)(void* obj, void* obj2);
 }ObjectIF;
 
 typedef struct _Object {

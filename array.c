@@ -13,11 +13,61 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* MACROS */
+
+#define ARRAY_SET_PRIMITIVE(datatype) \
+	if(basic_strcmp(self->name, #datatype)) { \
+		datatype* tmp; \
+		MALLOC(datatype, 1, tmp); \
+		basic_bin_copy(tmp, data, sizeof(datatype), 0); \
+		*(ptr + index) = tmp; \
+		return; \
+	} \
+
+#define ARRAY_SET_CLASS(datatype) \
+	if(basic_strcmp(self->name, #datatype)) { \
+		datatype* tmp = data; \
+		*(ptr + index) = tmp->objectIF->clone(data); \
+		return; \
+	} \
+
+#define ARRAY_CMP_PRIMITIVE(datatype) \
+	if(basic_strcmp(self->name, #datatype)) { \
+		datatype* tmp; \
+		datatype* tmp1; \
+		for (size_t i = 0; i < Array_length(this); ++i) { \
+			tmp = Array_get(this, i); \
+			tmp1 = Array_get(this1, i); \
+			if(!tmp) return false; \
+			if(!tmp1) return false; \
+			if (*tmp != *tmp1) return false; \
+			} \
+		return true; \
+	} \
+
+#define ARRAY_CMP_CLASS(datatype) \
+	if(basic_strcmp(self->name, #datatype)) { \
+		datatype* tmp; \
+		datatype* tmp1; \
+		for (size_t i = 0; i < Array_length(this); ++i) { \
+			tmp = Array_get(this, i); \
+			tmp1 = Array_get(this1, i); \
+			if(!tmp) return false; \
+			if(!tmp1) return false; \
+			if (!tmp->objectIF->equals(tmp, tmp1)) return false; \
+		} \
+		return true; \
+	} \
+
+
 /* function prototypes */
+/* overriding methods */ 
 private_fun char* Array_toString(void* obj);
 private_fun void* Array_clone(void* obj);
-private_fun void Array_dtor(void* array);
+private_fun void Array_dtor(void* obj);
+private_fun boolean Array_equals(void* obj, void* obj2);
 
+/* methods */
 private_fun void* Array_get(void* obj, size_t index);
 private_fun void Array_set(void* obj, void* data, size_t index);
 private_fun size_t Array_length(void* obj);
@@ -51,6 +101,7 @@ Array* Array_ctor(const char* name, size_t length)
 	super->objectIF->clone = &Array_clone;
 	super->objectIF->toString = &Array_toString;
 	super->objectIF->dtor = &Array_dtor;
+	super->objectIF->equals = &Array_equals;
 
 	this->super = super;
 	self->sub = NULL;
@@ -69,9 +120,7 @@ Array* Array_ctor(const char* name, size_t length)
 /* overriding object methods */
 private_fun char* Array_toString(void* obj)
 {
-	if (!obj) return NULL;
-	Array* this = obj;
-	o_Array* self = this->self;
+	CAST(Array, obj, NULL, );
 	FREE(self->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
@@ -82,14 +131,12 @@ private_fun char* Array_toString(void* obj)
 	return self->toString;
 }
 
-private_fun void Array_dtor(void* array)
+private_fun void Array_dtor(void* obj)
 {
-	if (!array) return;
-	Array* this = array;
-	o_Array* self = this->self;
+	CAST(Array, obj, , );
 	void** ptr = self->arr;
 
-	for (size_t i = 0; i < this->arrayIF->length(array); ++i) {
+	for (size_t i = 0; i < this->arrayIF->length(obj); ++i) {
 		if (basic_strcmp(self->name, "String")) {
 			delete(*(ptr + i));
 		}
@@ -111,9 +158,7 @@ private_fun void Array_dtor(void* array)
 
 private_fun void* Array_clone(void* obj)
 {
-	if (!obj) return NULL;
-	Array* this = obj;
-	o_Array* self = this->self;
+	CAST(Array, obj, NULL, );
 	Array* clone = Array_ctor(self->name, self->length);
 	for (size_t i = 0; i < self->length; ++i) {
 		clone->arrayIF->set(clone, this->arrayIF->get(this, i), i);
@@ -121,72 +166,55 @@ private_fun void* Array_clone(void* obj)
 	return clone;
 }
 
-/* array only methods */
-private_fun void* Array_get(void* arr, size_t index)
+private_fun boolean Array_equals(void* obj, void* obj2)
 {
-	if (!arr) return NULL;
+	CAST(Array, obj, false, );
+	CAST(Array, obj, false, 1);
+
+	if (!basic_strcmp(self->name, self1->name)) return false;
+	if (Array_length(self) != Array_length(self1)) return false;
+
+	ARRAY_CMP_PRIMITIVE(double);
+	ARRAY_CMP_PRIMITIVE(float);
+	ARRAY_CMP_PRIMITIVE(char);
+	ARRAY_CMP_PRIMITIVE(int);
+	ARRAY_CMP_PRIMITIVE(size_t);
+
+	ARRAY_CMP_CLASS(String);
+
+	return false;
+}
+
+/* array only methods */
+private_fun void* Array_get(void* obj, size_t index)
+{
+	CAST(Array, obj, NULL, );
 	if (index < 0) return NULL;
-	Array* this = arr;
-	o_Array* self = this->self;
 	void** ptr = self->arr;
 	if (index >= self->length) return NULL;
 	return *(ptr + index);
 }
 
-private_fun void Array_set(void* arr, void* data, size_t index)
+private_fun void Array_set(void* obj, void* data, size_t index)
 {
-	if (!arr) return;
 	if (!data) return;
 	if (index < 0) return;
-	Array* this = arr;
-	o_Array* self = this->self;
+	CAST(Array, obj, , );
 	if (index >= self->length) return;
 	void** ptr = self->arr;
-	if (basic_strcmp(self->name, "double")) {
-		double* tmp;
-		MALLOC(double, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(double), 0);
-		*(ptr + index) = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "float")) {
-		float* tmp;
-		MALLOC(float, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(float), 0);
-		*(ptr + index) = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "char")) {
-		char* tmp;
-		MALLOC(char, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(char), 0);
-		*(ptr + index) = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "int")) {
-		int* tmp;
-		MALLOC(int, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(int), 0);
-		*(ptr + index) = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "size_t")) {
-		size_t* tmp;
-		MALLOC(size_t, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(size_t), 0);
-		*(ptr + index) = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "String")) {
-		String* str = data;
-		*(ptr + index) = str->objectIF->clone(data);
-		return;
-	}
+
+	ARRAY_SET_PRIMITIVE(double);
+	ARRAY_SET_PRIMITIVE(float);
+	ARRAY_SET_PRIMITIVE(char);
+	ARRAY_SET_PRIMITIVE(int);
+	ARRAY_SET_PRIMITIVE(size_t);
+
+	ARRAY_SET_CLASS(String);
+
 }
 
 private_fun size_t Array_length(void* obj)
 {
-	if (!obj) return 0;
-	o_Array* this = ((Array*)obj)->self;
-	return this->length;
+	CAST(Array, obj, 0, );
+	return self->length;
 }

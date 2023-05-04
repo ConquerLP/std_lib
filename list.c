@@ -12,11 +12,58 @@
 
 #include <stdlib.h>
 
+/* MACROS */
+#define LIST_COMPARE_ELEMENT(datatype) \
+	if (basic_strcmp(self->name, #datatype)) { \
+		datatype* a = NULL; \
+		datatype* b = NULL; \
+		for (size_t i = 0; i < self->length; ++i) { \
+			a = List_get(this, i); \
+			b = List_get(this1, i); \
+			if(!a) return false; \
+			if(!b) return false; \
+			if (*a != *b) return false; \
+		} \
+		return true; \
+	} \
+
+#define LIST_COMPARE_ELEMENT_CLASS(datatype) \
+	if (basic_strcmp(self->name, #datatype)) { \
+		datatype* a = NULL; \
+		datatype* b = NULL; \
+		for (size_t i = 0; i < self->length; ++i) { \
+			a = List_get(this, i); \
+			b = List_get(this, i); \
+			if(!a) return false; \
+			if(!b) return false; \
+			if (!a->objectIF->equals(a, b)) return false; \
+		} \
+		return true; \
+	} \
+
+#define LIST_SET_ELEMENT(datatype) \
+	if (basic_strcmp(self->name, #datatype)) { \
+		datatype* tmp; \
+		MALLOC(datatype, 1, tmp); \
+		basic_bin_copy(tmp, data, sizeof(datatype), 0); \
+		node->data = tmp; \
+		return; \
+	} \
+
+#define LIST_SET_ELEMENT_CLASS(datatype) \
+	if (basic_strcmp(self->name, #datatype)) { \
+		datatype* ptr = data; \
+		node->data = ptr->objectIF->clone(data); \
+		return; \
+	} \
+	
+
 /* function prototypes */
 /* overriding methods */
 private_fun char* List_toString(void* obj);
 private_fun void List_dtor(void* obj);
 private_fun void* List_clone(void* obj);
+private_fun boolean List_equals(void* obj, void* obj2);
 /* methods */
 private_fun void* List_get(void* obj, size_t index);
 private_fun void List_set(void* obj, void* data, size_t index);
@@ -69,6 +116,7 @@ List* List_ctor(const char* name)
 	super->objectIF->clone = &List_clone;
 	super->objectIF->dtor = &List_dtor;
 	super->objectIF->toString = &List_toString;
+	super->objectIF->equals = &List_equals;
 
 	self->sub = NULL;
 	self->length = 0;
@@ -85,9 +133,7 @@ List* List_ctor(const char* name)
 /* overriding object methods */
 private_fun char* List_toString(void* obj)
 {
-	if (!obj) return NULL;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, NULL, );
 	FREE(self->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
@@ -100,9 +146,7 @@ private_fun char* List_toString(void* obj)
 
 private_fun void List_dtor(void* obj)
 {
-	if (!obj) return;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, , );
 	List_clear(obj);
 	self->head = NULL;
 	self->tail = NULL;
@@ -119,79 +163,63 @@ private_fun void List_dtor(void* obj)
 
 private_fun void* List_clone(void* obj)
 {
-	if (!obj) return NULL;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, NULL, );
 	List* clone = List_ctor(self->name);
 	if (!clone) return NULL;
 	List_addAll(clone, this);
 	return clone;
 }
 
+private_fun boolean List_equals(void* obj, void* obj2)
+{
+	CAST(List, obj, false, );
+	CAST(List, obj2, false, 1);
+	if (!basic_strcmp(self->name, self1->name)) return false;
+	if (List_size(self) != List_size(self1)) return false;
+
+	//primitive types
+
+	LIST_COMPARE_ELEMENT(double);
+	LIST_COMPARE_ELEMENT(float);
+	LIST_COMPARE_ELEMENT(char);
+	LIST_COMPARE_ELEMENT(int);
+	LIST_COMPARE_ELEMENT(size_t);
+
+	//classes
+	LIST_COMPARE_ELEMENT_CLASS(String);
+
+	return false;
+}
+
 /* List only methods */
 private_fun void* List_get(void* obj, size_t index)
 {
-	if (!obj) return NULL;
-	List* this = obj;
+	CAST(List, obj, NULL, );
 	return List_getNode(this, index)->data;
 }
 
 private_fun void List_set(void* obj, void* data, size_t index)
 {
-	if (!obj) return;
 	if (!data) return;
-	List* this = obj;
+	CAST(List, obj, , );
 	Node* node = List_getNode(this, index);
 	if (!node) return;
-	o_List* self = this->self;
-	if (basic_strcmp(self->name, "double")) {
-		double* tmp;
-		MALLOC(double, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(double), 0);
-		node->data = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "float")) {
-		float* tmp;
-		MALLOC(float, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(float), 0);
-		node->data = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "char")) {
-		char* tmp;
-		MALLOC(char, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(char), 0);
-		node->data = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "int")) {
-		int* tmp;
-		MALLOC(int, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(int), 0);
-		node->data = tmp;
-		return;
-	}
-	if (basic_strcmp(self->name, "size_t")) {
-		size_t* tmp;
-		MALLOC(size_t, 1, tmp);
-		basic_bin_copy(tmp, data, sizeof(size_t), 0);
-		node->data = tmp;
-		return;
-	}	
-	if (basic_strcmp(self->name, "String")) {
-		String* str = data;
-		node->data = str->objectIF->clone(data);
-		return;
-	}
+
+	//primitive types
+	LIST_SET_ELEMENT(double);
+	LIST_SET_ELEMENT(float);
+	LIST_SET_ELEMENT(char);
+	LIST_SET_ELEMENT(int);
+	LIST_SET_ELEMENT(size_t);
+
+	// classes
+	LIST_SET_ELEMENT_CLASS(String);
 }
 
 private_fun void List_append(void* obj, void* data)
 {
-	if (!obj) return;
 	if (!data) return;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, , );
 	Node* node;
 	MALLOC(Node, 1, node);
 	if (self->length == 0) {
@@ -213,9 +241,7 @@ private_fun void List_append(void* obj, void* data)
 
 private_fun void List_clear(void* obj)
 {
-	if (!obj) return;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, , );
 	while (self->length != 0) {
 		List_delete(obj, self->length);
 	}
@@ -223,10 +249,8 @@ private_fun void List_clear(void* obj)
 
 private_fun void List_insert(void* obj, void* data, size_t index)
 {
-	if (!obj) return;
 	if (!data) return;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, , );
 	Node* node = List_getNode(this, index);
 	if (!node) return;
 	Node* new;
@@ -240,11 +264,9 @@ private_fun void List_insert(void* obj, void* data, size_t index)
 
 private_fun void List_delete(void* obj, size_t index)
 {
-	if (!obj) return;
-	List* this = obj;
+	CAST(List, obj, , );
 	Node* node = List_getNode(this, index);
 	if (!node) return;
-	o_List* self = this->self;
 	//classes
 	if (basic_strcmp(self->name, "String")) {
 		delete(node->data);
@@ -277,10 +299,8 @@ private_fun void List_delete(void* obj, size_t index)
 
 private_fun size_t List_find(void* obj, void* toFind)
 {
-	if (!obj) return -1;
+	CAST(List, obj, -1, );
 	if (!toFind) return -1;
-	List* this = obj;
-	o_List* self = this->self;
 	if (self->length == 0) return -1;
 	Node* tmp = self->head;
 	if (toFind == tmp->data) return 0;
@@ -292,10 +312,8 @@ private_fun size_t List_find(void* obj, void* toFind)
 
 private_fun void List_addAll(void* obj, void* listToAdd)
 {
-	if (!obj) return;
+	CAST(List, obj, , );
 	if (!listToAdd) return;
-	List* this = obj;
-	o_List* self = this->self;
 	List* list_add = listToAdd;
 	o_List* list_add_self = list_add->self;
 	if (list_add_self->length == 0) return;
@@ -309,28 +327,22 @@ private_fun void List_addAll(void* obj, void* listToAdd)
 
 private_fun boolean List_isEmpty(void* obj)
 {
-	if (!obj) return true;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, true, );
 	if (self->length == 0) return true;
 	else return false;
 }
 
 private_fun size_t List_size(void* obj)
 {
-	if (!obj) return 0;
-	List* this = obj;
-	o_List* self = this->self;
+	CAST(List, obj, 0, );
 	return self->length;
 }
 
 private_fun List* List_subList(void* obj, size_t start, size_t end)
 {
-	if (!obj) return NULL;
+	CAST(List, obj, NULL, );
 	if (start < 0) return NULL;
 	if (start > end) return NULL;
-	List* this = obj;
-	o_List* self = this->self;
 	List* sub = List_ctor(self->name);
 	if (end > self->length) end = self->length;
 	if (start == end) {

@@ -10,6 +10,13 @@ extern "C"
 #include "def.h"
 #include "object.h"
 
+#define CAST(datatype, ptr, _return, n) datatype* this##n = NULL; \
+	o_##datatype* self##n = NULL; \
+	if(!ptr) return _return; \
+	this##n = ptr; \
+	self##n = this##n->self;
+
+
 /* list of allowed datatypes in the array & list */
 #define BASIC_DATATYPE_LENGTH 6
 extern char* basic_datatype_list[BASIC_DATATYPE_LENGTH];

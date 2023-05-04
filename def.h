@@ -15,7 +15,7 @@ extern "C"
 
 #define DEF_DEBUG false
 
-#define PRINT_DEBUG_MEMORY ;
+#define PRINT_DEBUG_MEMORY //PRINT_DEBUG_MEMORY
 
 #include <stdlib.h>
 #include <stdio.h>
