@@ -14,7 +14,7 @@ extern "C"
 typedef struct {
 	void (*setText)(void* obj, const char* text);
 	char (*charAt)(void* obj, size_t index);
-	struct _String(*stringAt)(void* obj, size_t index);
+	struct _String (*stringAt)(void* obj, size_t index);
 	struct _String* (*substring)(void* obj, size_t start, size_t end);
 	size_t(*length)(void* obj);
 	void (*toLowerCase)(void* obj);
