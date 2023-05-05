@@ -32,6 +32,13 @@ typedef struct {
 	void (*replaceAllCharOffset)(void* obj, char old, char new, size_t offset);
 	void (*replaceFirstCharOffset)(void* obj, char old, char new, size_t offset);
 	void (*replaceLastCharOffset)(void* obj, char old, char new, size_t offset);
+	//
+	void (*removeAllChar)(void* obj, char old);
+	void (*removeFirstChar)(void* obj, char old);
+	void (*removeLastChar)(void* obj, char old);
+	void (*removeAllCharOffset)(void* obj, char old, size_t offset);
+	void (*removeFirstCharOffset)(void* obj, char old, size_t offset);
+	void (*removeLastCharOffset)(void* obj, char old, size_t offset);
 
 	boolean(*containsSubstring)(void* obj, void* str);
 	boolean(*containsSubstringOffset)(void* obj, void* str, size_t offset);
@@ -48,6 +55,13 @@ typedef struct {
 	void (*replaceAllSubstringOffset)(void* obj, void* sub, size_t offset);
 	void (*replaceFirstSubstringOffset)(void* obj, void* sub, size_t offset);
 	void (*replaceLastSubstringOffset)(void* obj, void* sub, size_t offset);
+	//
+	void (*removeAllSubstring)(void* obj, void* sub);
+	void (*removeFirstSubstring)(void* obj, void* sub);
+	void (*removeLastSubstring)(void* obj, void* sub);
+	void (*removeAllSubstringOffset)(void* obj, void* sub, size_t offset);
+	void (*removeFirstSubstringOffset)(void* obj, void* sub, size_t offset);
+	void (*removeLastSubstringOffset)(void* obj, void* sub, size_t offset);
 
 	boolean(*compare)(void* str1, void* str2);
 	boolean(*compareIgnCase)(void* str1, void* str2);

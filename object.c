@@ -39,7 +39,7 @@ Object* Object_ctor(const char* name)
 
 void Object_dtor(void* obj)
 {
-	CAST(Object, obj, , );
+	CAST_OBJECT(obj, , );
 	FREE(this->objectIF);
 	FREE(self->name);
 	FREE(this->self);
@@ -48,7 +48,7 @@ void Object_dtor(void* obj)
 
 private_fun char* Object_toString(void* obj)
 {
-	CAST(Object, obj, NULL, );
+	CAST_OBJECT(obj, NULL, );
 	return self->name;
 }
 
@@ -60,8 +60,8 @@ private_fun void* Object_clone(void* obj)
 
 private_fun boolean Object_equals(void* obj, void* obj2)
 {
-	CAST(Object, obj, false, );
-	CAST(Object, obj2, false, 1);
+	CAST_OBJECT(obj, false, );
+	CAST_OBJECT(obj2, false, 1);
 	if (basic_strcmp(self->name, self1->name)) return true;
 	return false;
 }

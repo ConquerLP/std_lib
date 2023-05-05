@@ -89,13 +89,10 @@ Array* Array_ctor(const char* name, size_t length)
 	MALLOC(ArrayIF, 1, thisIF);
 	MALLOC(o_Array, 1, self);
 
+	((o_Object*)super->self)->sub = this;
+	this->super = super;
 	this->self = self;
 	this->arrayIF = thisIF;
-
-	thisIF->get = &Array_get;
-	thisIF->set = &Array_set;
-	thisIF->length = &Array_length;
-
 	this->objectIF = super->objectIF;
 
 	super->objectIF->clone = &Array_clone;
@@ -103,7 +100,10 @@ Array* Array_ctor(const char* name, size_t length)
 	super->objectIF->dtor = &Array_dtor;
 	super->objectIF->equals = &Array_equals;
 
-	this->super = super;
+	thisIF->get = &Array_get;
+	thisIF->set = &Array_set;
+	thisIF->length = &Array_length;
+
 	self->sub = NULL;
 	self->length = length;
 

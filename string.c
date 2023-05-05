@@ -11,6 +11,7 @@
 /* Helper functions*/
 private_fun boolean String_cmpChar(char a, char b, boolean ignCase);
 private_fun char String_CharToLower(char a);
+private_fun char String_CharToUpper(char a);
 
 /* overriding methods */
 private_fun char* String_toString(void* obj);
@@ -87,9 +88,11 @@ String* String_ctor(const char* text)
 	MALLOC(StringIF, 1, thisIF);
 	MALLOC(o_String, 1, self);
 
-	this->self = self;
-	this->stringIF = thisIF;
-	this->objectIF = super->objectIF;
+	((o_Object*)super->self)->sub = this;
+	this->super = super; 
+	this->self = self; 
+	this->stringIF = thisIF; 
+	this->objectIF = super->objectIF; 
 
 	super->objectIF->toString = &String_toString;
 	super->objectIF->clone = &String_clone;
@@ -151,9 +154,7 @@ String* String_ctor(const char* text)
 	thisIF->setText = &String_parseFloat;
 	thisIF->setText = &String_parseInt;
 	thisIF->setText = &String_parseSize_t;
-
-
-	this->super = super;
+	
 	self->sub = NULL;
 	self->length = basic_strlen(text);
 	self->str = basic_strcpy(text);
@@ -214,16 +215,58 @@ private_fun char String_charAt(void* obj, size_t index)
 	return *(self->str + index);
 }
 
-private_fun String* String_stringAt(void* obj, size_t index);
-private_fun String* String_subString(void* obj, size_t start, size_t end);
+private_fun String* String_stringAt(void* obj, size_t index)
+{
+	CAST(String, obj, NULL, );
+	return String_subString(obj, index, self->length - 1);
+}
+private_fun String* String_subString(void* obj, size_t start, size_t end)
+{
+	CAST(String, obj, NULL, );
+	if (self->length <= 0) return NULL;
+	if (start > end) return NULL;
+	if (end >= self->length) return NULL;
+	if (start >= self->length) return NULL;
+	String* sub = String_ctor("0");
+	if (end == start) {
+		String_replaceFirstChar(obj, '0', String_charAt(obj, start));
+		return sub;
+	}
+	size_t sub_length = end - start + 1;
+	o_String* sub_self = sub->self;
+	sub_self->length = sub_length;
+	FREE(sub_self->str);
+	char* tmp;
+	MALLOC(char, sub_length, tmp);
+	//
+	for (size_t i = 0; i < sub_length; ++i) {
+		basic_memset(tmp, String_charAt(obj, i + start), 1);
+	}
+	basic_memset(tmp + sub_length, '\0', 1);
+	return sub;
+}
+
 private_fun size_t String_length(void* obj)
 {
 	CAST(String, obj, -1, );
 	return self->length;
 }
 
-private_fun void String_toLowerCase(void* obj);
-private_fun void String_toUpperCase(void* obj);
+private_fun void String_toLowerCase(void* obj)
+{
+	CAST(String, obj, , );
+	for (size_t i = 0; i < self->length; ++i) {
+		basic_memset(self->str + i, String_CharToLower(String_charAt(this, i)), 1);
+	}
+}
+
+private_fun void String_toUpperCase(void* obj)
+{
+	CAST(String, obj, , );
+	for (size_t i = 0; i < self->length; ++i) {
+		basic_memset(self->str + i, String_CharToUpper(String_charAt(this, i)) , 1);
+	}
+}
 
 private_fun boolean String_containsChar(void* obj, char c)
 {
@@ -396,12 +439,57 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, size_t o
 private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, size_t offset);
 private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, size_t offset);
 
-private_fun boolean String_compare(void* obj, void* str2);
-private_fun boolean String_compareIgnCase(void* obj, void* str2);
-private_fun boolean Stringis_Empty(void* obj);
+private_fun boolean String_compare(void* obj, void* str2)
+{
+	CAST(String, obj, false, );
+	CAST(String, str2, false, 1);
+	return basic_strcmp(self->str, self1->str);
+}
 
-private_fun void String_append(void* str1, void* str2);
-private_fun void String_trim(void* obj);
+private_fun boolean String_compareIgnCase(void* obj, void* str2)
+{
+	CAST(String, obj, false, );
+	CAST(String, str2, false, 1);
+	String* a = String_clone(obj);
+	String* b = String_clone(str2);
+
+	String_toLowerCase(a);
+	String_toLowerCase(b);
+
+	boolean result = basic_strcmp(a->objectIF->toString(a), b->objectIF->toString(b));
+	delete(a);
+	delete(b);
+
+	return result;
+}
+
+private_fun boolean String_isEmpty(void* obj)
+{
+	CAST(String, obj, true, );
+	if (self->length <= 0) return true;
+	else return false;
+}
+
+private_fun void String_append(void* str1, void* str2)
+{
+	CAST(String, str1, , );
+	CAST(String, str1, , 1);
+	size_t new_length = self->length + self1->length - 1;
+	self->length = new_length;
+	char* copy_str1 = basic_strcpy(self->str);
+	FREE(self->str);
+	char* self_str;
+	MALLOC(char, new_length, self_str);
+	basic_bin_copy(self_str, copy_str1, basic_strlen(copy_str1) - 1, 0);
+	basic_bin_copy(self_str, self1->str, self1->length, basic_strlen(copy_str1) - 1);
+	FREE(copy_str1);
+}
+
+private_fun void String_trim(void* obj)
+{
+	CAST(String, obj, , );
+	//String_
+}
 
 private_fun String* String_doubleToString(double value);
 private_fun String* String_floatToString(float value);
@@ -427,6 +515,14 @@ private_fun boolean String_cmpChar(char a, char b, boolean ignCase)
 }
 
 private_fun char String_CharToLower(char a) 
+{
+	if (a >= 97 && a < 122) {
+		return a - 32;
+	}
+	else return a;
+}
+
+private_fun char String_CharToUpper(char a)
 {
 	if (a >= 97 && a < 122) {
 		return a - 32;

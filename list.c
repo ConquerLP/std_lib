@@ -95,8 +95,16 @@ List* List_ctor(const char* name)
 	MALLOC(ListIF, 1, thisIF);
 	MALLOC(o_List, 1, self);
 
+	((o_Object*)super->self)->sub = this;
+	this->super = super;
 	this->self = self;
 	this->listIF = thisIF;
+	this->objectIF = super->objectIF;
+
+	super->objectIF->clone = &List_clone;
+	super->objectIF->dtor = &List_dtor;
+	super->objectIF->toString = &List_toString;
+	super->objectIF->equals = &List_equals;
 
 	thisIF->get = &List_get;
 	thisIF->set = &List_set;
@@ -109,14 +117,6 @@ List* List_ctor(const char* name)
 	thisIF->isEmpty = &List_isEmpty;
 	thisIF->size = &List_size;
 	thisIF->subList = &List_subList;
-
-	this->objectIF = super->objectIF;
-	this->super = super;
-
-	super->objectIF->clone = &List_clone;
-	super->objectIF->dtor = &List_dtor;
-	super->objectIF->toString = &List_toString;
-	super->objectIF->equals = &List_equals;
 
 	self->sub = NULL;
 	self->length = 0;
