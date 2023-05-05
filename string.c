@@ -1,6 +1,9 @@
 #include "string.h"
 #include "string.r"
 
+#include "array.h"
+#include "array.r"
+
 #include "def.h"
 #include "basic.h"
 
@@ -34,6 +37,8 @@ private_fun size_t String_findFirstChar(void* obj, char c);
 private_fun size_t String_findLastChar(void* obj, char c);
 private_fun size_t String_findLastCharOffset(void* obj, char c, size_t offset);
 private_fun size_t String_findFirstCharOffset(void* obj, char c, size_t offset);
+private_fun Array* String_findAllChar(void* obj, char c);
+private_fun Array* String_findAllCharOffset(void* obj, char c, size_t offset);
 
 private_fun void String_replaceAllChar(void* obj, char old, char new);
 private_fun void String_replaceFirstChar(void* obj, char old, char new);
@@ -41,6 +46,13 @@ private_fun void String_replaceLastChar(void* obj, char old, char new);
 private_fun void String_replaceAllCharOffset(void* obj, char old, char new, size_t offset);
 private_fun void String_replaceFirstCharOffset(void* obj, char old, char new, size_t offset);
 private_fun void String_replaceLastCharOffset(void* obj, char old, char new, size_t offset);
+
+private_fun void String_removeAllChar(void* obj, char old);
+private_fun void String_removeFirstChar(void* obj, char old);
+private_fun void String_removeLastChar(void* obj, char old);
+private_fun void String_removeAllCharOffset(void* obj, char old, size_t offset);
+private_fun void String_removeFirstCharOffset(void* obj, char old, size_t offset);
+private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset);
 
 private_fun boolean String_containsSubstring(void* obj, void* str);
 private_fun boolean String_containsSubstringOffset(void* obj, void* str, size_t offset);
@@ -51,6 +63,7 @@ private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t off
 private_fun Array* String_findAllSubstrings(void* obj, void* str);
 private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset);
 private_fun Array* String_split(void* obj, void* str);
+
 private_fun void String_replaceAllSubstring(void* obj, void* sub);
 private_fun void String_replaceFirstSubstring(void* obj, void* sub);
 private_fun void String_replaceLastSubstring(void* obj, void* sub);
@@ -58,9 +71,16 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, size_t o
 private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, size_t offset);
 private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, size_t offset);
 
+private_fun void String_removeAllSubstring(void* obj, void* sub);
+private_fun void String_removeFirstSubstring(void* obj, void* sub);
+private_fun void String_removeLastSubstring(void* obj, void* sub);
+private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t offset);
+
 private_fun boolean String_compare(void* obj, void* str2);
 private_fun boolean String_compareIgnCase(void* obj, void* str2);
-private_fun boolean Stringis_Empty(void* obj);
+private_fun boolean String_isEmpty(void* obj);
 
 private_fun void String_append(void* str1, void* str2);
 private_fun void String_trim(void* obj);
@@ -114,6 +134,8 @@ String* String_ctor(const char* text)
 	thisIF->setText = &String_findLastChar;
 	thisIF->setText = &String_findLastCharOffset;
 	thisIF->setText = &String_findFirstCharOffset;
+	thisIF->setText = &String_findAllChar;
+	thisIF->setText = &String_findAllCharOffset;
 
 	thisIF->setText = &String_replaceAllChar;
 	thisIF->setText = &String_replaceFirstChar;
@@ -121,6 +143,13 @@ String* String_ctor(const char* text)
 	thisIF->setText = &String_replaceAllCharOffset;
 	thisIF->setText = &String_replaceFirstCharOffset;
 	thisIF->setText = &String_replaceLastCharOffset;
+
+	thisIF->setText = &String_removeAllChar;
+	thisIF->setText = &String_removeFirstChar;
+	thisIF->setText = &String_removeLastChar;
+	thisIF->setText = &String_removeAllCharOffset;
+	thisIF->setText = &String_removeFirstCharOffset;
+	thisIF->setText = &String_removeLastCharOffset;
 
 	thisIF->setText = &String_containsSubstring;
 	thisIF->setText = &String_containsSubstringOffset;
@@ -131,6 +160,7 @@ String* String_ctor(const char* text)
 	thisIF->setText = &String_findAllSubstrings;
 	thisIF->setText = &String_findAllSubstringsOffset;
 	thisIF->setText = &String_split;
+
 	thisIF->setText = &String_replaceAllSubstring;
 	thisIF->setText = &String_replaceFirstSubstring;
 	thisIF->setText = &String_replaceLastSubstring;
@@ -138,9 +168,16 @@ String* String_ctor(const char* text)
 	thisIF->setText = &String_replaceFirstSubstringOffset;
 	thisIF->setText = &String_replaceLastSubstringOffset;
 
+	thisIF->setText = &String_removeAllSubstring;
+	thisIF->setText = &String_removeFirstSubstring;
+	thisIF->setText = &String_removeLastSubstring;
+	thisIF->setText = &String_removeAllSubstringOffset;
+	thisIF->setText = &String_removeFirstSubstringOffset;
+	thisIF->setText = &String_removeLastSubstringOffset;
+
 	thisIF->setText = &String_compare;
 	thisIF->setText = &String_compareIgnCase;
-	thisIF->setText = &Stringis_Empty;
+	thisIF->setText = &String_isEmpty;
 
 	thisIF->setText = &String_append;
 	thisIF->setText = &String_trim;
@@ -238,11 +275,9 @@ private_fun String* String_subString(void* obj, size_t start, size_t end)
 	FREE(sub_self->str);
 	char* tmp;
 	MALLOC(char, sub_length, tmp);
-	//
-	for (size_t i = 0; i < sub_length; ++i) {
-		basic_memset(tmp, String_charAt(obj, i + start), 1);
-	}
-	basic_memset(tmp + sub_length, '\0', 1);
+	basic_bin_copy(tmp, self->str, sub_length - 1, start);
+	basic_memset(tmp + sub_length - 1, '\0', 1);
+	sub_self->str = tmp;
 	return sub;
 }
 
@@ -317,6 +352,36 @@ private_fun size_t String_findFirstCharOffset(void* obj, char c, size_t offset)
 	return j;
 }
 
+private_fun Array* String_findAllChar(void* obj, char c)
+{
+	return String_findAllCharOffset(obj, c, 0);
+}
+
+private_fun Array* String_findAllCharOffset(void* obj, char c, size_t offset)
+{
+	CAST(String, obj, NULL, );
+	if (offset < 0) return NULL;
+	if (offset >= self->length) return NULL;
+	size_t count = 0;
+	for (size_t i = 0; i < self->length; ++i) {
+		if (String_charAt(obj, i) == c) count++;
+	}
+	if (count == 0) return NULL;
+	Array* arr = Array_ctor("size_t", count);
+	size_t* tmp;
+	MALLOC(size_t, 1, tmp);
+	*tmp = 0;
+	for (size_t i = offset, j = 0; i < self->length; ++i) {
+		if (String_charAt(obj, i) == c) {
+			*tmp = i;
+			arr->arrayIF->set(arr, tmp, j);
+			j++;
+		}
+	}
+	FREE(tmp);
+	return arr;
+}
+
 private_fun void String_replaceAllChar(void* obj, char old, char new)
 {
 	String_replaceAllCharOffset(obj, old, new, 0);
@@ -355,6 +420,93 @@ private_fun void String_replaceLastCharOffset(void* obj, char old, char new, siz
 	size_t index = String_findLastCharOffset(obj, old, 0);
 	if (index >= self->length) return;
 	basic_memset(self->str + index, new, 1);
+}
+
+private_fun void String_removeAllChar(void* obj, char old)
+{
+	String_removeAllCharOffset(obj, old, 0);
+}
+
+private_fun void String_removeFirstChar(void* obj, char old)
+{
+	String_removeFirstCharOffset(obj, old, 0);
+}
+
+private_fun void String_removeLastChar(void* obj, char old)
+{
+	String_removeFirstCharOffset(obj, old, 0);
+}
+
+private_fun void String_removeAllCharOffset(void* obj, char old, size_t offset)
+{
+	CAST(String, obj, , );
+	if (offset >= self->length) return;
+	if (offset <= 0) return;
+	if (self->length == 0) return;
+	size_t count = 0;
+	char* tmp;
+	MALLOC(char, self->length, tmp);
+	basic_bin_copy(tmp, self->str, offset, 0);
+	for (size_t i = offset; i < self->length; ++i) {
+		if (String_charAt(obj, i) == old) {
+			count++;
+			continue;
+		}
+		basic_memset(tmp + i, String_charAt(obj, i + count), 1);
+	}
+	REALLOC(char, self->length - count, tmp);
+	basic_memset(tmp + self->length - count - 1, '\0', 1);
+	self->length -= count;
+	FREE(self->str);
+	self->str = tmp;
+}
+
+private_fun void String_removeFirstCharOffset(void* obj, char old, size_t offset)
+{
+	CAST(String, obj, , );
+	if (offset >= self->length) return;
+	if (offset <= 0) return;
+	if (self->length == 0) return;
+	size_t count = 0;
+	char* tmp;
+	MALLOC(char, self->length, tmp);
+	basic_bin_copy(tmp, self->str, offset, 0);
+	for (size_t i = offset; i < self->length; ++i) {
+		if (String_charAt(obj, i) == old && count == 0) {
+			count++;
+			continue;
+		}
+		basic_memset(tmp + i, String_charAt(obj, i + count), 1);
+	}
+	REALLOC(char, self->length - count, tmp);
+	basic_memset(tmp + self->length - count - 1, '\0', 1);
+	self->length -= count;
+	FREE(self->str);
+	self->str = tmp;
+}
+
+private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
+{
+	CAST(String, obj, , );
+	if (offset >= self->length) return;
+	if (offset <= 0) return;
+	if (self->length == 0) return;
+	size_t count = 0;
+	char* tmp;
+	MALLOC(char, self->length, tmp);
+	basic_bin_copy(tmp, self->str, offset, 0);
+	for (size_t i = self->length - 1; i >= offset; --i) {
+		if (String_charAt(obj, i) == old && count == 0) {
+			count++;
+			continue;
+		}
+		basic_memset(tmp + i, String_charAt(obj, i - count), 1);
+	}
+	REALLOC(char, self->length - count, tmp);
+	basic_memset(tmp + self->length - count - 1, '\0', 1);
+	self->length -= count;
+	FREE(self->str);
+	self->str = tmp;
 }
 
 private_fun boolean String_containsSubstring(void* obj, void* str)
@@ -429,6 +581,7 @@ private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t off
 	}
 	return -1;
 }
+
 private_fun Array* String_findAllSubstrings(void* obj, void* str);
 private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset);
 private_fun Array* String_split(void* obj, void* str);
@@ -438,6 +591,13 @@ private_fun void String_replaceLastSubstring(void* obj, void* sub);
 private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, size_t offset);
 private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, size_t offset);
 private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, size_t offset);
+
+private_fun void String_removeAllSubstring(void* obj, void* sub);
+private_fun void String_removeFirstSubstring(void* obj, void* sub);
+private_fun void String_removeLastSubstring(void* obj, void* sub);
+private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t offset);
 
 private_fun boolean String_compare(void* obj, void* str2)
 {
@@ -450,17 +610,8 @@ private_fun boolean String_compareIgnCase(void* obj, void* str2)
 {
 	CAST(String, obj, false, );
 	CAST(String, str2, false, 1);
-	String* a = String_clone(obj);
-	String* b = String_clone(str2);
 
-	String_toLowerCase(a);
-	String_toLowerCase(b);
-
-	boolean result = basic_strcmp(a->objectIF->toString(a), b->objectIF->toString(b));
-	delete(a);
-	delete(b);
-
-	return result;
+	return basic_strcmpIgnCase(self->str, self1->str);
 }
 
 private_fun boolean String_isEmpty(void* obj)
@@ -516,15 +667,15 @@ private_fun boolean String_cmpChar(char a, char b, boolean ignCase)
 
 private_fun char String_CharToLower(char a) 
 {
-	if (a >= 97 && a < 122) {
-		return a - 32;
+	if (a >= 65 && a < 91) {
+		return a + 32;
 	}
 	else return a;
 }
 
 private_fun char String_CharToUpper(char a)
 {
-	if (a >= 97 && a < 122) {
+	if (a >= 97 && a < 123) {
 		return a - 32;
 	}
 	else return a;

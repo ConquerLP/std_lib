@@ -26,13 +26,15 @@ typedef struct {
 	size_t(*findLastChar)(void* obj, char c);
 	size_t(*findLastCharOffset)(void* obj, char c, size_t offset);
 	size_t(*findFirstCharOffset)(void* obj, char c, size_t offset);
+	Array* (*findAllChar)(void* obj, char c);
+	Array* (*findAllCharOffset)(void* obj, char c, size_t offset);
 	void (*replaceAllChar)(void* obj, char old, char new);
 	void (*replaceFirstChar)(void* obj, char old, char new);
 	void (*replaceLastChar)(void* obj, char old, char new);
 	void (*replaceAllCharOffset)(void* obj, char old, char new, size_t offset);
 	void (*replaceFirstCharOffset)(void* obj, char old, char new, size_t offset);
 	void (*replaceLastCharOffset)(void* obj, char old, char new, size_t offset);
-	//
+	
 	void (*removeAllChar)(void* obj, char old);
 	void (*removeFirstChar)(void* obj, char old);
 	void (*removeLastChar)(void* obj, char old);
@@ -55,7 +57,7 @@ typedef struct {
 	void (*replaceAllSubstringOffset)(void* obj, void* sub, size_t offset);
 	void (*replaceFirstSubstringOffset)(void* obj, void* sub, size_t offset);
 	void (*replaceLastSubstringOffset)(void* obj, void* sub, size_t offset);
-	//
+	
 	void (*removeAllSubstring)(void* obj, void* sub);
 	void (*removeFirstSubstring)(void* obj, void* sub);
 	void (*removeLastSubstring)(void* obj, void* sub);

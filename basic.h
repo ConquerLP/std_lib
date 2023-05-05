@@ -39,6 +39,7 @@ boolean basic_isAllowedType(const char* cmp);
 /* Helper functions */
 size_t basic_strlen(const char* str);
 boolean basic_strcmp(const char* s1, const char* s2);
+boolean basic_strcmpIgnCase(const char* s1, const char* s2);
 char* basic_strcpy(const char* str);
 void basic_bin_copy(void* dest, void* source, size_t bytes, size_t offset);
 void basic_memset(void* dest, char c, size_t length);

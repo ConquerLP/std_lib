@@ -40,6 +40,24 @@ boolean basic_strcmp(const char* s1, const char* s2)
 	return true;
 }
 
+boolean basic_strcmpIgnCase(const char* s1, const char* s2)
+{
+	if (!s1) return false;
+	if (!s2) return false;
+	if (basic_strlen(s1) != basic_strlen(s2)) return false;
+	char a = *s1, b = *s2;
+	for (size_t i = 0; i < basic_strlen(s1); ++i) {
+		if (*(s1 + i) >= 97 && *(s1 + i) < 123) {
+			a = *(s1 + i) - 32;
+		}
+		if (*(s2 + i) >= 97 && *(s2 + i) < 123) {
+			b = *(s2 + i) - 32;
+		}
+		if (a != b) return false;
+	}
+	return true;
+}
+
 char* basic_strcpy(const char* str)
 {
 	if (!str) return NULL;
