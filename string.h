@@ -22,6 +22,8 @@ typedef struct {
 
 	boolean(*containsChar)(void* obj, char c);
 	boolean(*containsCharOffset)(void* obj, char c, size_t offset);
+	size_t(*countOccurencesChar)(void* obj, char c);
+	size_t(*countOccurencesCharOffset)(void* obj, char c, size_t offset);
 	size_t(*findFirstChar)(void* obj, char c);
 	size_t(*findLastChar)(void* obj, char c);
 	size_t(*findLastCharOffset)(void* obj, char c, size_t offset);
@@ -44,6 +46,8 @@ typedef struct {
 
 	boolean(*containsSubstring)(void* obj, void* str);
 	boolean(*containsSubstringOffset)(void* obj, void* str, size_t offset);
+	size_t(*countSubstringOccurences)(void* obj, void* str);
+	size_t(*countSubstringOccurencesOffset)(void* obj, void* str, size_t offset);
 	size_t(*findFirstString)(void* obj, void* str);
 	size_t(*findLastString)(void* obj, void* str);
 	size_t(*findLastStringOffset)(void* obj, void* str, size_t offset);
@@ -51,12 +55,12 @@ typedef struct {
 	Array* (*findAllSubstrings)(void* obj, void* str);
 	Array* (*findAllSubstringsOffset)(void* obj, void* str, size_t offset);
 	Array* (*split)(void* obj, void* str);
-	void (*replaceAllSubstring)(void* obj, void* sub);
-	void (*replaceFirstSubstring)(void* obj, void* sub);
-	void (*replaceLastSubstring)(void* obj, void* sub);
-	void (*replaceAllSubstringOffset)(void* obj, void* sub, size_t offset);
-	void (*replaceFirstSubstringOffset)(void* obj, void* sub, size_t offset);
-	void (*replaceLastSubstringOffset)(void* obj, void* sub, size_t offset);
+	void (*replaceAllSubstring)(void* obj, void* sub, void* replacement);
+	void (*replaceFirstSubstring)(void* obj, void* sub, void* replacement);
+	void (*replaceLastSubstring)(void* obj, void* sub, void* replacement);
+	void (*replaceAllSubstringOffset)(void* obj, void* replacement, void* sub, size_t offset);
+	void (*replaceFirstSubstringOffset)(void* obj, void* replacement, void* sub, size_t offset);
+	void (*replaceLastSubstringOffset)(void* obj, void* replacement, void* sub, size_t offset);
 	
 	void (*removeAllSubstring)(void* obj, void* sub);
 	void (*removeFirstSubstring)(void* obj, void* sub);

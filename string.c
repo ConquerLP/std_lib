@@ -33,6 +33,8 @@ private_fun void String_toUpperCase(void* obj);
 
 private_fun boolean String_containsChar(void* obj, char c);
 private_fun boolean String_containsCharOffset(void* obj, char c, size_t offset);
+private_fun size_t String_countOccurencesChar(void* obj, char c);
+private_fun size_t String_countOccurencesCharOffset(void* obj, char c, size_t offset);
 private_fun size_t String_findFirstChar(void* obj, char c);
 private_fun size_t String_findLastChar(void* obj, char c);
 private_fun size_t String_findLastCharOffset(void* obj, char c, size_t offset);
@@ -56,6 +58,8 @@ private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
 
 private_fun boolean String_containsSubstring(void* obj, void* str);
 private_fun boolean String_containsSubstringOffset(void* obj, void* str, size_t offset);
+private_fun size_t String_countSubstringOccurences(void* obj, void* str);
+private_fun size_t String_countSubstringOccurencesOffset(void* obj, void* str, size_t offset);
 private_fun size_t String_findFirstString(void* obj, void* str);
 private_fun size_t String_findLastString(void* obj, void* str);
 private_fun size_t String_findLastStringOffset(void* obj, void* str, size_t offset);
@@ -64,12 +68,12 @@ private_fun Array* String_findAllSubstrings(void* obj, void* str);
 private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset);
 private_fun Array* String_split(void* obj, void* str);
 
-private_fun void String_replaceAllSubstring(void* obj, void* sub);
-private_fun void String_replaceFirstSubstring(void* obj, void* sub);
-private_fun void String_replaceLastSubstring(void* obj, void* sub);
-private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, size_t offset);
-private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, size_t offset);
-private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement);
+private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replacement);
+private_fun void String_replaceLastSubstring(void* obj, void* sub, void* replacement);
+private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
+private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
+private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
 
 private_fun void String_removeAllSubstring(void* obj, void* sub);
 private_fun void String_removeFirstSubstring(void* obj, void* sub);
@@ -121,76 +125,80 @@ String* String_ctor(const char* text)
 
 	thisIF->setText = &String_setText;
 
-	thisIF->setText = &String_charAt;
-	thisIF->setText = &String_stringAt;
-	thisIF->setText = &String_subString;
-	thisIF->setText = &String_length;
-	thisIF->setText = &String_toLowerCase;
-	thisIF->setText = &String_toUpperCase;
+	thisIF->charAt = &String_charAt;
+	thisIF->stringAt = &String_stringAt;
+	thisIF->substring = &String_subString;
+	thisIF->length = &String_length;
+	thisIF->toLowerCase = &String_toLowerCase;
+	thisIF->toUpperCase = &String_toUpperCase;
 
-	thisIF->setText = &String_containsChar;
-	thisIF->setText = &String_containsCharOffset;
-	thisIF->setText = &String_findFirstChar;
-	thisIF->setText = &String_findLastChar;
-	thisIF->setText = &String_findLastCharOffset;
-	thisIF->setText = &String_findFirstCharOffset;
-	thisIF->setText = &String_findAllChar;
-	thisIF->setText = &String_findAllCharOffset;
+	thisIF->containsChar = &String_containsChar;
+	thisIF->containsCharOffset = &String_containsCharOffset;
+	thisIF->countOccurencesChar = &String_countOccurencesChar;
+	thisIF->countOccurencesCharOffset = &String_countOccurencesCharOffset;
+	thisIF->findFirstChar = &String_findFirstChar;
+	thisIF->findLastChar = &String_findLastChar;
+	thisIF->findLastCharOffset = &String_findLastCharOffset;
+	thisIF->findFirstCharOffset = &String_findFirstCharOffset;
+	thisIF->findAllChar = &String_findAllChar;
+	thisIF->findAllCharOffset = &String_findAllCharOffset;
 
-	thisIF->setText = &String_replaceAllChar;
-	thisIF->setText = &String_replaceFirstChar;
-	thisIF->setText = &String_replaceLastChar;
-	thisIF->setText = &String_replaceAllCharOffset;
-	thisIF->setText = &String_replaceFirstCharOffset;
-	thisIF->setText = &String_replaceLastCharOffset;
+	thisIF->replaceAllChar = &String_replaceAllChar;
+	thisIF->replaceFirstChar = &String_replaceFirstChar;
+	thisIF->replaceLastChar = &String_replaceLastChar;
+	thisIF->replaceAllCharOffset = &String_replaceAllCharOffset;
+	thisIF->replaceFirstCharOffset = &String_replaceFirstCharOffset;
+	thisIF->replaceLastCharOffset = &String_replaceLastCharOffset;
 
-	thisIF->setText = &String_removeAllChar;
-	thisIF->setText = &String_removeFirstChar;
-	thisIF->setText = &String_removeLastChar;
-	thisIF->setText = &String_removeAllCharOffset;
-	thisIF->setText = &String_removeFirstCharOffset;
-	thisIF->setText = &String_removeLastCharOffset;
+	thisIF->removeAllChar = &String_removeAllChar;
+	thisIF->removeFirstChar = &String_removeFirstChar;
+	thisIF->removeLastChar = &String_removeLastChar;
+	thisIF->removeAllCharOffset = &String_removeAllCharOffset;
+	thisIF->removeFirstCharOffset = &String_removeFirstCharOffset;
+	thisIF->removeLastCharOffset = &String_removeLastCharOffset;
 
-	thisIF->setText = &String_containsSubstring;
-	thisIF->setText = &String_containsSubstringOffset;
-	thisIF->setText = &String_findFirstString;
-	thisIF->setText = &String_findLastString;
-	thisIF->setText = &String_findLastStringOffset;
-	thisIF->setText = &String_findFirstStringOffset;
-	thisIF->setText = &String_findAllSubstrings;
-	thisIF->setText = &String_findAllSubstringsOffset;
-	thisIF->setText = &String_split;
+	thisIF->containsSubstring = &String_containsSubstring;
+	thisIF->containsSubstringOffset = &String_containsSubstringOffset;
+	thisIF->countSubstringOccurences = &String_countSubstringOccurences;
+	thisIF->countSubstringOccurencesOffset = &String_countSubstringOccurencesOffset;
+	thisIF->findFirstString = &String_findFirstString;
+	thisIF->findLastString = &String_findLastString;
+	thisIF->findLastStringOffset = &String_findLastStringOffset;
+	thisIF->findFirstStringOffset = &String_findFirstStringOffset;
+	thisIF->findAllSubstrings = &String_findAllSubstrings;
+	thisIF->findAllSubstringsOffset = &String_findAllSubstringsOffset;
+	thisIF->split = &String_split;
 
-	thisIF->setText = &String_replaceAllSubstring;
-	thisIF->setText = &String_replaceFirstSubstring;
-	thisIF->setText = &String_replaceLastSubstring;
-	thisIF->setText = &String_replaceAllSubstringOffset;
-	thisIF->setText = &String_replaceFirstSubstringOffset;
-	thisIF->setText = &String_replaceLastSubstringOffset;
+	thisIF->replaceAllSubstring = &String_replaceAllSubstring;
+	thisIF->replaceFirstSubstring = &String_replaceFirstSubstring;
+	thisIF->replaceLastSubstring = &String_replaceLastSubstring;
+	thisIF->replaceAllSubstringOffset = &String_replaceAllSubstringOffset;
+	thisIF->replaceFirstSubstringOffset = &String_replaceFirstSubstringOffset;
+	thisIF->replaceLastSubstringOffset = &String_replaceLastSubstringOffset;
 
-	thisIF->setText = &String_removeAllSubstring;
-	thisIF->setText = &String_removeFirstSubstring;
-	thisIF->setText = &String_removeLastSubstring;
-	thisIF->setText = &String_removeAllSubstringOffset;
-	thisIF->setText = &String_removeFirstSubstringOffset;
-	thisIF->setText = &String_removeLastSubstringOffset;
+	thisIF->removeAllSubstring = &String_removeAllSubstring;
+	thisIF->removeFirstSubstring = &String_removeFirstSubstring;
+	thisIF->removeLastSubstring = &String_removeLastSubstring;
+	thisIF->removeAllSubstringOffset = &String_removeAllSubstringOffset;
+	thisIF->removeFirstSubstringOffset = &String_removeFirstSubstringOffset;
+	thisIF->removeLastSubstringOffset = &String_removeLastSubstringOffset;
 
-	thisIF->setText = &String_compare;
-	thisIF->setText = &String_compareIgnCase;
-	thisIF->setText = &String_isEmpty;
+	thisIF->compare = &String_compare;
+	thisIF->compareIgnCase = &String_compareIgnCase;
+	thisIF->isEmpty = &String_isEmpty;
 
-	thisIF->setText = &String_append;
-	thisIF->setText = &String_trim;
+	thisIF->append = &String_append;
+	thisIF->trim = &String_trim;
 
-	thisIF->setText = &String_doubleToString;
-	thisIF->setText = &String_floatToString;
-	thisIF->setText = &String_intToString;
-	thisIF->setText = &String_size_tToString;
+	thisIF->doubleToString = &String_doubleToString;
+	thisIF->floatToString = &String_floatToString;
+	thisIF->intToString = &String_intToString;
+	thisIF->size_tToString = &String_size_tToString;
 
-	thisIF->setText = &String_parseDouble;
-	thisIF->setText = &String_parseFloat;
-	thisIF->setText = &String_parseInt;
-	thisIF->setText = &String_parseSize_t;
+	thisIF->parseDouble = &String_parseDouble;
+	thisIF->parseFloat = &String_parseFloat;
+	thisIF->parseInt = &String_parseInt;
+	thisIF->parseSize_t = &String_parseSize_t;
 	
 	self->sub = NULL;
 	self->length = basic_strlen(text);
@@ -317,6 +325,22 @@ private_fun boolean String_containsCharOffset(void* obj, char c, size_t offset)
 		if (String_cmpChar(String_charAt(this, i), c, false)) return true;
 	}
 	return false;
+}
+
+private_fun size_t String_countOccurencesChar(void* obj, char c)
+{
+	return String_countOccurencesCharOffset(obj, c, 0);
+}
+
+private_fun size_t String_countOccurencesCharOffset(void* obj, char c, size_t offset)
+{
+	CAST(String, obj, -1, );
+	if (offset >= self->length) return -1;
+	size_t count = 0;
+	for (size_t i = offset; i < self->length; ++i) {
+		if (String_charAt(obj, i) == c) count++;
+	}
+	return count;
 }
 
 private_fun size_t String_findFirstChar(void* obj, char c)
@@ -534,6 +558,28 @@ private_fun boolean String_containsSubstringOffset(void* obj, void* str, size_t 
 	return false;
 }
 
+private_fun size_t String_countSubstringOccurences(void* obj, void* str)
+{
+	return String_countSubstringOccurencesOffset(obj, str, 0);
+}
+
+private_fun size_t String_countSubstringOccurencesOffset(void* obj, void* str, size_t offset)
+{
+	CAST(String, obj, -1, );
+	CAST(String, obj, -1, 1);
+	if (offset >= self->length) return -1;
+	if (self1->length > self->length) return -1;
+	size_t count = 0;
+	size_t index = 0;
+	while (1) {
+		index = String_findFirstStringOffset(obj, str, offset);
+		if (index >= self->length) break;
+		offset = index + self1->length - 1;
+		count++;
+	}
+	return count;
+}
+
 private_fun size_t String_findFirstString(void* obj, void* str)
 {
 	return String_findFirstStringOffset(obj, str, 0);
@@ -582,15 +628,71 @@ private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t off
 	return -1;
 }
 
-private_fun Array* String_findAllSubstrings(void* obj, void* str);
-private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset);
+private_fun Array* String_findAllSubstrings(void* obj, void* str)
+{
+	return String_findAllSubstringsOffset(obj, str, 0);
+}
+
+private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset)
+{
+	CAST(String, obj, NULL, );
+	CAST(String, obj, NULL, 1);
+	Array* arr = Array_ctor("size_t", 0);
+	size_t index = 0;
+	while (1) {
+		index = String_findFirstStringOffset(obj, str, offset);
+		if (index >= self->length) break;
+		offset = index + self1->length - 1;
+		arr->arrayIF->resize(arr, arr->arrayIF->length(arr) + 1);
+		arr->arrayIF->set(arr, &index, arr->arrayIF->length(arr) - 1);
+	}
+	if (arr->arrayIF->length(arr) == 0) {
+		delete(arr);
+		return NULL;
+	}
+	return arr;
+}
+
 private_fun Array* String_split(void* obj, void* str);
-private_fun void String_replaceAllSubstring(void* obj, void* sub);
-private_fun void String_replaceFirstSubstring(void* obj, void* sub);
-private_fun void String_replaceLastSubstring(void* obj, void* sub);
-private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, size_t offset);
-private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, size_t offset);
-private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement);
+private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replacement);
+private_fun void String_replaceLastSubstring(void* obj, void* sub, void* replacement);
+private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* replacement, size_t offset)
+{
+	CAST(String, obj, , );
+	CAST(String, obj, , 1);
+	CAST(String, obj, , 2);
+	if (offset >= self->length) return;
+	if (self1->length > self->length) return;
+	size_t new_length_inc = self2->length - self->length;
+	size_t index = offset;
+	if (new_length_inc == 0) {
+		while (index < self->length) {
+			index = String_findFirstStringOffset(obj, sub, index);
+			if (index > self->length) return;
+			basic_bin_copy(self->str, self2->str, self2->length, index);
+		}
+		return;
+	}
+	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
+	char* tmp;
+	MALLOC(char, count * new_length_inc + self->length, tmp);
+	if (new_length_inc < 0) {
+		while (index < self->length) {
+			index = String_findFirstStringOffset(obj, sub, index);
+			if (index > self->length) return;
+			//basic_bin_copy(tmp, self->str, index, 0);
+			//basic_bin_copy(self->str, self2->str, self2->length, index);
+		}
+		return;
+	}
+	if (new_length_inc > 0) {
+
+	}
+}
+
+private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
+private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
 
 private_fun void String_removeAllSubstring(void* obj, void* sub);
 private_fun void String_removeFirstSubstring(void* obj, void* sub);
@@ -638,8 +740,10 @@ private_fun void String_append(void* str1, void* str2)
 
 private_fun void String_trim(void* obj)
 {
-	CAST(String, obj, , );
-	//String_
+	char* to_remcove = { " \n\t" };
+	for (size_t i = 0; i < basic_strlen(to_remcove); ++i) {
+		String_removeAllChar(obj, to_remcove[i]);
+	}
 }
 
 private_fun String* String_doubleToString(double value);

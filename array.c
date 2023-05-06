@@ -70,6 +70,7 @@ private_fun boolean Array_equals(void* obj, void* obj2);
 /* methods */
 private_fun void* Array_get(void* obj, size_t index);
 private_fun void Array_set(void* obj, void* data, size_t index);
+private_fun void Array_resize(void* obj, size_t new_length);
 private_fun size_t Array_length(void* obj);
 
 
@@ -103,6 +104,7 @@ Array* Array_ctor(const char* name, size_t length)
 	thisIF->get = &Array_get;
 	thisIF->set = &Array_set;
 	thisIF->length = &Array_length;
+	thisIF->resize = &Array_resize;
 
 	self->sub = NULL;
 	self->length = length;
@@ -217,4 +219,25 @@ private_fun size_t Array_length(void* obj)
 {
 	CAST(Array, obj, 0, );
 	return self->length;
+}
+
+private_fun void Array_resize(void* obj, size_t new_length)
+{
+	CAST(Array, obj, , );
+	if (new_length <= 0) return;
+	void** ptr = self->arr;
+	if (new_length < self->length) {
+		for (size_t i = new_length; i < self->length; ++i) {
+			if (basic_strcmp(self->name, "String")) {
+				delete(*(ptr + i));
+			}
+			//primitive types
+			else {
+				FREE(*(ptr + i));
+				continue;
+			}
+		}
+	}
+	REALLOC(void*, new_length, ptr);
+	self->length = new_length;
 }
