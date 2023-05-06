@@ -12,6 +12,7 @@ extern "C"
 
 typedef struct _ArrayIF {
 	void (*set)(void* obj, void* data, size_t index);
+	void (*resize)(void* obj, size_t new_length);
 	void* (*get)(void* obj, size_t index);
 	size_t(*length)(void* obj);
 }ArrayIF;
