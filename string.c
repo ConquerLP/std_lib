@@ -666,23 +666,20 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 	if (self1->length > self->length) return;
 	size_t new_length_inc = self2->length - self1->length;
 	size_t index = String_findFirstStringOffset(obj, sub, offset);
+	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
 	if (index > self->length) return;
 	if (new_length_inc == 0) {
-		while (index < self->length) {
+		for (size_t i = 0; i < count; ++i) {
 			basic_bin_copy(self->str, self2->str, self2->length, index);
 			index = String_findFirstStringOffset(obj, sub, index + self1->length - 1);
 		}
 		return;
 	}
-	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
+	
 	char* tmp;
 	MALLOC(char, count * new_length_inc + self->length, tmp);
 	if (new_length_inc < 0) {
-		while (index < self->length) {
-			basic_bin_copy(tmp, self->str, index, index);
-			basic_bin_copy(tmp, self2->str, self2->length, index);
-
-			index = String_findFirstStringOffset(obj, sub, index + self1->length - 1);
+		for (size_t i = 0; i < count; ++i) {
 
 		}
 		return;
@@ -695,12 +692,86 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
 private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
 
-private_fun void String_removeAllSubstring(void* obj, void* sub);
-private_fun void String_removeFirstSubstring(void* obj, void* sub);
-private_fun void String_removeLastSubstring(void* obj, void* sub);
-private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t offset);
-private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t offset);
-private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_removeAllSubstring(void* obj, void* sub)
+{
+	String_removeAllSubstringOffset(obj, sub, 0);
+}
+
+private_fun void String_removeFirstSubstring(void* obj, void* sub)
+{
+	String_removeFirstSubstringOffset(obj, sub, 0);
+}
+
+private_fun void String_removeLastSubstring(void* obj, void* sub)
+{
+	String_removeLastSubstringOffset(obj, sub, 0);
+}
+
+private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t offset)
+{
+	CAST(String, obj, , );
+	CAST(String, sub, , 1);
+	if (offset >= self->length) return;
+	if (self1->length > self->length) return;
+	if (self1->length == self->length && offset == 0) {
+		self->length = 0;
+		FREE(self->str);
+		self->str = basic_strcpy("");
+		return;
+	}
+	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
+	if (count == 0) return;
+	size_t new_size = (self1->length - 1) * count + self->length;
+	size_t start = 0;
+	size_t end = String_findFirstStringOffset(obj, sub, offset) + self1->length - start;
+	char* tmp;
+	MALLOC(char, new_size, tmp);
+	for (size_t i = 0; i < count; ++i) {
+		basic_bin_copy(tmp, self->str + start, end, start);
+		start = end;
+		offset = start;
+		end = String_findFirstStringOffset(obj, sub, offset) + self1->length - start;
+	}
+	FREE(self->str);
+	self->str = tmp;
+	self->length = new_size;
+}
+
+private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t offset)
+{
+	CAST(String, obj, , );
+	CAST(String, sub, , 1);
+	if (offset >= self->length) return;
+	if (self1->length > self->length) return;
+	size_t index = String_findFirstStringOffset(obj, sub, offset);
+	if (index >= self->length) return;
+	size_t new_size = self->length - self1->length;
+	char* tmp;
+	MALLOC(char, new_size, tmp);
+	basic_bin_copy(tmp, self->str, index, 0);
+	basic_bin_copy(tmp, self->str + index + self1->length, new_size - index, index);
+	FREE(self->str);
+	self->length = new_size;
+	self->str = tmp;
+}
+
+private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t offset)
+{
+	CAST(String, obj, , );
+	CAST(String, sub, , 1);
+	if (offset >= self->length) return;
+	if (self1->length > self->length) return;
+	size_t index = String_findLastStringOffset(obj, sub, offset);
+	if (index >= self->length) return;
+	size_t new_size = self->length - self1->length;
+	char* tmp;
+	MALLOC(char, new_size, tmp);
+	basic_bin_copy(tmp, self->str, index, 0);
+	basic_bin_copy(tmp, self->str + index + self1->length, new_size - index, index);
+	FREE(self->str);
+	self->length = new_size;
+	self->str = tmp;
+}
 
 private_fun boolean String_compare(void* obj, void* str2)
 {
