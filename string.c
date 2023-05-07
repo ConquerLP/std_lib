@@ -10,6 +10,8 @@
 #include "object.h"
 #include "object.r"
 
+#define TMP_CHAR_LENGTH 20
+
 /* function prototypes */
 /* Helper functions*/
 private_fun boolean String_cmpChar(char a, char b, boolean ignCase);
@@ -87,7 +89,7 @@ private_fun boolean String_compareIgnCase(void* obj, void* str2);
 private_fun boolean String_isEmpty(void* obj);
 
 private_fun void String_append(void* str1, void* str2);
-private_fun void String_trim(void* obj);
+private_fun void String_trim(void* obj, const char* toTrim);
 
 private_fun String* String_doubleToString(double value);
 private_fun String* String_floatToString(float value);
@@ -535,7 +537,7 @@ private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
 
 private_fun boolean String_containsSubstring(void* obj, void* str)
 {
-	String_containsSubstringOffset(obj, str, 0);
+	return String_containsSubstringOffset(obj, str, 0);
 }
 private_fun boolean String_containsSubstringOffset(void* obj, void* str, size_t offset)
 {
@@ -654,9 +656,22 @@ private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t o
 }
 
 private_fun Array* String_split(void* obj, void* str);
-private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement);
-private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replacement);
-private_fun void String_replaceLastSubstring(void* obj, void* sub, void* replacement);
+
+private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement)
+{
+	String_replaceAllSubstringOffset(obj, sub, replacement, 0);
+}
+
+private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replacement)
+{
+	String_replaceFirstSubstringOffset(obj, sub, replacement, 0);
+}
+
+private_fun void String_replaceLastSubstring(void* obj, void* sub, void* replacement)
+{
+	String_replaceLastSubstringOffset(obj, sub, replacement, 0);
+}
+
 private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* replacement, size_t offset)
 {
 	CAST(String, obj, , );
@@ -666,8 +681,8 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 	if (self1->length > self->length) return;
 	size_t new_length_inc = self2->length - self1->length;
 	size_t index = String_findFirstStringOffset(obj, sub, offset);
-	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
 	if (index > self->length) return;
+	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
 	if (new_length_inc == 0) {
 		for (size_t i = 0; i < count; ++i) {
 			basic_bin_copy(self->str, self2->str, self2->length, index);
@@ -675,22 +690,60 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 		}
 		return;
 	}
-	
 	char* tmp;
-	MALLOC(char, count * new_length_inc + self->length, tmp);
-	if (new_length_inc < 0) {
-		for (size_t i = 0; i < count; ++i) {
-
-		}
-		return;
+	size_t new_length = count * new_length_inc + self->length;
+	MALLOC(char, new_length, tmp);
+	basic_bin_copy(tmp, self->str, index, 0);
+	for (size_t i = 0; i < count; ++i) {
+		basic_bin_copy(tmp, self2->str, self2->length, index);
+		index = String_findFirstStringOffset(obj, sub, index + self1->length);
 	}
-	if (new_length_inc > 0) {
-
-	}
+	if(index >= self->length) index = String_findFirstStringOffset(obj, sub, offset);
+	basic_bin_copy(tmp, self->str + index + self1->length, self->length - index - count * self1->length, index + self2->length - 1);
+	FREE(self->str);
+	self->str = tmp;
+	self->length = new_length;
 }
 
-private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
-private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* replacement, size_t offset);
+private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* replacement, size_t offset)
+{
+	CAST(String, obj, , );
+	CAST(String, sub, , 1);
+	CAST(String, replacement, , 2);
+	if (offset >= self->length) return;
+	if (self1->length > self->length) return;
+	size_t new_length_inc = self2->length - self1->length;
+	size_t new_length = self->length + new_length_inc;
+	size_t index = String_findFirstStringOffset(obj, sub, offset);
+	char* tmp;
+	MALLOC(char, new_length, tmp);
+	basic_bin_copy(tmp, self->str, index, 0);
+	basic_bin_copy(tmp, self2->str, self2->length, index);
+	basic_bin_copy(tmp, self->str + index, self->length - index, index + self2->length);
+	FREE(self->str);
+	self->length = new_length;
+	self->str = tmp;
+}
+
+private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* replacement, size_t offset)
+{
+	CAST(String, obj, , );
+	CAST(String, sub, , 1);
+	CAST(String, replacement, , 2);
+	if (offset >= self->length) return;
+	if (self1->length > self->length) return;
+	size_t new_length_inc = self2->length - self1->length;
+	size_t new_length = self->length + new_length_inc;
+	size_t index = String_findLastStringOffset(obj, sub, offset);
+	char* tmp;
+	MALLOC(char, new_length, tmp);
+	basic_bin_copy(tmp, self->str, index, 0);
+	basic_bin_copy(tmp, self2->str, self2->length, index);
+	basic_bin_copy(tmp, self->str + index, self->length - index, index + self2->length);
+	FREE(self->str);
+	self->length = new_length;
+	self->str = tmp;
+}
 
 private_fun void String_removeAllSubstring(void* obj, void* sub)
 {
@@ -810,23 +863,115 @@ private_fun void String_append(void* str1, void* str2)
 	FREE(copy_str1);
 }
 
-private_fun void String_trim(void* obj)
+private_fun void String_trim(void* obj, const char* toTrim)
 {
-	char* to_remcove = { " \n\t" };
-	for (size_t i = 0; i < basic_strlen(to_remcove); ++i) {
-		String_removeAllChar(obj, to_remcove[i]);
+	for (size_t i = 0; i < basic_strlen(toTrim); ++i) {
+		String_removeAllChar(obj, toTrim[i]);
 	}
 }
 
-private_fun String* String_doubleToString(double value);
-private_fun String* String_floatToString(float value);
-private_fun String* String_intToString(int value);
-private_fun String* String_size_tToString(size_t value);
+private_fun String* String_doubleToString(double value)
+{
+	char buff[TMP_CHAR_LENGTH] = { 0 };
+	snprintf(buff, TMP_CHAR_LENGTH - 1, "%lf", value);
+	String* string = String_ctor(buff);
+	String_trim(string, "\0 ");
+	return string;
+}
 
-private_fun double String_parseDouble(void* obj);
-private_fun float String_parseFloat(void* obj);
-private_fun int String_parseInt(void* obj);
-private_fun size_t String_parseSize_t(void* obj);
+private_fun String* String_floatToString(float value)
+{
+	char buff[TMP_CHAR_LENGTH] = { 0 };
+	snprintf(buff, TMP_CHAR_LENGTH - 1, "%f", value);
+	String* string = String_ctor(buff);
+	String_trim(string, "\0 ");
+	return string;
+}
+
+private_fun String* String_intToString(int value) 
+{
+	char buff[TMP_CHAR_LENGTH] = { 0 };
+	snprintf(buff, TMP_CHAR_LENGTH - 1, "%i", value);
+	String* string = String_ctor(buff);
+	String_trim(string, "\0 ");
+	return string;
+}
+
+private_fun String* String_size_tToString(size_t value)
+{
+	char buff[TMP_CHAR_LENGTH] = { 0 };
+	snprintf(buff, TMP_CHAR_LENGTH - 1, "%zu", value);
+	String* string = String_ctor(buff);
+	String_trim(string, "\0 ");
+	return string;
+}
+
+private_fun double String_parseDouble(void* obj)
+{
+	CAST(String, obj, 0.0, );
+	char to_check[] = { "\t\0\n/*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz" };
+	for (size_t i = 0; i < basic_strlen(to_check); ++i) {
+		if (String_containsChar(obj, to_check[i])) return 0.0;
+	}
+	char check_doubles[] = { "-+." };
+	for (size_t i = 0; i < basic_strlen(check_doubles); ++i) {
+		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0.0;
+	}
+	if (String_charAt(obj, 0) == '-' && String_charAt(obj, 1) == '.') {
+		String* filter = String_ctor("-.");
+		String* filter_repalcement = String_ctor("-0.");
+		String_replaceFirstSubstring(obj, filter, filter_repalcement);
+		delete(filter);
+		delete(filter_repalcement);
+		return atof(self->str);
+	}
+	if (String_charAt(obj, 0) == '.') {
+		String* filter = String_ctor(".");
+		String* filter_repalcement = String_ctor("0.");
+		String_replaceFirstSubstring(obj, filter, filter_repalcement);
+		delete(filter);
+		delete(filter_repalcement);
+		return atof(self->str);
+	}
+	else return 0.0;
+}
+
+private_fun float String_parseFloat(void* obj)
+{
+	return String_parseDouble(obj);
+}
+
+private_fun int String_parseInt(void* obj)
+{
+	CAST(String, obj, 0, );
+	char to_check[] = { "\t\0\n/*.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz." };
+	for (size_t i = 0; i < basic_strlen(to_check); ++i) {
+		if (String_containsChar(obj, to_check[i])) return 0;
+	}
+	char check_doubles[] = { "-+" };
+	for (size_t i = 0; i < basic_strlen(check_doubles); ++i) {
+		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
+	}
+	return atoi(self->str);
+}
+
+private_fun size_t String_parseSize_t(void* obj)
+{
+	CAST(String, obj, 0, );
+	char to_check[] = { "\t\0\n/*.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz." };
+	for (size_t i = 0; i < basic_strlen(to_check); ++i) {
+		if (String_containsChar(obj, to_check[i])) return 0;
+	}
+	char check_doubles[] = { "-+" };
+	for (size_t i = 0; i < basic_strlen(check_doubles); ++i) {
+		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
+	}
+	size_t result = 0;
+	for (size_t i = 0; i < self->length; ++i) {
+		result = result * 10 + (self->str[i] - 48);
+	}
+	return result;
+}
 
 /* Helper functions */
 private_fun boolean String_cmpChar(char a, char b, boolean ignCase)

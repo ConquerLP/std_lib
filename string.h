@@ -14,7 +14,7 @@ extern "C"
 typedef struct {
 	void (*setText)(void* obj, const char* text);
 	char (*charAt)(void* obj, size_t index);
-	struct _String (*stringAt)(void* obj, size_t index);
+	struct _String* (*stringAt)(void* obj, size_t index);
 	struct _String* (*substring)(void* obj, size_t start, size_t end);
 	size_t(*length)(void* obj);
 	void (*toLowerCase)(void* obj);
@@ -74,7 +74,7 @@ typedef struct {
 	boolean(*isEmpty)(void* obj);
 
 	void (*append)(void* str1, void* str2);
-	void (*trim)(void* obj);
+	void (*trim)(void* obj, const char* toTrim);
 
 	struct _String* (*doubleToString)(double value);
 	struct _String* (*floatToString)(float value);
