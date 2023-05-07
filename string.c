@@ -68,7 +68,7 @@ private_fun size_t String_findLastStringOffset(void* obj, void* str, size_t offs
 private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t offset);
 private_fun Array* String_findAllSubstrings(void* obj, void* str);
 private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset);
-private_fun Array* String_split(void* obj, void* str);
+//private_fun Array* String_split(void* obj, void* str);
 
 private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement);
 private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replacement);
@@ -169,7 +169,7 @@ String* String_ctor(const char* text)
 	thisIF->findFirstStringOffset = &String_findFirstStringOffset;
 	thisIF->findAllSubstrings = &String_findAllSubstrings;
 	thisIF->findAllSubstringsOffset = &String_findAllSubstringsOffset;
-	thisIF->split = &String_split;
+	//thisIF->split = &String_split;
 
 	thisIF->replaceAllSubstring = &String_replaceAllSubstring;
 	thisIF->replaceFirstSubstring = &String_replaceFirstSubstring;
@@ -265,6 +265,7 @@ private_fun char String_charAt(void* obj, size_t index)
 private_fun String* String_stringAt(void* obj, size_t index)
 {
 	CAST(String, obj, NULL, );
+	if (index >= self->length) return NULL;
 	return String_subString(obj, index, self->length - 1);
 }
 private_fun String* String_subString(void* obj, size_t start, size_t end)
@@ -285,7 +286,7 @@ private_fun String* String_subString(void* obj, size_t start, size_t end)
 	FREE(sub_self->str);
 	char* tmp;
 	MALLOC(char, sub_length, tmp);
-	basic_bin_copy(tmp, self->str, sub_length - 1, start);
+	basic_bin_copy(tmp, self->str + start, sub_length, 0);
 	basic_memset(tmp + sub_length - 1, '\0', 1);
 	sub_self->str = tmp;
 	return sub;
@@ -655,7 +656,13 @@ private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t o
 	return arr;
 }
 
-private_fun Array* String_split(void* obj, void* str);
+/*
+private_fun Array* String_split(void* obj, void* str)
+{
+	CAST(String, obj, NULL, );
+	CAST(String, str, NULL, 1);
+}
+*/
 
 private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement)
 {
@@ -681,7 +688,7 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 	if (self1->length > self->length) return;
 	size_t new_length_inc = self2->length - self1->length;
 	size_t index = String_findFirstStringOffset(obj, sub, offset);
-	if (index > self->length) return;
+	if (index >= self->length) return;
 	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
 	if (new_length_inc == 0) {
 		for (size_t i = 0; i < count; ++i) {
@@ -715,6 +722,7 @@ private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* 
 	size_t new_length_inc = self2->length - self1->length;
 	size_t new_length = self->length + new_length_inc;
 	size_t index = String_findFirstStringOffset(obj, sub, offset);
+	if (index >= self->length) return;
 	char* tmp;
 	MALLOC(char, new_length, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
@@ -735,6 +743,7 @@ private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* r
 	size_t new_length_inc = self2->length - self1->length;
 	size_t new_length = self->length + new_length_inc;
 	size_t index = String_findLastStringOffset(obj, sub, offset);
+	if (index >= self->length) return;
 	char* tmp;
 	MALLOC(char, new_length, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
@@ -938,13 +947,13 @@ private_fun double String_parseDouble(void* obj)
 
 private_fun float String_parseFloat(void* obj)
 {
-	return String_parseDouble(obj);
+	return (float)String_parseDouble(obj);
 }
 
 private_fun int String_parseInt(void* obj)
 {
 	CAST(String, obj, 0, );
-	char to_check[] = { "\t\0\n/*.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz." };
+	char to_check[] = { "\t\0\n/*.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz" };
 	for (size_t i = 0; i < basic_strlen(to_check); ++i) {
 		if (String_containsChar(obj, to_check[i])) return 0;
 	}
@@ -958,7 +967,7 @@ private_fun int String_parseInt(void* obj)
 private_fun size_t String_parseSize_t(void* obj)
 {
 	CAST(String, obj, 0, );
-	char to_check[] = { "\t\0\n/*.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz." };
+	char to_check[] = { "\t\0\n/*.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz" };
 	for (size_t i = 0; i < basic_strlen(to_check); ++i) {
 		if (String_containsChar(obj, to_check[i])) return 0;
 	}

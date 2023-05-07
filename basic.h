@@ -10,7 +10,8 @@ extern "C"
 #include "def.h"
 #include "object.h"
 
-#define CAST(datatype, ptr, _return, n) datatype* this##n = NULL; \
+#define CAST(datatype, ptr, _return, n) \
+	datatype* this##n = NULL; \
 	o_##datatype* self##n = NULL; \
 	if(!ptr) return _return; \
 	this##n = ptr; \
@@ -22,13 +23,13 @@ extern "C"
 	if(!basic_strcmp(#datatype, object_ptr_self##n->name)) return _return; \
 	self##n = this##n->self; \
 
-#define CAST_OBJECT(ptr, _return, n) Object* this##n = NULL; \
+#define CAST_OBJECT(ptr, _return, n) \
+	Object* this##n = NULL; \
 	o_Object* self##n = NULL; \
 	if(!ptr) return _return; \
 	this##n = ptr; \
 	if(!this##n->self) exit(1); \
 	self##n = this##n->self; \
-
 
 /* list of allowed datatypes in the array & list */
 #define BASIC_DATATYPE_LENGTH 6
