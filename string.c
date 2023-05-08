@@ -904,6 +904,14 @@ String* String_size_tToString(size_t value)
 	return string;
 }
 
+String* String_booleanToString(boolean value)
+{
+	String* string = String_ctor("");
+	if (value >= true) String_setText(string, "true");
+	else String_setText(string, "false");
+	return string;
+}
+
 private_fun double String_parseDouble(void* obj)
 {
 	CAST(String, obj, 0.0, );

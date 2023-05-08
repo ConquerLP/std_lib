@@ -17,7 +17,8 @@ extern "C"
 
 typedef struct _FilemanagerIF {
 	Array* (*scanCompleteFile)(void* obj);
-	void (*close)(void* obj); 
+	void (*close)(void* obj);
+	boolean (*exist)(void* obj);
 	String* (*getLineAsString)(void* obj);
 	double (*getLineAsDouble)(void* obj);
 	float (*getLineAsFloat)(void* obj);
@@ -31,7 +32,7 @@ typedef struct _FilemanagerIF {
 	void (*writeAsint)(void* obj, int value, boolean append_flag);
 	void (*writeAsSize_t)(void* obj, size_t value, boolean append_flag);
 	void (*writeAsBoolean)(void* obj, boolean value, boolean append_flag);
-	size_t(*getLineCount)(void* obj);
+	size_t (*getLineCount)(void* obj);
 
 }FilemanagerIF;
 
