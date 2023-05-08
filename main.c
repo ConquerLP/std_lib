@@ -131,7 +131,7 @@ int main(void) {
 	printf("*%zu\n", string0->stringIF->findFirstString(string0, string1));
 	printf("*%zu\n", string0->stringIF->findLastString(string0, string1));
 	printf("*%zu\n", string0->stringIF->findFirstStringOffset(string0, string1, 2));
-	printf("*%zu\n", string0->stringIF->findLastStringOffset(string0, string1, 20));
+	printf("**%zu\n", string0->stringIF->findLastStringOffset(string0, string1, 20));
 
 
 	Array* c = string0->stringIF->findAllSubstrings(string0, string1);
@@ -177,13 +177,71 @@ int main(void) {
 	printf("%s\n", string0->objectIF->toString(string0));
 
 
+	string2->stringIF->setText(string2, "banane");
+	string2->stringIF->setText(string1, "find");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->removeAllSubstringOffset(string0, string1, 0);
+	printf("%s\n", string0->objectIF->toString(string0));
 
 
+	string2->stringIF->setText(string2, "banane");
+	string2->stringIF->setText(string1, "find");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->removeFirstSubstringOffset(string0, string1, 0);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string2->stringIF->setText(string2, "banane");
+	string2->stringIF->setText(string1, "find");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->removeLastSubstringOffset(string0, string1, 13);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string2->stringIF->setText(string2, "find");
+	string2->stringIF->setText(string1, "find");
+
+	if (string2->stringIF->compare(string2, string1)) {
+		printf("string1 is equal to string2\n");
+	}
+
+	string2->stringIF->setText(string2, "FiNd");
+	string2->stringIF->setText(string1, "find");
+
+	if (string2->stringIF->compareIgnCase(string2, string1)) {
+		printf("string1 is equal to string2\n");
+	}
+
+	string0->stringIF->setText(string0, "");
+	if (string0->stringIF->isEmpty(string0)) {
+		printf("This string is empty\n");
+	}
+
+	string0->stringIF->setText(string0, "  ,,,   Fhi");
+	string0->stringIF->trim(string0, " ,");
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	String* string3 = String_doubleToString(3.4);
+	printf("%s\n", string3->objectIF->toString(string3));
+
+	String* string4 = String_floatToString(6.2f);
+	printf("%s\n", string4->objectIF->toString(string4));
+
+	String* string5 = String_intToString(-2);
+	printf("%s\n", string5->objectIF->toString(string5));
+
+	String* string6 = String_size_tToString(9);
+	printf("%s\n", string6->objectIF->toString(string6));
+
+	String* string7 = String_ctor("2");
+	printf("%zu", string7->stringIF->parseSize_t(string7));
 
 	delete(string0);
 	delete(string1);
 	delete(string2);
-
+	delete(string3);
+	delete(string4);
+	delete(string5);
+	delete(string6);
+	delete(string7);
 
 	PRINT_DEBUG_MEMORY;
 

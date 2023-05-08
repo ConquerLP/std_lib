@@ -14,8 +14,6 @@ extern "C"
 typedef struct {
 	void (*setText)(void* obj, const char* text);
 	char (*charAt)(void* obj, size_t index);
-	struct _String* (*stringAt)(void* obj, size_t index);
-	struct _String* (*substring)(void* obj, size_t start, size_t end);
 	size_t(*length)(void* obj);
 	void (*toLowerCase)(void* obj);
 	void (*toUpperCase)(void* obj);
@@ -76,11 +74,6 @@ typedef struct {
 	void (*append)(void* str1, void* str2);
 	void (*trim)(void* obj, const char* toTrim);
 
-	struct _String* (*doubleToString)(double value);
-	struct _String* (*floatToString)(float value);
-	struct _String* (*intToString)(int value);
-	struct _String* (*size_tToString)(size_t value);
-
 	double (*parseDouble)(void* obj);
 	float (*parseFloat)(void* obj);
 	int (*parseInt)(void* obj);
@@ -96,8 +89,16 @@ typedef struct _String {
 }String;
 
 /* public functions */
+/* main ctor */
 String* String_ctor(const char* text);
 
+/* alternitive ctors */
+String* String_doubleToString(double value);
+String* String_floatToString(float value);
+String* String_intToString(int value);
+String* String_size_tToString(size_t value);
+String* String_stringAt(void* obj, size_t index);
+String* String_subString(void* obj, size_t start, size_t end);
 
 #ifdef __cplusplus
 } // extern "C"
