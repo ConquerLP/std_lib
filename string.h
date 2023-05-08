@@ -96,8 +96,16 @@ typedef struct _String {
 }String;
 
 /* public functions */
+/* main ctor */
 String* String_ctor(const char* text);
 
+/* alternitive ctors */
+String* String_doubleToString(double value);
+String* String_floatToString(float value);
+String* String_intToString(int value);
+String* String_size_tToString(size_t value);
+String* String_stringAt(void* obj, size_t index);
+String* String_subString(void* obj, size_t start, size_t end);
 
 #ifdef __cplusplus
 } // extern "C"
