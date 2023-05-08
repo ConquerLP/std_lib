@@ -44,7 +44,139 @@ int main(void) {
 	printf("%zu\n", string0->stringIF->countOccurencesChar(string0, 'a'));
 
 	printf("%zu\n", string0->stringIF->countOccurencesCharOffset(string0, 'b', 4));
-	printf("%zu\n", string0->stringIF->countOccurencesCharOffset(string0, 'a', 7));
+	
+	printf("%zu\n", string0->stringIF->findFirstChar(string0, 'a'));
+	printf("%zu\n", string0->stringIF->findLastChar(string0, 'a'));
+
+	printf("%zu\n", string0->stringIF->findFirstCharOffset(string0, 'a', 5));
+	printf("%zu\n", string0->stringIF->findLastCharOffset(string0, 'a', 5));
+	printf("%zu\n", string0->stringIF->findLastCharOffset(NULL, 'a', 5));
+
+	Array* a = string0->stringIF->findAllChar(string0, 'a');
+
+	for (size_t i = 0; i < a->arrayIF->length(a); ++i) {
+		printf("*%zu\n", *((size_t*)a->arrayIF->get(a, i)));
+	}
+
+	delete(a);
+
+	Array* b = string0->stringIF->findAllCharOffset(string0, 'a', 5);
+
+	for (size_t i = 0; i < b->arrayIF->length(b); ++i) {
+		printf("#%zu\n", *((size_t*)b->arrayIF->get(b, i)));
+	}
+
+	delete(b);
+
+
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->replaceFirstChar(string0, 'a', 'u');
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string0->stringIF->replaceLastChar(string0, 'b', 'i');
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string0->stringIF->replaceAllChar(string0, 'a', 'u');
+	printf("%s\n", string0->objectIF->toString(string0));
+
+
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->replaceFirstCharOffset(string0, 'u', 'a', 5);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string0->stringIF->replaceLastCharOffset(string0, 'i', 'b', 4);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string0->stringIF->replaceAllCharOffset(string0, 'u', 'a', 5);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string0->stringIF->setText(string0, "Tesssst");
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->removeFirstChar(string0, 's');
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->removeLastChar(string0, 's');
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->removeAllChar(string0, 's');
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string0->stringIF->setText(string0, "Tesssst");
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->removeFirstCharOffset(string0, 's', 4);
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->removeLastCharOffset(string0, 's', 1);
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->removeAllCharOffset(string0, 's', 100);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string1->stringIF->setText(string1, "find");
+	string2->stringIF->setText(string2, "FIND");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	if (string0->stringIF->containsSubstring(string0, string1)) {
+		printf("found\n");
+	}
+	if (string0->stringIF->containsSubstringOffset(string0, string1, 4)) {
+		printf("found\n");
+	}
+	if (!string0->stringIF->containsSubstring(string0, string2)) {
+		printf("not found\n");
+	}
+	if (!string0->stringIF->containsSubstringOffset(string0, string2, 4)) {
+		printf("not found\n");
+	}
+
+	printf("%zu\n", string0->stringIF->countSubstringOccurences(string0, string1));
+	printf("%zu\n", string0->stringIF->countSubstringOccurencesOffset(string0, string1, 2));
+	printf("%zu\n", string0->stringIF->countSubstringOccurences(string0, string2));
+
+	printf("*%zu\n", string0->stringIF->findFirstString(string0, string1));
+	printf("*%zu\n", string0->stringIF->findLastString(string0, string1));
+	printf("*%zu\n", string0->stringIF->findFirstStringOffset(string0, string1, 2));
+	printf("*%zu\n", string0->stringIF->findLastStringOffset(string0, string1, 20));
+
+
+	Array* c = string0->stringIF->findAllSubstrings(string0, string1);
+
+	for (size_t i = 0; i < c->arrayIF->length(c); ++i) {
+		printf("#%zu\n", *((size_t*)c->arrayIF->get(c, i)));
+	}
+	delete(c);
+
+	Array* d = string0->stringIF->findAllSubstringsOffset(string0, string1, 6);
+
+	for (size_t i = 0; i < d->arrayIF->length(d); ++i) {
+		printf("*%zu\n", *((size_t*)d->arrayIF->get(d, i)));
+	}
+	delete(d);
+
+	string0->stringIF->replaceAllSubstring(string0, string1, string2);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string2->stringIF->setText(string2, "u");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->replaceAllSubstring(string0, string1, string2);
+	printf("%s\n", string0->objectIF->toString(string0));
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->replaceAllSubstringOffset(string0, string1, string2, 6);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string2->stringIF->setText(string2, "banane");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->replaceAllSubstringOffset(string0, string1, string2, 0);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string2->stringIF->setText(string2, "banane");
+	string2->stringIF->setText(string1, "find");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->replaceFirstSubstringOffset(string0, string1, string2, 0);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+	string2->stringIF->setText(string2, "banane");
+	string2->stringIF->setText(string1, "find");
+	string0->stringIF->setText(string0, "findMEfindMEfindME");
+	string0->stringIF->replaceLastSubstringOffset(string0, string1, string2, 0);
+	printf("%s\n", string0->objectIF->toString(string0));
+
+
 
 
 

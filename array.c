@@ -78,7 +78,7 @@ private_fun size_t Array_length(void* obj);
 
 Array* Array_ctor(const char* name, size_t length)
 {
-	if (length <= 0) return NULL;
+	if (length < 0) return NULL;
 	if (!name) return NULL;
 	if (!basic_isAllowedType(name)) return NULL;
 	Object* super = Object_ctor("Array");

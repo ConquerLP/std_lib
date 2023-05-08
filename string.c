@@ -277,18 +277,18 @@ private_fun String* String_subString(void* obj, size_t start, size_t end)
 	if (start >= self->length) return NULL;
 	String* sub = String_ctor("0");
 	if (end == start) {
-		String_replaceFirstChar(obj, '0', String_charAt(obj, start));
+		String_replaceFirstChar(sub, '0', String_charAt(obj, start));
 		return sub;
 	}
+	CAST(String, sub, NULL, 1);
 	size_t sub_length = end - start + 1;
-	o_String* sub_self = sub->self;
-	sub_self->length = sub_length;
-	FREE(sub_self->str);
+	self1->length = sub_length;
+	FREE(self1->str);
 	char* tmp;
 	MALLOC(char, sub_length, tmp);
 	basic_bin_copy(tmp, self->str + start, sub_length, 0);
 	basic_memset(tmp + sub_length - 1, '\0', 1);
-	sub_self->str = tmp;
+	self1->str = tmp;
 	return sub;
 }
 
@@ -341,7 +341,7 @@ private_fun size_t String_countOccurencesCharOffset(void* obj, char c, size_t of
 	if (offset >= self->length) return -1;
 	size_t count = 0;
 	for (size_t i = offset; i < self->length; ++i) {
-		if (String_charAt(obj, i) == c) count++;
+		if (String_cmpChar(String_charAt(this, i), c, false)) count++;
 	}
 	return count;
 }
@@ -360,11 +360,10 @@ private_fun size_t String_findLastCharOffset(void* obj, char c, size_t offset)
 	if (offset < 0) return -1;
 	if (offset >= self->length) return -1;
 	if (!String_containsCharOffset(obj, c, offset)) return -1;
-	size_t j = 0;
-	for (size_t i = self->length; i <= offset; --i) {
-		if (String_cmpChar(String_charAt(this, i), c, false)) j = i;
+	for (size_t i = self->length - 1; i >= offset; --i) {
+		if (String_cmpChar(String_charAt(this, i), c, false)) return i;
 	}
-	return j;
+	return -1;
 }
 private_fun size_t String_findFirstCharOffset(void* obj, char c, size_t offset)
 {
@@ -372,11 +371,10 @@ private_fun size_t String_findFirstCharOffset(void* obj, char c, size_t offset)
 	if (offset < 0) return -1;
 	if (offset >= self->length) return -1;
 	if (!String_containsCharOffset(obj, c, offset)) return -1;
-	size_t j = 0;
 	for (size_t i = offset; i < self->length; ++i) {
-		if (String_cmpChar(String_charAt(this, i), c, false)) j = i;
+		if (String_cmpChar(String_charAt(this, i), c, false)) return i;
 	}
-	return j;
+	return -1;
 }
 
 private_fun Array* String_findAllChar(void* obj, char c)
@@ -389,17 +387,14 @@ private_fun Array* String_findAllCharOffset(void* obj, char c, size_t offset)
 	CAST(String, obj, NULL, );
 	if (offset < 0) return NULL;
 	if (offset >= self->length) return NULL;
-	size_t count = 0;
-	for (size_t i = 0; i < self->length; ++i) {
-		if (String_charAt(obj, i) == c) count++;
-	}
+	size_t count = String_countOccurencesCharOffset(obj, c, offset);
 	if (count == 0) return NULL;
 	Array* arr = Array_ctor("size_t", count);
 	size_t* tmp;
 	MALLOC(size_t, 1, tmp);
 	*tmp = 0;
 	for (size_t i = offset, j = 0; i < self->length; ++i) {
-		if (String_charAt(obj, i) == c) {
+		if (String_cmpChar(String_charAt(this, i), c, false)) {
 			*tmp = i;
 			arr->arrayIF->set(arr, tmp, j);
 			j++;
@@ -436,7 +431,7 @@ private_fun void String_replaceAllCharOffset(void* obj, char old, char new, size
 private_fun void String_replaceFirstCharOffset(void* obj, char old, char new, size_t offset)
 {
 	CAST(String, obj, , );
-	size_t index = String_findFirstCharOffset(obj, old, 0);
+	size_t index = String_findFirstCharOffset(obj, old, offset);
 	if (index >= self->length) return;
 	basic_memset(self->str + index, new, 1);
 }
@@ -444,7 +439,7 @@ private_fun void String_replaceFirstCharOffset(void* obj, char old, char new, si
 private_fun void String_replaceLastCharOffset(void* obj, char old, char new, size_t offset)
 {
 	CAST(String, obj, , );
-	size_t index = String_findLastCharOffset(obj, old, 0);
+	size_t index = String_findLastCharOffset(obj, old, offset);
 	if (index >= self->length) return;
 	basic_memset(self->str + index, new, 1);
 }
@@ -468,21 +463,21 @@ private_fun void String_removeAllCharOffset(void* obj, char old, size_t offset)
 {
 	CAST(String, obj, , );
 	if (offset >= self->length) return;
-	if (offset <= 0) return;
+	if (offset < 0) return;
 	if (self->length == 0) return;
 	size_t count = 0;
 	char* tmp;
 	MALLOC(char, self->length, tmp);
 	basic_bin_copy(tmp, self->str, offset, 0);
-	for (size_t i = offset; i < self->length; ++i) {
-		if (String_charAt(obj, i) == old) {
+	for (size_t i = offset, j = offset; i < self->length; ++i) {
+		if (String_cmpChar(String_charAt(this, i), old, false)) {
 			count++;
 			continue;
 		}
-		basic_memset(tmp + i, String_charAt(obj, i + count), 1);
+		basic_memset(tmp + j, String_charAt(obj, i), 1);
+		++j;
 	}
 	REALLOC(char, self->length - count, tmp);
-	basic_memset(tmp + self->length - count - 1, '\0', 1);
 	self->length -= count;
 	FREE(self->str);
 	self->str = tmp;
@@ -492,48 +487,32 @@ private_fun void String_removeFirstCharOffset(void* obj, char old, size_t offset
 {
 	CAST(String, obj, , );
 	if (offset >= self->length) return;
-	if (offset <= 0) return;
+	if (offset < 0) return;
 	if (self->length == 0) return;
-	size_t count = 0;
-	char* tmp;
-	MALLOC(char, self->length, tmp);
-	basic_bin_copy(tmp, self->str, offset, 0);
-	for (size_t i = offset; i < self->length; ++i) {
-		if (String_charAt(obj, i) == old && count == 0) {
-			count++;
-			continue;
-		}
-		basic_memset(tmp + i, String_charAt(obj, i + count), 1);
-	}
-	REALLOC(char, self->length - count, tmp);
-	basic_memset(tmp + self->length - count - 1, '\0', 1);
-	self->length -= count;
-	FREE(self->str);
-	self->str = tmp;
+	size_t index = String_findFirstCharOffset(obj, old, offset);
+	if (index >= self->length) return;
+	String* part1 = String_subString(obj, 0, index);
+	String* part2 = String_stringAt(obj, index + 1);
+	String_append(part1, part2);
+	String_setText(obj, part1->objectIF->toString(part1));
+	delete(part1);
+	delete(part2);
 }
 
 private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
 {
 	CAST(String, obj, , );
 	if (offset >= self->length) return;
-	if (offset <= 0) return;
+	if (offset < 0) return;
 	if (self->length == 0) return;
-	size_t count = 0;
-	char* tmp;
-	MALLOC(char, self->length, tmp);
-	basic_bin_copy(tmp, self->str, offset, 0);
-	for (size_t i = self->length - 1; i >= offset; --i) {
-		if (String_charAt(obj, i) == old && count == 0) {
-			count++;
-			continue;
-		}
-		basic_memset(tmp + i, String_charAt(obj, i - count), 1);
-	}
-	REALLOC(char, self->length - count, tmp);
-	basic_memset(tmp + self->length - count - 1, '\0', 1);
-	self->length -= count;
-	FREE(self->str);
-	self->str = tmp;
+	size_t index = String_findLastCharOffset(obj, old, offset);
+	if (index >= self->length) return;
+	String* part1 = String_subString(obj, 0, index);
+	String* part2 = String_stringAt(obj, index + 1);
+	String_append(part1, part2);
+	String_setText(obj, part1->objectIF->toString(part1));
+	delete(part1);
+	delete(part2);
 }
 
 private_fun boolean String_containsSubstring(void* obj, void* str)
@@ -597,10 +576,9 @@ private_fun size_t String_findLastStringOffset(void* obj, void* str, size_t offs
 	CAST(String, str, -1, 1);
 	if (offset >= self->length) return -1;
 	if (self1->length > self->length) return -1;
-
-	for (size_t i = self->length - 1, j = 0; i >= offset; --i) {
-		if (String_charAt(obj, i) == String_charAt(str, self1->length - 1)) {
-			for (j = self1->length - 1; j >= 0; --j) {
+	for (size_t i = self->length - 2, j = 0; i >= offset; --i) {
+		if (String_charAt(obj, i) == String_charAt(str, self1->length - 2)) {
+			for (j = self1->length - 2; j >= 0; --j) {
 				if (!String_cmpChar(String_charAt(obj, i), String_charAt(str, j), false)) break;
 				if (j == 0) return i;
 				--i;
@@ -616,10 +594,9 @@ private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t off
 	CAST(String, str, -1, 1);
 	if (offset >= self->length) return -1;
 	if (self1->length > self->length) return -1;
-
 	for (size_t i = offset, j = 0; i < self->length; ++i) {
 		if (String_charAt(obj, i) == String_charAt(str, 0)) {
-			for (j = 0; j < self1->length; ++j) {
+			for (j = 0; j < self1->length - 1; ++j) {
 				if (!String_cmpChar(String_charAt(obj, i + j), String_charAt(str, j), false)) {
 					i += j;
 					break;
@@ -640,18 +617,15 @@ private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t o
 {
 	CAST(String, obj, NULL, );
 	CAST(String, str, NULL, 1);
-	Array* arr = Array_ctor("size_t", 0);
+	size_t count = String_countSubstringOccurencesOffset(obj, str, offset);
+	if (count == 0) return NULL;
+	Array* arr = Array_ctor("size_t", count);
 	size_t index = 0;
-	while (1) {
+	for (size_t i = 0; i < count; ++i) {
 		index = String_findFirstStringOffset(obj, str, offset);
 		if (index >= self->length) break;
 		offset = index + self1->length - 1;
-		arr->arrayIF->resize(arr, arr->arrayIF->length(arr) + 1);
-		arr->arrayIF->set(arr, &index, arr->arrayIF->length(arr) - 1);
-	}
-	if (arr->arrayIF->length(arr) == 0) {
-		delete(arr);
-		return NULL;
+		arr->arrayIF->set(arr, &index, i);
 	}
 	return arr;
 }
@@ -686,13 +660,13 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 	CAST(String, replacement, , 2);
 	if (offset >= self->length) return;
 	if (self1->length > self->length) return;
-	size_t new_length_inc = self2->length - self1->length;
+	long long int new_length_inc = self2->length - self1->length;
 	size_t index = String_findFirstStringOffset(obj, sub, offset);
 	if (index >= self->length) return;
 	size_t count = String_countSubstringOccurencesOffset(obj, sub, offset);
 	if (new_length_inc == 0) {
 		for (size_t i = 0; i < count; ++i) {
-			basic_bin_copy(self->str, self2->str, self2->length, index);
+			basic_bin_copy(self->str, self2->str, self2->length - 1, index);
 			index = String_findFirstStringOffset(obj, sub, index + self1->length - 1);
 		}
 		return;
@@ -700,13 +674,23 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 	char* tmp;
 	size_t new_length = count * new_length_inc + self->length;
 	MALLOC(char, new_length, tmp);
-	basic_bin_copy(tmp, self->str, index, 0);
-	for (size_t i = 0; i < count; ++i) {
-		basic_bin_copy(tmp, self2->str, self2->length, index);
-		index = String_findFirstStringOffset(obj, sub, index + self1->length);
+	basic_memset(tmp + new_length - 1, '\0', 1);
+	basic_bin_copy(tmp, self->str, offset, 0);
+	size_t i = offset;
+	size_t j = offset;
+	while (i < self->length - 1) {
+		if (i == index) {
+			index = String_findFirstStringOffset(obj, sub, index + self1->length - 1);
+			basic_bin_copy(tmp, self2->str, self2->length - 1, j);
+			j += self2->length - 1;
+			i += self1->length - 1;
+		}
+		else {
+			basic_memset(tmp + j, String_charAt(obj, i), 1);
+			i++;
+			j++;
+		}
 	}
-	if(index >= self->length) index = String_findFirstStringOffset(obj, sub, offset);
-	basic_bin_copy(tmp, self->str + index + self1->length, self->length - index - count * self1->length, index + self2->length - 1);
 	FREE(self->str);
 	self->str = tmp;
 	self->length = new_length;
@@ -726,8 +710,8 @@ private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* 
 	char* tmp;
 	MALLOC(char, new_length, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
-	basic_bin_copy(tmp, self2->str, self2->length, index);
-	basic_bin_copy(tmp, self->str + index, self->length - index, index + self2->length);
+	basic_bin_copy(tmp, self2->str, self2->length - 1, index);
+	basic_bin_copy(tmp, self->str + index + self1->length - 1, self->length - index - self1->length + 1, index + self2->length - 1);
 	FREE(self->str);
 	self->length = new_length;
 	self->str = tmp;
@@ -747,8 +731,8 @@ private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* r
 	char* tmp;
 	MALLOC(char, new_length, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
-	basic_bin_copy(tmp, self2->str, self2->length, index);
-	basic_bin_copy(tmp, self->str + index, self->length - index, index + self2->length);
+	basic_bin_copy(tmp, self2->str, self2->length - 1, index);
+	basic_bin_copy(tmp, self->str + index + self1->length - 1, self->length - index - self1->length + 1, index + self2->length - 1);
 	FREE(self->str);
 	self->length = new_length;
 	self->str = tmp;
@@ -860,7 +844,7 @@ private_fun boolean String_isEmpty(void* obj)
 private_fun void String_append(void* str1, void* str2)
 {
 	CAST(String, str1, , );
-	CAST(String, str1, , 1);
+	CAST(String, str2, , 1);
 	size_t new_length = self->length + self1->length - 1;
 	self->length = new_length;
 	char* copy_str1 = basic_strcpy(self->str);
@@ -870,6 +854,7 @@ private_fun void String_append(void* str1, void* str2)
 	basic_bin_copy(self_str, copy_str1, basic_strlen(copy_str1) - 1, 0);
 	basic_bin_copy(self_str, self1->str, self1->length, basic_strlen(copy_str1) - 1);
 	FREE(copy_str1);
+	self->str = self_str;
 }
 
 private_fun void String_trim(void* obj, const char* toTrim)
