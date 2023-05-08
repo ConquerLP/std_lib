@@ -36,6 +36,9 @@
     <ClInclude Include="template.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="filemanager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic.h">
@@ -54,6 +57,9 @@
       <Filter>Headerdateien</Filter>
     </None>
     <None Include="template.r">
+      <Filter>Headerdateien</Filter>
+    </None>
+    <None Include="filemanager.r">
       <Filter>Headerdateien</Filter>
     </None>
   </ItemGroup>
@@ -80,6 +86,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="template.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="filemanager.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

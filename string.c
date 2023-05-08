@@ -625,7 +625,11 @@ private_fun Array* String_split(void* obj, void* str)
 {
 	CAST(String, obj, NULL, );
 	CAST(String, str, NULL, 1);
+	size_t count = String_countSubstringOccurences(obj, str);
+	if (count == 0) return NULL;
+	Array* arr = Array_ctor("String", count);
 }
+
 */
 
 private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement)

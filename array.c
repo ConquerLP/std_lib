@@ -180,6 +180,7 @@ private_fun boolean Array_equals(void* obj, void* obj2)
 	ARRAY_CMP_PRIMITIVE(float);
 	ARRAY_CMP_PRIMITIVE(char);
 	ARRAY_CMP_PRIMITIVE(int);
+	ARRAY_CMP_PRIMITIVE(boolean);
 	ARRAY_CMP_PRIMITIVE(size_t);
 
 	ARRAY_CMP_CLASS(String);
@@ -209,6 +210,7 @@ private_fun void Array_set(void* obj, void* data, size_t index)
 	ARRAY_SET_PRIMITIVE(float);
 	ARRAY_SET_PRIMITIVE(char);
 	ARRAY_SET_PRIMITIVE(int);
+	ARRAY_SET_PRIMITIVE(boolean);
 	ARRAY_SET_PRIMITIVE(size_t);
 
 	ARRAY_SET_CLASS(String);

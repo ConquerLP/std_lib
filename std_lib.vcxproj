@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="array.h" />
     <ClInclude Include="def.h" />
+    <ClInclude Include="filemanager.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="std_lib.h" />
@@ -141,6 +142,7 @@
   <ItemGroup>
     <None Include="array.r" />
     <None Include="basic.h" />
+    <None Include="filemanager.r" />
     <None Include="list.r" />
     <None Include="object.r" />
     <None Include="string.r" />
@@ -150,6 +152,7 @@
     <ClCompile Include="array.c" />
     <ClCompile Include="basic.c" />
     <ClCompile Include="def.c" />
+    <ClCompile Include="filemanager.c" />
     <ClCompile Include="list.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="object.c" />
