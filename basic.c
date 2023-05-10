@@ -92,3 +92,22 @@ void basic_memset(void* dest, char c, size_t length)
 		*((char*)dest + i) = c;
 	}
 }
+
+void* basic_return_by_type(void* source, const char* type, size_t index)
+{
+	if (!source) return NULL;
+	if (!type) return NULL;
+	if (basic_strcmp(type, "double")) {
+		return (double*)source + index;
+	}
+	if (basic_strcmp(type, "float")) {
+		return (float*)source + index;
+	}
+	if (basic_strcmp(type, "int")) {
+		return (int*)source + index;
+	}
+	if (basic_strcmp(type, "size_t")) {
+		return (size_t*)source + index;
+	}
+	return NULL;
+}

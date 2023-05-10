@@ -44,6 +44,7 @@ boolean basic_strcmpIgnCase(const char* s1, const char* s2);
 char* basic_strcpy(const char* str);
 void basic_bin_copy(void* dest, void* source, size_t bytes, size_t offset);
 void basic_memset(void* dest, char c, size_t length);
+void* basic_return_by_type(void* source, const char* type, size_t index);
 
 /* Object functions */
 Object* Object_ctor(const char* name);

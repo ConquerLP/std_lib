@@ -18,7 +18,6 @@ extern "C"
 typedef struct _FilemanagerIF {
 	Array* (*scanCompleteFile)(void* obj);
 	void (*close)(void* obj);
-	boolean (*exist)(void* obj);
 	String* (*getLineAsString)(void* obj);
 	double (*getLineAsDouble)(void* obj);
 	float (*getLineAsFloat)(void* obj);
@@ -26,25 +25,35 @@ typedef struct _FilemanagerIF {
 	size_t (*getLineAsSize_t)(void* obj);
 	boolean (*getLineAsBoolean)(void* obj);
 	void (*setToken)(void* obj, char token);	// default is '\n'
-	void (*writeAsString)(void* obj, void* str, boolean append_flag);
-	void (*writeAsDouble)(void* obj, double value, boolean append_flag);
-	void (*writeAsFloat)(void* obj, float value, boolean append_flag);
-	void (*writeAsint)(void* obj, int value, boolean append_flag);
-	void (*writeAsSize_t)(void* obj, size_t value, boolean append_flag);
-	void (*writeAsBoolean)(void* obj, boolean value, boolean append_flag);
+	void (*writeAsString)(void* obj, void* str);
+	void (*writeAsDouble)(void* obj, double value);
+	void (*writeAsFloat)(void* obj, float value);
+	void (*writeAsint)(void* obj, int value);
+	void (*writeAsSize_t)(void* obj, size_t value);
+	void (*writeAsBoolean)(void* obj, boolean value);
 	size_t (*getLineCount)(void* obj);
-
 }FilemanagerIF;
 
 typedef struct _Filemanager {
 	void* super; // must be first
 	void* self;
-	FilemanagerIF* classIF;
+	FilemanagerIF* filemanagerIF;
 	ObjectIF* objectIF;
 }Filemanager;
+
+/* modes: */
+/*  
+* "r"	opens a file for reading, it must exist
+* "w"	creates an empty file for writing, if a file with the same name exist, it's contents is erased 
+* "a"	appends to a file, if the file does not exist it is created
+* "r+"	opends a file for reading and writing, it must exist
+* "w+"	creates an empty file for reading and writing, if a file with the same name exist, it's contents is erased 
+* "a+"	opens a file for reading and appending/writing
+*/
+Filemanager* Filemanager_ctor(const char* filename_path, const char* mode);
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-#endif // FILESMANAGER_H
+#endif // FILEMANAGER_H

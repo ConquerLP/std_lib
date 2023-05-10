@@ -13,83 +13,110 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Headerdateien\math">
+      <UniqueIdentifier>{b65619d7-b7c5-49b9-8491-99447b97f542}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\std_lib">
+      <UniqueIdentifier>{a5940aa7-5b8f-4af1-90ea-3e7ead459e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\std_lib">
+      <UniqueIdentifier>{29837ac3-0bc6-46ec-bcbb-9f1ef9df744e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\math">
+      <UniqueIdentifier>{e10bf996-3400-4754-b209-c4a0af5e3b48}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="array.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="def.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="filemanager.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="list.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="string.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="template.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
     <ClInclude Include="std_lib.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="def.h">
-      <Filter>Headerdateien</Filter>
+    <ClInclude Include="vector.h">
+      <Filter>Headerdateien\math</Filter>
     </ClInclude>
-    <ClInclude Include="string.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="object.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="array.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="list.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="template.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="filemanager.h">
-      <Filter>Headerdateien</Filter>
+    <ClInclude Include="std_lib_math.h">
+      <Filter>Headerdateien\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="basic.h">
-      <Filter>Headerdateien</Filter>
-    </None>
-    <None Include="string.r">
-      <Filter>Headerdateien</Filter>
-    </None>
-    <None Include="object.r">
-      <Filter>Headerdateien</Filter>
-    </None>
     <None Include="array.r">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\std_lib</Filter>
     </None>
-    <None Include="list.r">
-      <Filter>Headerdateien</Filter>
-    </None>
-    <None Include="template.r">
-      <Filter>Headerdateien</Filter>
+    <None Include="basic.h">
+      <Filter>Headerdateien\std_lib</Filter>
     </None>
     <None Include="filemanager.r">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\std_lib</Filter>
+    </None>
+    <None Include="list.r">
+      <Filter>Headerdateien\std_lib</Filter>
+    </None>
+    <None Include="object.r">
+      <Filter>Headerdateien\std_lib</Filter>
+    </None>
+    <None Include="string.r">
+      <Filter>Headerdateien\std_lib</Filter>
+    </None>
+    <None Include="template.r">
+      <Filter>Headerdateien\std_lib</Filter>
+    </None>
+    <None Include="vector.r">
+      <Filter>Headerdateien\math</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="def.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="string.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="object.c">
-      <Filter>Quelldateien</Filter>
+    <ClCompile Include="array.c">
+      <Filter>Quelldateien\std_lib</Filter>
     </ClCompile>
     <ClCompile Include="basic.c">
-      <Filter>Quelldateien</Filter>
+      <Filter>Quelldateien\std_lib</Filter>
     </ClCompile>
-    <ClCompile Include="array.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="list.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="template.c">
-      <Filter>Quelldateien</Filter>
+    <ClCompile Include="def.c">
+      <Filter>Quelldateien\std_lib</Filter>
     </ClCompile>
     <ClCompile Include="filemanager.c">
-      <Filter>Quelldateien</Filter>
+      <Filter>Quelldateien\std_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="list.c">
+      <Filter>Quelldateien\std_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="object.c">
+      <Filter>Quelldateien\std_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="string.c">
+      <Filter>Quelldateien\std_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="template.c">
+      <Filter>Quelldateien\std_lib</Filter>
+    </ClCompile>
+    <ClCompile Include="vector.c">
+      <Filter>Quelldateien\math</Filter>
+    </ClCompile>
+    <ClCompile Include="std_lib_math.c">
+      <Filter>Quelldateien\math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

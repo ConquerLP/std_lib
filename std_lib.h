@@ -8,6 +8,8 @@
 #include "object.h"
 #include "array.h"
 #include "list.h"
+#include "filemanager.h"
+#include "std_lib_math.h"
 
 #include <stdio.h>
 #include <stdlib.h>
