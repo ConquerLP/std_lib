@@ -17,7 +17,6 @@ extern "C"
 
 typedef struct _FilemanagerIF {
 	Array* (*scanCompleteFile)(void* obj);
-	void (*close)(void* obj);
 	String* (*getLineAsString)(void* obj);
 	double (*getLineAsDouble)(void* obj);
 	float (*getLineAsFloat)(void* obj);
