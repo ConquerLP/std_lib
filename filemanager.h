@@ -23,7 +23,6 @@ typedef struct _FilemanagerIF {
 	int (*getLineAsInt)(void* obj);
 	size_t (*getLineAsSize_t)(void* obj);
 	boolean (*getLineAsBoolean)(void* obj);
-	void (*setToken)(void* obj, char token);	// default is '\n'
 	void (*writeAsString)(void* obj, void* str);
 	void (*writeAsDouble)(void* obj, double value);
 	void (*writeAsFloat)(void* obj, float value);

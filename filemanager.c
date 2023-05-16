@@ -10,6 +10,9 @@
 #include "array.h"
 #include "array.r"
 
+#include "string.h"
+#include "string.r"
+
 #define BUFFER_SIZE 1024
 
 /* function prototypes */
@@ -27,7 +30,6 @@ private_fun float Filemanager_getLineAsFloat(void* obj);
 private_fun int Filemanager_getLineAsInt(void* obj);
 private_fun size_t Filemanager_getLineAsSize_t(void* obj);
 private_fun boolean Filemanager_getLineAsBoolean(void* obj);
-private_fun void Filemanager_setToken(void* obj, char token);
 private_fun void Filemanager_writeAsString(void* obj, void* str);
 private_fun void Filemanager_writeAsDouble(void* obj, double value);
 private_fun void Filemanager_writeAsFloat(void* obj, float value);
@@ -77,7 +79,6 @@ Filemanager* Filemanager_ctor(const char* filename_path, const char* mode)
 	thisIF->getLineAsInt = &Filemanager_getLineAsInt;
 	thisIF->getLineAsSize_t = &Filemanager_getLineAsSize_t;
 	thisIF->getLineAsBoolean = &Filemanager_getLineAsBoolean;
-	thisIF->setToken = &Filemanager_setToken;
 	thisIF->writeAsString = &Filemanager_writeAsString;
 	thisIF->writeAsDouble = &Filemanager_writeAsDouble;
 	thisIF->writeAsFloat = &Filemanager_writeAsFloat;
@@ -87,9 +88,9 @@ Filemanager* Filemanager_ctor(const char* filename_path, const char* mode)
 	thisIF->getLineCount = &Filemanager_getLineCount;
 
 	self->sub = NULL;
-	self->token = '\n';
 	self->filename_path = basic_strcpy(filename_path);
 	self->count_of_lines = 0;
+	self->current_line = 0;
 	self->mode = basic_strcpy(mode);
 	self->file_stream = fopen(filename_path, mode);
 	if (!self->file_stream) {
@@ -155,35 +156,91 @@ private_fun Array* Filemanager_scanCompleteFile(void* obj)
 	return arr;
 }
 
-private_fun String* Filemanager_getLineAsString(void* obj);
+private_fun String* Filemanager_getLineAsString(void* obj)
+{
+	CAST(Filemanager, obj, NULL, );
+	char buffer[BUFFER_SIZE];
+	fgets(buffer, BUFFER_SIZE, self->file_stream);
+
+	String* tmp = String_ctor(buffer);
+
+
+
+
+
+}
+
 private_fun double Filemanager_getLineAsDouble(void* obj);
 private_fun float Filemanager_getLineAsFloat(void* obj);
 private_fun int Filemanager_getLineAsInt(void* obj);
 private_fun size_t Filemanager_getLineAsSize_t(void* obj);
 private_fun boolean Filemanager_getLineAsBoolean(void* obj);
-private_fun void Filemanager_setToken(void* obj, char token)
+
+private_fun void Filemanager_writeAsString(void* obj, void* str)
 {
 	CAST(Filemanager, obj, , );
-	self->token = token;
+	CAST(String, str, , 1);
+	//file is only for reading
+	if (basic_strcmp(self->mode, "r")) return;
+	fflush(self->file_stream);
+	fprintf(self->file_stream, "%s", self1->str);
 }
 
-private_fun void Filemanager_writeAsString(void* obj, void* str);
-private_fun void Filemanager_writeAsDouble(void* obj, double value);
-private_fun void Filemanager_writeAsFloat(void* obj, float value);
-private_fun void Filemanager_writeAsInt(void* obj, int value);
-private_fun void Filemanager_writeAsSize_t(void* obj, size_t value);
-private_fun void Filemanager_writeAsBoolean(void* obj, boolean value);
+private_fun void Filemanager_writeAsDouble(void* obj, double value)
+{
+	CAST(Filemanager, obj, , );
+	//file is only for reading
+	if (basic_strcmp(self->mode, "r")) return;
+	fflush(self->file_stream);
+	fprintf(self->file_stream, "%lf", value);
+}
+
+private_fun void Filemanager_writeAsFloat(void* obj, float value)
+{
+	CAST(Filemanager, obj, , );
+	//file is only for reading
+	if (basic_strcmp(self->mode, "r")) return;
+	fflush(self->file_stream);
+	fprintf(self->file_stream, "%f", value);
+}
+
+private_fun void Filemanager_writeAsInt(void* obj, int value)
+{
+	CAST(Filemanager, obj, , );
+	//file is only for reading
+	if (basic_strcmp(self->mode, "r")) return;
+	fflush(self->file_stream);
+	fprintf(self->file_stream, "%i", value);
+}
+
+private_fun void Filemanager_writeAsSize_t(void* obj, size_t value)
+{
+	CAST(Filemanager, obj, , );
+	//file is only for reading
+	if (basic_strcmp(self->mode, "r")) return;
+	fflush(self->file_stream);
+	fprintf(self->file_stream, "%zu", value);
+}
+
+private_fun void Filemanager_writeAsBoolean(void* obj, boolean value)
+{
+	CAST(Filemanager, obj, , );
+	//file is only for reading
+	if (basic_strcmp(self->mode, "r")) return;
+	fflush(self->file_stream);
+	fprintf(self->file_stream, "%i", value);
+}
+
 private_fun size_t Filemanager_getLineCount(void* obj)
 {
 	CAST(Filemanager, obj, -1, );
 	if (self->count_of_lines == 0) {
 		char buffer[BUFFER_SIZE];
 		size_t count = 0;
-		while (fgets(buffer, BUFFER_SIZE, self->file_stream)) {
+		while (fgets(buffer, BUFFER_SIZE, self->file_stream) != NULL) {
 			count++;
 		}
 		self->count_of_lines = count;
 	}
 	return self->count_of_lines;
 }
-
