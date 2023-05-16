@@ -67,8 +67,8 @@ Filemanager* Filemanager_ctor(const char* filename_path, const char* mode)
 	this->filemanagerIF = thisIF;
 	this->objectIF = super->objectIF;
 
-	super->objectIF->clone = &Filemanager_toString;
-	super->objectIF->toString = &Filemanager_clone;
+	super->objectIF->clone = &Filemanager_clone;
+	super->objectIF->toString = &Filemanager_toString;
 	super->objectIF->dtor = &Filemanager_dtor;
 	super->objectIF->equals = &Filemanager_equals;
 	
@@ -160,21 +160,88 @@ private_fun String* Filemanager_getLineAsString(void* obj)
 {
 	CAST(Filemanager, obj, NULL, );
 	char buffer[BUFFER_SIZE];
-	fgets(buffer, BUFFER_SIZE, self->file_stream);
-
-	String* tmp = String_ctor(buffer);
-
-
-
-
-
+	self->current_line++;
+	if (self->current_line > self->count_of_lines) return NULL;
+	for (size_t i = 0; i < self->current_line; ++i) {
+		fgets(buffer, BUFFER_SIZE, self->file_stream);
+	}
+	return String_ctor(buffer);
 }
 
-private_fun double Filemanager_getLineAsDouble(void* obj);
-private_fun float Filemanager_getLineAsFloat(void* obj);
-private_fun int Filemanager_getLineAsInt(void* obj);
-private_fun size_t Filemanager_getLineAsSize_t(void* obj);
-private_fun boolean Filemanager_getLineAsBoolean(void* obj);
+private_fun double Filemanager_getLineAsDouble(void* obj)
+{
+	CAST(Filemanager, obj, 0.0, );
+	char buffer[BUFFER_SIZE];
+	self->current_line++;
+	if (self->current_line > self->count_of_lines) return 0.0;
+	for (size_t i = 0; i < self->current_line; ++i) {
+		fgets(buffer, BUFFER_SIZE, self->file_stream);
+	}
+	String* tmp = String_ctor(buffer);
+	double result = tmp->stringIF->parseDouble(tmp);
+	delete(tmp);
+	return result;
+}
+
+private_fun float Filemanager_getLineAsFloat(void* obj)
+{
+	CAST(Filemanager, obj, 0.0, );
+	char buffer[BUFFER_SIZE];
+	self->current_line++;
+	if (self->current_line > self->count_of_lines) return 0.0;
+	for (size_t i = 0; i < self->current_line; ++i) {
+		fgets(buffer, BUFFER_SIZE, self->file_stream);
+	}
+	String* tmp = String_ctor(buffer);
+	float result = tmp->stringIF->parseFloat(tmp);
+	delete(tmp);
+	return result;
+}
+
+private_fun int Filemanager_getLineAsInt(void* obj)
+{
+	CAST(Filemanager, obj, 0, );
+	char buffer[BUFFER_SIZE];
+	self->current_line++;
+	if (self->current_line > self->count_of_lines) return 0;
+	for (size_t i = 0; i < self->current_line; ++i) {
+		fgets(buffer, BUFFER_SIZE, self->file_stream);
+	}
+	String* tmp = String_ctor(buffer);
+	int result = tmp->stringIF->parseInt(tmp);
+	delete(tmp);
+	return result;
+}
+
+private_fun size_t Filemanager_getLineAsSize_t(void* obj)
+{
+	CAST(Filemanager, obj, 0, );
+	char buffer[BUFFER_SIZE];
+	self->current_line++;
+	if (self->current_line > self->count_of_lines) return 0;
+	for (size_t i = 0; i < self->current_line; ++i) {
+		fgets(buffer, BUFFER_SIZE, self->file_stream);
+	}
+	String* tmp = String_ctor(buffer);
+	size_t result = tmp->stringIF->parseSize_t(tmp);
+	delete(tmp);
+	return result;
+}
+
+private_fun boolean Filemanager_getLineAsBoolean(void* obj)
+{
+	CAST(Filemanager, obj, 0, );
+	char buffer[BUFFER_SIZE];
+	self->current_line++;
+	if (self->current_line > self->count_of_lines) return 0;
+	for (size_t i = 0; i < self->current_line; ++i) {
+		fgets(buffer, BUFFER_SIZE, self->file_stream);
+	}
+	String* tmp = String_ctor(buffer);
+	boolean result = tmp->stringIF->parseInt(tmp);
+	delete(tmp);
+	return result;
+}
 
 private_fun void Filemanager_writeAsString(void* obj, void* str)
 {
