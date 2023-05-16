@@ -14,6 +14,9 @@
 #include "string.r"
 
 #define BUFFER_SIZE 1024
+#define RESET_FILE \
+	fclose(self->file_stream); \
+	self->file_stream = fopen(self->filename_path, self->mode); \
 
 /* function prototypes */
 /* overriding methods */
@@ -146,13 +149,14 @@ private_fun Array* Filemanager_scanCompleteFile(void* obj)
 	CAST(Filemanager, obj, NULL, );
 	Array* arr = Array_ctor("String", Filemanager_getLineCount(obj));
 	if (!arr) return NULL;
+	char buffer[BUFFER_SIZE] = {0};
 	for (size_t i = 0; i < arr->arrayIF->length(arr); ++i) {
-		char buffer[BUFFER_SIZE];
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 		String* tmp = String_ctor(buffer);
 		arr->arrayIF->set(arr, tmp, i);
 		delete(tmp);
 	}
+	RESET_FILE;
 	return arr;
 }
 
@@ -165,6 +169,7 @@ private_fun String* Filemanager_getLineAsString(void* obj)
 	for (size_t i = 0; i < self->current_line; ++i) {
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 	}
+	RESET_FILE;
 	return String_ctor(buffer);
 }
 
@@ -180,6 +185,7 @@ private_fun double Filemanager_getLineAsDouble(void* obj)
 	String* tmp = String_ctor(buffer);
 	double result = tmp->stringIF->parseDouble(tmp);
 	delete(tmp);
+	RESET_FILE;
 	return result;
 }
 
@@ -195,6 +201,7 @@ private_fun float Filemanager_getLineAsFloat(void* obj)
 	String* tmp = String_ctor(buffer);
 	float result = tmp->stringIF->parseFloat(tmp);
 	delete(tmp);
+	RESET_FILE;
 	return result;
 }
 
@@ -210,6 +217,7 @@ private_fun int Filemanager_getLineAsInt(void* obj)
 	String* tmp = String_ctor(buffer);
 	int result = tmp->stringIF->parseInt(tmp);
 	delete(tmp);
+	RESET_FILE;
 	return result;
 }
 
@@ -225,6 +233,7 @@ private_fun size_t Filemanager_getLineAsSize_t(void* obj)
 	String* tmp = String_ctor(buffer);
 	size_t result = tmp->stringIF->parseSize_t(tmp);
 	delete(tmp);
+	RESET_FILE;
 	return result;
 }
 
@@ -240,6 +249,7 @@ private_fun boolean Filemanager_getLineAsBoolean(void* obj)
 	String* tmp = String_ctor(buffer);
 	boolean result = tmp->stringIF->parseInt(tmp);
 	delete(tmp);
+	RESET_FILE;
 	return result;
 }
 
@@ -309,5 +319,6 @@ private_fun size_t Filemanager_getLineCount(void* obj)
 		}
 		self->count_of_lines = count;
 	}
+	RESET_FILE;
 	return self->count_of_lines;
 }
