@@ -21,14 +21,12 @@
 		MALLOC(datatype, 1, tmp); \
 		basic_bin_copy(tmp, data, sizeof(datatype), 0); \
 		*(ptr + index) = tmp; \
-		return; \
 	} \
 
 #define ARRAY_SET_CLASS(datatype) \
 	if(basic_strcmp(self->name, #datatype)) { \
 		datatype* tmp = data; \
 		*(ptr + index) = tmp->objectIF->clone(data); \
-		return; \
 	} \
 
 #define ARRAY_CMP_PRIMITIVE(datatype) \
@@ -72,7 +70,7 @@ private_fun void* Array_get(void* obj, size_t index);
 private_fun void Array_set(void* obj, void* data, size_t index);
 private_fun void Array_resize(void* obj, size_t new_length);
 private_fun size_t Array_length(void* obj);
-
+private_fun void Array_fill(void* obj, void* data);
 
 /* public functions */
 
@@ -105,6 +103,7 @@ Array* Array_ctor(const char* name, size_t length)
 	thisIF->set = &Array_set;
 	thisIF->length = &Array_length;
 	thisIF->resize = &Array_resize;
+	thisIF->resize = &Array_fill;
 
 	self->sub = NULL;
 	self->length = length;
@@ -215,6 +214,23 @@ private_fun void Array_set(void* obj, void* data, size_t index)
 
 	ARRAY_SET_CLASS(String);
 
+}
+
+private_fun void Array_fill(void* obj, void* data)
+{
+	CAST(Array, obj, , );
+	if (!data) return;
+	void** ptr = self->arr;
+	for (size_t index = 0; index < self->length; ++index) {
+		ARRAY_SET_PRIMITIVE(double);
+		ARRAY_SET_PRIMITIVE(float);
+		ARRAY_SET_PRIMITIVE(char);
+		ARRAY_SET_PRIMITIVE(int);
+		ARRAY_SET_PRIMITIVE(boolean);
+		ARRAY_SET_PRIMITIVE(size_t);
+
+		ARRAY_SET_CLASS(String);
+	}
 }
 
 private_fun size_t Array_length(void* obj)

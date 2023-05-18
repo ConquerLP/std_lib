@@ -33,6 +33,8 @@ private_fun size_t String_length(void* obj);
 private_fun void String_toLowerCase(void* obj);
 private_fun void String_toUpperCase(void* obj);
 
+private_fun boolean String_startsWithChar(void* obj, char c);
+private_fun boolean String_endsWithChar(void* obj, char c);
 private_fun boolean String_containsChar(void* obj, char c);
 private_fun boolean String_containsCharOffset(void* obj, char c, size_t offset);
 private_fun size_t String_countOccurencesChar(void* obj, char c);
@@ -58,6 +60,8 @@ private_fun void String_removeAllCharOffset(void* obj, char old, size_t offset);
 private_fun void String_removeFirstCharOffset(void* obj, char old, size_t offset);
 private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset);
 
+private_fun boolean String_startsWithString(void* obj, void* str);
+private_fun boolean String_endsWithString(void* obj, void* str);
 private_fun boolean String_containsSubstring(void* obj, void* str);
 private_fun boolean String_containsSubstringOffset(void* obj, void* str, size_t offset);
 private_fun size_t String_countSubstringOccurences(void* obj, void* str);
@@ -127,6 +131,8 @@ String* String_ctor(const char* text)
 	thisIF->toLowerCase = &String_toLowerCase;
 	thisIF->toUpperCase = &String_toUpperCase;
 
+	thisIF->startsWithChar = &String_startsWithChar;
+	thisIF->endsWithChar = &String_endsWithChar;
 	thisIF->containsChar = &String_containsChar;
 	thisIF->containsCharOffset = &String_containsCharOffset;
 	thisIF->countOccurencesChar = &String_countOccurencesChar;
@@ -138,6 +144,8 @@ String* String_ctor(const char* text)
 	thisIF->findAllChar = &String_findAllChar;
 	thisIF->findAllCharOffset = &String_findAllCharOffset;
 
+	thisIF->startsWithString = &String_startsWithString;
+	thisIF->endsWithString = &String_endsWithString;
 	thisIF->replaceAllChar = &String_replaceAllChar;
 	thisIF->replaceFirstChar = &String_replaceFirstChar;
 	thisIF->replaceLastChar = &String_replaceLastChar;
@@ -300,6 +308,20 @@ private_fun void String_toUpperCase(void* obj)
 	for (size_t i = 0; i < self->length; ++i) {
 		basic_memset(self->str + i, String_CharToUpper(String_charAt(this, i)) , 1);
 	}
+}
+
+private_fun boolean String_startsWithChar(void* obj, char c)
+{
+	CAST(String, obj, false, );
+	if (String_charAt(obj, 0) == c) return true;
+	return false;
+}
+
+private_fun boolean String_endsWithChar(void* obj, char c)
+{
+	CAST(String, obj, false, );
+	if (String_charAt(obj, self->length - 1) == c) return true;
+	return false;
 }
 
 private_fun boolean String_containsChar(void* obj, char c)
@@ -501,6 +523,26 @@ private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
 	String_setText(obj, part1->objectIF->toString(part1));
 	delete(part1);
 	delete(part2);
+}
+
+private_fun boolean String_startsWithString(void* obj, void* str)
+{
+	CAST(String, obj, false, );
+	CAST(String, str, false, 1);
+	if (self1->length > self->length) return false;
+	if (self->length == 0 || self1->length == 0) return false;
+	if (String_findFirstString(obj, str) == 0) return true;
+	return false;
+}
+
+private_fun boolean String_endsWithString(void* obj, void* str)
+{
+	CAST(String, obj, false, );
+	CAST(String, str, false, 1);
+	if (self1->length > self->length) return false;
+	if (self->length == 0 || self1->length == 0) return false;
+	if (String_findLastString(obj, str) == self->length - self1->length) return true;
+	return false;
 }
 
 private_fun boolean String_containsSubstring(void* obj, void* str)
