@@ -252,7 +252,9 @@ private_fun boolean Filemanager_getLineAsBoolean(void* obj)
 	boolean result = tmp->stringIF->parseInt(tmp);
 	delete(tmp);
 	RESET_FILE;
-	return result;
+	if (result >= 1) return true;
+	if (result <= 0) return false;
+	return false;
 }
 
 private_fun void Filemanager_writeAsString(void* obj, void* str)

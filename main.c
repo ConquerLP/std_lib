@@ -7,9 +7,7 @@ int main(void) {
 	String* str = String_ctor("Test\n");
 
 	for (size_t i = 0; i < 10; ++i) {
-		//input->filemanagerIF->writeAsDouble(input, 2.5);
-
-		printf("%lf\n", input->filemanagerIF->getLineAsDouble(input));
+		printf("%i\n", input->filemanagerIF->getLineAsInt(input));
 	}
 
 	delete(input);
