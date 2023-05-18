@@ -17,6 +17,7 @@
 #define RESET_FILE \
 	fclose(self->file_stream); \
 	self->file_stream = fopen(self->filename_path, self->mode); \
+	if(!self->file_stream) exit(1); \
 
 /* function prototypes */
 /* overriding methods */
@@ -40,6 +41,7 @@ private_fun void Filemanager_writeAsInt(void* obj, int value);
 private_fun void Filemanager_writeAsSize_t(void* obj, size_t value);
 private_fun void Filemanager_writeAsBoolean(void* obj, boolean value);
 private_fun size_t Filemanager_getLineCount(void* obj);
+private_fun void Filemanager_setAppend(void* obj, const char* append);
 
 /* helper functions */
 
@@ -89,22 +91,21 @@ Filemanager* Filemanager_ctor(const char* filename_path, const char* mode)
 	thisIF->writeAsSize_t = &Filemanager_writeAsSize_t;
 	thisIF->writeAsBoolean = &Filemanager_writeAsBoolean;
 	thisIF->getLineCount = &Filemanager_getLineCount;
+	thisIF->setAppend = &Filemanager_setAppend;
 
 	self->sub = NULL;
 	self->filename_path = basic_strcpy(filename_path);
 	self->count_of_lines = 0;
 	self->current_line = 0;
+	self->std_append = basic_strcpy("\n");
 	self->mode = basic_strcpy(mode);
 	self->file_stream = fopen(filename_path, mode);
-	if (!self->file_stream) {
-		FREE(self->filename_path);
-		FREE(self->mode);
-		FREE(self);
-		FREE(this->filemanagerIF);
-		Object_dtor(this->super);
-		FREE(this);
-		return NULL;
+	if (!self->file_stream) exit(1);
+	char buffer[BUFFER_SIZE];
+	while (fgets(buffer, BUFFER_SIZE, self->file_stream) != NULL) {
+		self->count_of_lines++;
 	}
+	RESET_FILE;
 	return this;
 }
 
@@ -128,6 +129,7 @@ private_fun void Filemanager_dtor(void* obj)
 	CAST(Filemanager, obj, , );
 	fclose(self->file_stream);
 	FREE(self->filename_path);
+	FREE(self->std_append);
 	FREE(self->mode);
 	FREE(self);
 	Object_dtor(this->super);
@@ -260,7 +262,7 @@ private_fun void Filemanager_writeAsString(void* obj, void* str)
 	//file is only for reading
 	if (basic_strcmp(self->mode, "r")) return;
 	fflush(self->file_stream);
-	fprintf(self->file_stream, "%s", self1->str);
+	fprintf(self->file_stream, "%s%s", self1->str, self->std_append);
 }
 
 private_fun void Filemanager_writeAsDouble(void* obj, double value)
@@ -269,7 +271,7 @@ private_fun void Filemanager_writeAsDouble(void* obj, double value)
 	//file is only for reading
 	if (basic_strcmp(self->mode, "r")) return;
 	fflush(self->file_stream);
-	fprintf(self->file_stream, "%lf", value);
+	fprintf(self->file_stream, "%lf%s", value, self->std_append);
 }
 
 private_fun void Filemanager_writeAsFloat(void* obj, float value)
@@ -278,7 +280,7 @@ private_fun void Filemanager_writeAsFloat(void* obj, float value)
 	//file is only for reading
 	if (basic_strcmp(self->mode, "r")) return;
 	fflush(self->file_stream);
-	fprintf(self->file_stream, "%f", value);
+	fprintf(self->file_stream, "%f%s", value, self->std_append);
 }
 
 private_fun void Filemanager_writeAsInt(void* obj, int value)
@@ -287,7 +289,7 @@ private_fun void Filemanager_writeAsInt(void* obj, int value)
 	//file is only for reading
 	if (basic_strcmp(self->mode, "r")) return;
 	fflush(self->file_stream);
-	fprintf(self->file_stream, "%i", value);
+	fprintf(self->file_stream, "%i%s", value, self->std_append);
 }
 
 private_fun void Filemanager_writeAsSize_t(void* obj, size_t value)
@@ -296,7 +298,7 @@ private_fun void Filemanager_writeAsSize_t(void* obj, size_t value)
 	//file is only for reading
 	if (basic_strcmp(self->mode, "r")) return;
 	fflush(self->file_stream);
-	fprintf(self->file_stream, "%zu", value);
+	fprintf(self->file_stream, "%zu%s", value, self->std_append);
 }
 
 private_fun void Filemanager_writeAsBoolean(void* obj, boolean value)
@@ -305,20 +307,18 @@ private_fun void Filemanager_writeAsBoolean(void* obj, boolean value)
 	//file is only for reading
 	if (basic_strcmp(self->mode, "r")) return;
 	fflush(self->file_stream);
-	fprintf(self->file_stream, "%i", value);
+	fprintf(self->file_stream, "%i%s", value, self->std_append);
 }
 
 private_fun size_t Filemanager_getLineCount(void* obj)
 {
 	CAST(Filemanager, obj, -1, );
-	if (self->count_of_lines == 0) {
-		char buffer[BUFFER_SIZE];
-		size_t count = 0;
-		while (fgets(buffer, BUFFER_SIZE, self->file_stream) != NULL) {
-			count++;
-		}
-		self->count_of_lines = count;
-	}
-	RESET_FILE;
 	return self->count_of_lines;
+}
+
+private_fun void Filemanager_setAppend(void* obj, const char* append)
+{
+	CAST(Filemanager, obj, , );
+	FREE(self->std_append);
+	self->std_append = basic_strcpy(append);
 }

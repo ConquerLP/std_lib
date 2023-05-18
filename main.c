@@ -2,14 +2,18 @@
 
 int main(void) {
 
-	Filemanager* input = Filemanager_ctor("test.txt", "r");
+	Filemanager* input = Filemanager_ctor("test.txt", "r+");
 
-	Array* arr = input->filemanagerIF->scanCompleteFile(input);
+	String* str = String_ctor("Test\n");
 
-	for (size_t i = 0; i < arr->arrayIF->length(arr); ++i) {
-		String* tmp = arr->arrayIF->get(arr, i);
-		printf("%s", tmp->objectIF->toString(tmp));
+	for (size_t i = 0; i < 10; ++i) {
+		//input->filemanagerIF->writeAsDouble(input, 2.5);
+
+		printf("%lf\n", input->filemanagerIF->getLineAsDouble(input));
 	}
+
+	delete(input);
+	delete(str);
 
 	PRINT_DEBUG_MEMORY;
 

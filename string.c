@@ -11,6 +11,7 @@
 #include "object.r"
 
 #define TMP_CHAR_LENGTH 20
+char to_trim[] = { "\t\nABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz()[]{}:;^'~%=<>!?&$#@_|\" " };
 
 /* function prototypes */
 /* Helper functions*/
@@ -915,7 +916,7 @@ String* String_booleanToString(boolean value)
 private_fun double String_parseDouble(void* obj)
 {
 	CAST(String, obj, 0.0, );
-	char to_check[] = { "\t\n/*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz" };
+	char to_check[] = { "/*" };
 	for (size_t i = 0; i < basic_strlen(to_check) - 1; ++i) {
 		if (String_containsChar(obj, to_check[i])) return 0.0;
 	}
@@ -924,21 +925,26 @@ private_fun double String_parseDouble(void* obj)
 		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0.0;
 	}
 	if (String_containsChar(obj, '+') && String_containsChar(obj, '-')) return 0.0;
+	String* copy = String_clone(obj);
+	CAST(String, copy, 0.0, 1);
+	String_trim(copy, to_trim);
 	String* filter = String_ctor("");
 	String* filter_repalcement = String_ctor("");
-	if (String_charAt(obj, 0) == '-' && String_charAt(obj, 1) == '.') {
+	if (String_charAt(copy, 0) == '-' && String_charAt(copy, 1) == '.') {
 		String_setText(filter, "-.");
 		String_setText(filter_repalcement, "-0.");
-		String_replaceFirstSubstring(obj, filter, filter_repalcement);
+		String_replaceFirstSubstring(copy, filter, filter_repalcement);
 	}
-	if (String_charAt(obj, 0) == '.') {
+	if (String_charAt(copy, 0) == '.') {
 		String_setText(filter, ".");
 		String_setText(filter_repalcement, "0.");
-		String_replaceFirstSubstring(obj, filter, filter_repalcement);
+		String_replaceFirstSubstring(copy, filter, filter_repalcement);
 	}
 	delete(filter);
 	delete(filter_repalcement);
-	return atof(self->str);
+	double result = atof(self1->str);
+	delete(copy);
+	return result;
 }
 
 private_fun float String_parseFloat(void* obj)
@@ -949,7 +955,7 @@ private_fun float String_parseFloat(void* obj)
 private_fun int String_parseInt(void* obj)
 {
 	CAST(String, obj, 0, );
-	char to_check[] = { "\t\n/*.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz" };
+	char to_check[] = { "/*.," };
 	for (size_t i = 0; i < basic_strlen(to_check) - 1; ++i) {
 		if (String_containsChar(obj, to_check[i])) return 0;
 	}
@@ -958,13 +964,18 @@ private_fun int String_parseInt(void* obj)
 		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
 	}
 	if (String_containsChar(obj, '+') && String_containsChar(obj, '-')) return 0;
-	return atoi(self->str);
+	String* copy = String_clone(obj);
+	CAST(String, copy, 0, 1);
+	String_trim(copy, to_trim);
+	int result = atoi(self1->str);
+	delete(copy);
+	return result;
 }
 
 private_fun size_t String_parseSize_t(void* obj)
 {
 	CAST(String, obj, 0, );
-	char to_check[] = { "\t\n/*-.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz" };
+	char to_check[] = { "/*.,-" };
 	for (size_t i = 0; i < basic_strlen(to_check) - 1; ++i) {
 		if (String_containsChar(obj, to_check[i])) return 0;
 	}
@@ -972,11 +983,15 @@ private_fun size_t String_parseSize_t(void* obj)
 	for (size_t i = 0; i < basic_strlen(check_doubles) - 1; ++i) {
 		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
 	}
-	String_trim(obj, " +");
+	String* copy = String_clone(obj);
+	CAST(String, copy, 0, 1);
+	String_trim(copy, to_trim);
+	String_trim(copy, "+");
 	size_t result = 0;
-	for (size_t i = 0; i < self->length - 1; ++i) {
-		result = result * 10 + (self->str[i] - 48);
+	for (size_t i = 0; i < self1->length - 1; ++i) {
+		result = result * 10 + (self1->str[i] - 48);
 	}
+	delete(copy);
 	return result;
 }
 

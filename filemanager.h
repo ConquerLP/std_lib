@@ -30,6 +30,7 @@ typedef struct _FilemanagerIF {
 	void (*writeAsSize_t)(void* obj, size_t value);
 	void (*writeAsBoolean)(void* obj, boolean value);
 	size_t (*getLineCount)(void* obj);
+	void (*setAppend)(void* obj, const char* append);
 }FilemanagerIF;
 
 typedef struct _Filemanager {
