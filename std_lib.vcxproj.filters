@@ -83,6 +83,9 @@
     <None Include="vector.r">
       <Filter>Headerdateien\math</Filter>
     </None>
+    <None Include="RUN_ME.bat">
+      <Filter>Quelldateien</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
