@@ -99,8 +99,8 @@ typedef struct _String {
 String* String_ctor(const char* text);
 
 /* alternitive ctors */
-String* String_doubleToString(double value);
-String* String_floatToString(float value);
+String* String_doubleToString(double value, int prec);
+String* String_floatToString(float value, int prec);
 String* String_intToString(int value);
 String* String_size_tToString(size_t value);
 String* String_booleanToString(boolean value);

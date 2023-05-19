@@ -2,14 +2,11 @@
 
 int main(void) {
 
-	String* str = String_ctor("test");
-	String* str1 = String_ctor("trains");
-
-	//str->stringIF->insertCharAt(str, 'u', 1);
-	str->stringIF->insertStringAt(str, str1, 1);
+	String* str = String_doubleToString(3.63214, 3);
+	
+	printf("%s", str->objectIF->toString(str));
 
 	delete(str);
-	delete(str1);
 
 	PRINT_DEBUG_MEMORY;
 
