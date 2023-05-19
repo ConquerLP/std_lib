@@ -947,19 +947,19 @@ private_fun void String_trim(void* obj, const char* toTrim)
 	}
 }
 
-String* String_doubleToString(double value)
+String* String_doubleToString(double value, int prec)
 {
 	char buff[TMP_CHAR_LENGTH] = { 0 };
-	snprintf(buff, TMP_CHAR_LENGTH - 1, "%lf", value);
+	snprintf(buff, TMP_CHAR_LENGTH - 1, "%.*lf", prec, value);
 	String* string = String_ctor(buff);
 	String_trim(string, " ");
 	return string;
 }
 
-String* String_floatToString(float value)
+String* String_floatToString(float value, int prec)
 {
 	char buff[TMP_CHAR_LENGTH] = { 0 };
-	snprintf(buff, TMP_CHAR_LENGTH - 1, "%f", value);
+	snprintf(buff, TMP_CHAR_LENGTH - 1, "%.*f", prec, value);
 	String* string = String_ctor(buff);
 	String_trim(string, "\0 ");
 	return string;

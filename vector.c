@@ -9,7 +9,6 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
-#include <math.h>
 #include "std_lib_math.h"
 
 /* function prototpyes */
