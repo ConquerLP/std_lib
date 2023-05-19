@@ -528,6 +528,12 @@ private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
 private_fun boolean String_startsWithString(void* obj, void* str)
 {
 	CAST(String, obj, false, );
+	if (!Object_isObject(str)) {
+		String* tmp = String_ctor((const char*)str);
+		boolean result = String_startsWithString(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, false, 1);
 	if (self1->length > self->length) return false;
 	if (self->length == 0 || self1->length == 0) return false;

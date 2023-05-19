@@ -16,6 +16,7 @@ typedef struct _Object {
 	ObjectIF* objectIF;
 }Object;
 
+/* public d_tor for every possible class */
 void delete(void* obj);
 
 #endif // !OBJECT_H

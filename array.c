@@ -103,7 +103,7 @@ Array* Array_ctor(const char* name, size_t length)
 	thisIF->set = &Array_set;
 	thisIF->length = &Array_length;
 	thisIF->resize = &Array_resize;
-	thisIF->resize = &Array_fill;
+	thisIF->fill = &Array_fill;
 
 	self->sub = NULL;
 	self->length = length;

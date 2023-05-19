@@ -15,10 +15,10 @@ extern "C"
 	o_##datatype* self##n = NULL; \
 	if(!ptr) return _return; \
 	this##n = ptr; \
-	if(!this##n->self) exit(1); \
-	if(!this##n->super) exit(1); \
+	if(!this##n->self) return _return; \
+	if(!this##n->super) return _return; \
 	Object* object_ptr##n = this##n->super; \
-	if(!object_ptr##n->self) exit(1); \
+	if(!object_ptr##n->self) return _return; \
 	o_Object* object_ptr_self##n = object_ptr##n->self; \
 	if(!basic_strcmp(#datatype, object_ptr_self##n->name)) return _return; \
 	self##n = this##n->self; \
@@ -28,7 +28,7 @@ extern "C"
 	o_Object* self##n = NULL; \
 	if(!ptr) return _return; \
 	this##n = ptr; \
-	if(!this##n->self) exit(1); \
+	if(!this##n->self) return _return; \
 	self##n = this##n->self; \
 
 /* list of allowed datatypes in the array & list */

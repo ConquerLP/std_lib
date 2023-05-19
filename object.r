@@ -2,6 +2,8 @@
 
 #define OBJECT_R
 
+#include "def.h"
+
 /* Object class */
 
 typedef struct {
@@ -10,5 +12,6 @@ typedef struct {
 }o_Object;
 
 void Object_dtor(void* obj);
+boolean Object_isObject(void* obj);
 
 #endif

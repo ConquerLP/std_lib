@@ -65,3 +65,9 @@ private_fun boolean Object_equals(void* obj, void* obj2)
 	if (basic_strcmp(self->name, self1->name)) return true;
 	return false;
 }
+
+boolean Object_isObject(void* obj)
+{
+	CAST_OBJECT(obj, false, );
+	return true;
+}
