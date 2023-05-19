@@ -43,6 +43,7 @@ typedef struct {
 	void (*removeAllCharOffset)(void* obj, char old, size_t offset);
 	void (*removeFirstCharOffset)(void* obj, char old, size_t offset);
 	void (*removeLastCharOffset)(void* obj, char old, size_t offset);
+	void (*insertCharAt)(void* obj, char c, size_t index);
 
 	boolean(*startsWithString)(void* obj, void* str);
 	boolean(*endsWithString)(void* obj, void* str);
@@ -70,6 +71,7 @@ typedef struct {
 	void (*removeAllSubstringOffset)(void* obj, void* sub, size_t offset);
 	void (*removeFirstSubstringOffset)(void* obj, void* sub, size_t offset);
 	void (*removeLastSubstringOffset)(void* obj, void* sub, size_t offset);
+	void (*insertStringAt)(void* obj, void* str, size_t index);
 
 	boolean(*compare)(void* str1, void* str2);
 	boolean(*compareIgnCase)(void* str1, void* str2);

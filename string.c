@@ -59,6 +59,7 @@ private_fun void String_removeLastChar(void* obj, char old);
 private_fun void String_removeAllCharOffset(void* obj, char old, size_t offset);
 private_fun void String_removeFirstCharOffset(void* obj, char old, size_t offset);
 private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset);
+private_fun void String_insertCharAt(void* obj, char c, size_t index);
 
 private_fun boolean String_startsWithString(void* obj, void* str);
 private_fun boolean String_endsWithString(void* obj, void* str);
@@ -87,6 +88,7 @@ private_fun void String_removeLastSubstring(void* obj, void* sub);
 private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t offset);
 private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t offset);
 private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t offset);
+private_fun void String_insertStringAt(void* obj, void* str, size_t index);
 
 private_fun boolean String_compare(void* obj, void* str2);
 private_fun boolean String_compareIgnCase(void* obj, void* str2);
@@ -159,6 +161,7 @@ String* String_ctor(const char* text)
 	thisIF->removeAllCharOffset = &String_removeAllCharOffset;
 	thisIF->removeFirstCharOffset = &String_removeFirstCharOffset;
 	thisIF->removeLastCharOffset = &String_removeLastCharOffset;
+	thisIF->insertCharAt = &String_insertCharAt;
 
 	thisIF->containsSubstring = &String_containsSubstring;
 	thisIF->containsSubstringOffset = &String_containsSubstringOffset;
@@ -185,6 +188,7 @@ String* String_ctor(const char* text)
 	thisIF->removeAllSubstringOffset = &String_removeAllSubstringOffset;
 	thisIF->removeFirstSubstringOffset = &String_removeFirstSubstringOffset;
 	thisIF->removeLastSubstringOffset = &String_removeLastSubstringOffset;
+	thisIF->insertStringAt = &String_insertStringAt;
 
 	thisIF->compare = &String_compare;
 	thisIF->compareIgnCase = &String_compareIgnCase;
@@ -523,6 +527,21 @@ private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
 	String_setText(obj, part1->objectIF->toString(part1));
 	delete(part1);
 	delete(part2);
+}
+
+private_fun void String_insertCharAt(void* obj, char c, size_t index)
+{
+	CAST(String, obj, , );
+	if (self->length <= 1) return;
+	if (index >= self->length) return;
+	char* tmp;
+	MALLOC(char, self->length + 1, tmp);
+	basic_bin_copy(tmp, self->str, index, 0);
+	basic_memset(tmp + index, c, 1);
+	basic_bin_copy(tmp, self->str, self->length - index + 1, index + 1);
+	FREE(self->str);
+	self->length++;
+	self->str = tmp;
 }
 
 private_fun boolean String_startsWithString(void* obj, void* str)
@@ -864,6 +883,23 @@ private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t o
 	FREE(self->str);
 	self->length = new_size;
 	self->str = tmp;
+}
+
+private_fun void String_insertStringAt(void* obj, void* str, size_t index)
+{
+	CAST(String, obj, , );
+	CAST(String, str, , 1);
+	if (self->length <= 1) return;
+	if (self1->length <= 1) return;
+	if (index >= self->length) return;
+	char* tmp;
+	MALLOC(char, self->length + self1->length, tmp);
+	basic_bin_copy(tmp, self->str, index, 0);
+	basic_bin_copy(tmp, self1->str, self1->length - 1, index);
+	basic_bin_copy(tmp, self->str + index, self->length - index, index + self1->length - 1);
+	FREE(self->str);
+	self->str = tmp;
+	self->length = basic_strlen(tmp);
 }
 
 private_fun boolean String_compare(void* obj, void* str2)
