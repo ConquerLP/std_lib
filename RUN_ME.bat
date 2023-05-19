@@ -9,3 +9,4 @@ del *.vcxproj.filters
 del *.vcxproj.user
 del *.sln
 del *.bat
+del main.c
