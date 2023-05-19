@@ -25,6 +25,7 @@ private_fun void Vector3D_set(void* obj, char index, double value);
 private_fun double Vector3D_calcDotP(void* vec1, void* vec2);
 private_fun void Vector3D_rotate(void* obj, double angle, char axis);
 private_fun double Vector3D_getLength(void* obj);
+private_fun double Vector3D_angle(void* vec1, void* vec2);
 
 /* pulbic functions */
 Vector3D* Vector3D_ctor(double x, double y, double z)
@@ -52,6 +53,7 @@ Vector3D* Vector3D_ctor(double x, double y, double z)
 	thisIF->calcDotP = &Vector3D_calcDotP;
 	thisIF->rotate = &Vector3D_rotate;
 	thisIF->getLength = &Vector3D_getLength;
+	thisIF->getAngle = &Vector3D_angle;
 
 	self->sub = NULL;
 	self->toString = basic_strcpy("");

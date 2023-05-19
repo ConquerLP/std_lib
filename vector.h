@@ -11,6 +11,7 @@ typedef struct _Vector3DIF {
 	double (*calcDotP)(void* vec1, void* vec2);
 	void (*rotate)(void* obj, double angle, char axis);
 	double (*getLength)(void* obj);
+	double (*getAngle)(void* vec1, void* vec2);
 }Vector3DIF;
 
 typedef struct _Vector3D {
