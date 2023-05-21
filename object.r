@@ -12,5 +12,6 @@ typedef struct {
 }o_Object;
 
 void Object_dtor(void* obj);
+char* Object_getName(void* obj);
 
 #endif

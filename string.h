@@ -84,7 +84,6 @@ typedef struct {
 	float (*parseFloat)(void* obj);
 	int (*parseInt)(void* obj);
 	size_t(*parseSize_t)(void* obj);
-
 }StringIF;
 
 typedef struct _String {
@@ -106,7 +105,7 @@ String* String_size_tToString(size_t value);
 String* String_booleanToString(boolean value);
 String* String_stringAt(void* obj, size_t index);
 String* String_subString(void* obj, size_t start, size_t end);
-
+String* String_join(void* obj);
 #ifdef __cplusplus
 } // extern "C"
 #endif

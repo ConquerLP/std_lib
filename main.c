@@ -4,18 +4,17 @@ int main(void) {
 
 	String* str = String_ctor("boo:and:foo");
 
-	String* regex = String_ctor("o");
+	Array* test = Array_ctor("String", 20);
+	test->arrayIF->fill(test, str);
 
-	Array* arr = str->stringIF->split(str, regex);
 
-	for (size_t i = 0; i < arr->arrayIF->length(arr); ++i) {
-		String* tmp = arr->arrayIF->get(arr, i);
-		printf("%s", tmp->objectIF->toString(tmp));
-	}
+	String* str1 = String_join(test);
+
+	printf("\n%s\n", str1->objectIF->toString(str1));
 
 	delete(str);
-	delete(regex);
-	delete(arr);
+	delete(str1);
+	delete(test);
 
 	PRINT_DEBUG_MEMORY;
 

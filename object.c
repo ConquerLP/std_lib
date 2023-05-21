@@ -46,6 +46,14 @@ void Object_dtor(void* obj)
 	FREE(this);
 }
 
+char* Object_getName(void* obj)
+{
+	if (!obj) return NULL;
+	Object** this = obj;
+	o_Object* self = (*this)->self;
+	return self->name;
+}
+
 private_fun char* Object_toString(void* obj)
 {
 	CAST_OBJECT(obj, NULL, );

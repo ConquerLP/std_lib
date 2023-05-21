@@ -5,6 +5,7 @@
 #include "array.r"
 
 #include "list.h"
+#include "list.r"
 
 #include "def.h"
 #include "basic.h"
@@ -103,6 +104,7 @@ private_fun double String_parseDouble(void* obj);
 private_fun float String_parseFloat(void* obj);
 private_fun int String_parseInt(void* obj);
 private_fun size_t String_parseSize_t(void* obj);
+String* String_join(void* obj);
 
 /* public functions */
 String* String_ctor(const char* text)
@@ -1090,6 +1092,30 @@ private_fun size_t String_parseSize_t(void* obj)
 	}
 	delete(copy);
 	return result;
+}
+
+String* String_join(void* obj)
+{
+	if (!obj) return NULL;
+	String* result = String_ctor("");
+	if (basic_strcmp("Array", Object_getName(obj))) {
+		CAST(Array, obj, NULL, 1);
+		for (size_t i = 0; i < self1->length; ++i) {
+			result->stringIF->append(result, this1->arrayIF->get(this1, i));
+		}
+		return result;
+	}
+	else if (basic_strcmp("List", Object_getName(obj))) {
+		CAST(List, obj, NULL, 2);
+		for (size_t i = 0; i < self2->length; ++i) {
+			result->stringIF->append(result, this2->listIF->get(this2, i));
+		}
+		return result;
+	}
+	else {
+		delete(result);
+		return NULL;
+	}
 }
 
 /* Helper functions */
