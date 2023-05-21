@@ -13,7 +13,7 @@ extern "C"
 #define private_fun static
 #define perm_var static
 
-#define DEF_DEBUG false
+#define DEF_DEBUG true
 
 #define PRINT_DEBUG_MEMORY //PRINT_DEBUG_MEMORY
 

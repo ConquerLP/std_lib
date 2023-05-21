@@ -10,6 +10,7 @@ extern "C"
 #include <stdlib.h>
 #include "object.h"
 #include "def.h"
+#include "array.h"
 
 typedef struct {
 	void* (*get)(void* obj, size_t index);
@@ -23,6 +24,7 @@ typedef struct {
 	boolean (*isEmpty)(void* obj);
 	size_t (*size)(void* obj);
 	struct _List* (*subList)(void* obj, size_t start, size_t end);
+	Array* (*toArray)(void* obj);
 }ListIF;
 
 typedef struct _List {

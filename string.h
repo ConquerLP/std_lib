@@ -57,7 +57,7 @@ typedef struct {
 	size_t(*findFirstStringOffset)(void* obj, void* str, size_t offset);
 	Array* (*findAllSubstrings)(void* obj, void* str);
 	Array* (*findAllSubstringsOffset)(void* obj, void* str, size_t offset);
-	//Array* (*split)(void* obj, void* str);
+	Array* (*split)(void* obj, void* str);
 	void (*replaceAllSubstring)(void* obj, void* sub, void* replacement);
 	void (*replaceFirstSubstring)(void* obj, void* sub, void* replacement);
 	void (*replaceLastSubstring)(void* obj, void* sub, void* replacement);

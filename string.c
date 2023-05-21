@@ -4,6 +4,8 @@
 #include "array.h"
 #include "array.r"
 
+#include "list.h"
+
 #include "def.h"
 #include "basic.h"
 
@@ -73,7 +75,7 @@ private_fun size_t String_findLastStringOffset(void* obj, void* str, size_t offs
 private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t offset);
 private_fun Array* String_findAllSubstrings(void* obj, void* str);
 private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset);
-//private_fun Array* String_split(void* obj, void* str);
+private_fun Array* String_split(void* obj, void* str);
 
 private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement);
 private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replacement);
@@ -173,7 +175,7 @@ String* String_ctor(const char* text)
 	thisIF->findFirstStringOffset = &String_findFirstStringOffset;
 	thisIF->findAllSubstrings = &String_findAllSubstrings;
 	thisIF->findAllSubstringsOffset = &String_findAllSubstringsOffset;
-	//thisIF->split = &String_split;
+	thisIF->split = &String_split;
 
 	thisIF->replaceAllSubstring = &String_replaceAllSubstring;
 	thisIF->replaceFirstSubstring = &String_replaceFirstSubstring;
@@ -273,7 +275,7 @@ String* String_subString(void* obj, size_t start, size_t end)
 	CAST(String, obj, NULL, );
 	if (self->length <= 0) return NULL;
 	if (start > end) return NULL;
-	if (end >= self->length) return NULL;
+	if (end >= self->length) end = self->length - 1;
 	if (start >= self->length) return NULL;
 	String* sub = String_ctor("0");
 	if (end == start) {
@@ -682,17 +684,34 @@ private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t o
 	return arr;
 }
 
-/*
 private_fun Array* String_split(void* obj, void* str)
 {
 	CAST(String, obj, NULL, );
 	CAST(String, str, NULL, 1);
+
+	size_t start = 0;
 	size_t count = String_countSubstringOccurences(obj, str);
 	if (count == 0) return NULL;
-	Array* arr = Array_ctor("String", count);
+	List* list = List_ctor("String");
+	String* word = NULL;
+	while (true) {
+		size_t index = String_findFirstStringOffset(obj, str, start);
+		if (index >= self->length) {
+			word = String_subString(obj, start, self->length - 1);
+			list->listIF->append(list, word);
+			delete(word);
+			break;
+		}
+		if (start == index) word = String_ctor("?");
+		else word = String_subString(obj, start, index);
+		list->listIF->append(list, word);
+		delete(word);
+		start = index + self1->length - 1;
+	}
+	Array* result = list->listIF->toArray(list);
+	delete(list);
+	return result;
 }
-
-*/
 
 private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement)
 {

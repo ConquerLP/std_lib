@@ -2,11 +2,20 @@
 
 int main(void) {
 
-	String* str = String_doubleToString(3.63214, 3);
-	
-	printf("%s", str->objectIF->toString(str));
+	String* str = String_ctor("boo:and:foo");
+
+	String* regex = String_ctor("o");
+
+	Array* arr = str->stringIF->split(str, regex);
+
+	for (size_t i = 0; i < arr->arrayIF->length(arr); ++i) {
+		String* tmp = arr->arrayIF->get(arr, i);
+		printf("%s", tmp->objectIF->toString(tmp));
+	}
 
 	delete(str);
+	delete(regex);
+	delete(arr);
 
 	PRINT_DEBUG_MEMORY;
 

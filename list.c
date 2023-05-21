@@ -76,6 +76,7 @@ private_fun void List_addAll(void* obj, void* listToAdd);
 private_fun boolean List_isEmpty(void* obj);
 private_fun size_t List_size(void* obj);
 private_fun List* List_subList(void* obj, size_t start, size_t end);
+private_fun Array* List_toArray(void* obj);
 
 /* helper functions */
 private_fun Node* List_getNode(List* this, size_t index);
@@ -117,6 +118,7 @@ List* List_ctor(const char* name)
 	thisIF->isEmpty = &List_isEmpty;
 	thisIF->size = &List_size;
 	thisIF->subList = &List_subList;
+	thisIF->toArray = &List_toArray;
 
 	self->sub = NULL;
 	self->length = 0;
@@ -354,6 +356,17 @@ private_fun List* List_subList(void* obj, size_t start, size_t end)
 		}
 	}
 	return sub;
+}
+
+private_fun Array* List_toArray(void* obj)
+{
+	CAST(List, obj, NULL, );
+	if (self->length == 0) return NULL;
+	Array* arr = Array_ctor(self->name, self->length);
+	for (size_t i = 0; i < self->length; ++i) {
+		arr->arrayIF->set(arr, List_get(obj, i), i);
+	}
+	return arr;
 }
 
 /* helper functions */
