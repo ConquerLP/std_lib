@@ -7,8 +7,8 @@
 /* Object class */
 
 typedef struct {
-	void* sub;
 	char* name;
+	void* sub;
 }o_Object;
 
 void Object_dtor(void* obj);

@@ -537,12 +537,12 @@ private_fun void String_insertCharAt(void* obj, char c, size_t index)
 {
 	CAST(String, obj, , );
 	if (self->length <= 1) return;
-	if (index >= self->length) return;
+	if (index >= self->length) index = self->length - 1;
 	char* tmp;
 	MALLOC(char, self->length + 1, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
 	basic_memset(tmp + index, c, 1);
-	basic_bin_copy(tmp, self->str, self->length - index + 1, index + 1);
+	basic_bin_copy(tmp, self->str + index, self->length - index, index + 1);
 	FREE(self->str);
 	self->length++;
 	self->str = tmp;
