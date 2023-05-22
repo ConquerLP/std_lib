@@ -97,7 +97,7 @@ typedef struct _String {
 /* main ctor */
 String* String_ctor(const char* text);
 
-/* alternitive ctors */
+/* alternative ctors */
 String* String_doubleToString(double value, int prec);
 String* String_floatToString(float value, int prec);
 String* String_intToString(int value);
@@ -106,6 +106,10 @@ String* String_booleanToString(boolean value);
 String* String_stringAt(void* obj, size_t index);
 String* String_subString(void* obj, size_t start, size_t end);
 String* String_join(void* obj);
+
+#define _setS(str, new_str) str->stringIF->setText(str, new_str);
+#define _printS(string) string->objectIF->toString(string)
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

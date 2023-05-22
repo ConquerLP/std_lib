@@ -12,6 +12,7 @@ extern "C"
 #define global_var static
 #define private_fun static
 #define perm_var static
+#define ARRAY_SIZE(ptr) (sizeof((ptr)) / sizeof((*ptr)))
 
 #define DEF_DEBUG false
 

@@ -36,6 +36,7 @@ extern "C"
 extern char* basic_datatype_list[BASIC_DATATYPE_LENGTH];
 extern size_t basic_datatype_list_length;
 boolean basic_isAllowedType(const char* cmp);
+#define BASIC_LONGEST_NUM 20
 
 /* Helper functions */
 size_t basic_strlen(const char* str);
