@@ -16,7 +16,7 @@ void mem_fail(void)
 #if DEF_DEBUG
 
 #define DEF_PADDING 20
-#define DEF_MAX_DEBUG_LIST 1024 * 1024 * 1024
+#define DEF_MAX_DEBUG_LIST 1024 * 1024 * 128 // 128 MB
 static void* def_pointerDebugList[DEF_MAX_DEBUG_LIST];
 static boolean def_flagList[DEF_MAX_DEBUG_LIST] = { false };
 static size_t def_pointerDebugListCount_index = 0;
@@ -79,16 +79,20 @@ void def_pointerDebugList_print(void)
 {
 	fprintf(stdout, "%s\n", def_line);
 	fprintf(stdout, "PointerDebugList\n");
-	fprintf(stdout, "%zu of %zu possible allcated pointers were used\n", def_pointerDebugListCount_index, DEF_MAX_DEBUG_LIST);
+	size_t mem_size = DEF_MAX_DEBUG_LIST / 1024 / 1024;
+	fprintf(stdout, "%zu of %zu possible allcated pointers were used (%zu MB)\n", def_pointerDebugListCount_index, DEF_MAX_DEBUG_LIST, mem_size);
 	fprintf(stdout, "%zu of %zu were freed\n", def_pointerDebugListCount_index - def_pointerDebugList_count, def_pointerDebugListCount_index);
-	fprintf(stdout, "%s\n", "---------------------------------------");
-	fprintf(stdout, "%*s%s%s\n", -DEF_PADDING - 2, "Pointer address", " | Freed", " | Index");
-	fprintf(stdout, "%s\n", "---------------------------------------");
+	fprintf(stdout, "%s\n", "---------------------------------------------------------------------------------");
+	fprintf(stdout, "%*s%s%*s\n", -DEF_PADDING - 2, "Pointer address", " | Freed |", DEF_PADDING + 3, "Index |");
+	fprintf(stdout, "%s\n", "---------------------------------------------------------------------------------");
 	for (size_t i = 0, j = 0; i < def_pointerDebugListCount_index; i++) {
 		if (def_pointerDebugList_match(def_pointerDebugList[i], &j)) {
-			fprintf(stdout, "0x%0*p | yes   | %zu\n", DEF_PADDING, def_pointerDebugList[i], i + 1);
+			fprintf(stdout, "0x%0*p | yes   | %*zu |\n", DEF_PADDING, def_pointerDebugList[i], DEF_PADDING, i + 1);
 		}
-		else fprintf(stdout, "0x%0*p | no    | %zu\n", DEF_PADDING, def_pointerDebugList[i], i + 1);
+		else {
+			fprintf(stdout, "0x%0*p | no    | %*zu | %s\n", DEF_PADDING, def_pointerDebugList[i], DEF_PADDING, i + 1, "freed automatically");
+			FREE(def_pointerDebugList[i]);
+		}
 	}
 	fprintf(stdout, "%s\n", def_line);
 }

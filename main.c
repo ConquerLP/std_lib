@@ -7,6 +7,7 @@ int main(void) {
 	if (_containsS(str, "test"));
 	if (_compareS(str, "train"));
 
+	delete(str);
 
 	PRINT_DEBUG_MEMORY;
 

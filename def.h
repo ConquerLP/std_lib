@@ -14,7 +14,7 @@ extern "C"
 #define perm_var static
 #define ARRAY_SIZE(ptr) (sizeof((ptr)) / sizeof((*ptr)))
 
-#define DEF_DEBUG false
+#define DEF_DEBUG true
 
 #define PRINT_DEBUG_MEMORY //PRINT_DEBUG_MEMORY
 
