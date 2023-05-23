@@ -87,7 +87,7 @@ List* List_ctor(const char* name)
 {
 	if (!basic_isAllowedType(name)) return NULL;
 
-	Object* super = Object_ctor("List");
+	Object* super = Object_ctor();
 	List* this;
 	ListIF* thisIF;
 	o_List* self;

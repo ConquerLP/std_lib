@@ -14,19 +14,17 @@ extern "C"
 	datatype* this##n = NULL; \
 	o_##datatype* self##n = NULL; \
 	if(!ptr) return _return; \
+	if(!basic_strcmp(def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), #datatype)) return _return; \
 	this##n = ptr; \
 	if(!this##n->self) return _return; \
 	if(!this##n->super) return _return; \
-	Object* object_ptr##n = this##n->super; \
-	if(!object_ptr##n->self) return _return; \
-	o_Object* object_ptr_self##n = object_ptr##n->self; \
-	if(!basic_strcmp(#datatype, object_ptr_self##n->name)) return _return; \
 	self##n = this##n->self; \
-
+	
 #define CAST_OBJECT(ptr, _return, n) \
 	Object* this##n = NULL; \
 	o_Object* self##n = NULL; \
 	if(!ptr) return _return; \
+	if(!basic_strcmp(def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), "Object")) return _return; \
 	this##n = ptr; \
 	if(!this##n->self) return _return; \
 	self##n = this##n->self; \
@@ -47,8 +45,33 @@ void basic_bin_copy(void* dest, void* source, size_t bytes, size_t offset);
 void basic_memset(void* dest, char c, size_t length);
 void* basic_return_by_type(void* source, const char* type, size_t index);
 
+/*
+* Memory allocation functions
+*/
+
+#define MALLOC(data_type, size, ptr) \
+	(ptr) = malloc(sizeof(data_type) * (size)); \
+	if(!ptr) mem_fail(); \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, true, false, #data_type, __FILE__, __LINE__, def_counter()); \
+
+#define REALLOC(data_type, size, old_ptr) \
+	data_type* ptr0 = realloc((void*)old_ptr, sizeof(data_type) * (size)); \
+	if(!ptr0) mem_fail(); \
+	if(ptr0 != old_ptr) def_hashtable_set(DEF_GLOBAL_HASHTABLE, old_ptr, true, true, #data_type, __FILE__, __LINE__, \
+	def_counter()); \
+	old_ptr = ptr0; \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr0, true, false, #data_type, __FILE__, __LINE__, \
+	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, old_ptr)); \
+
+#define FREE(ptr) \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, true, true, \
+	def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), __FILE__, __LINE__, \
+	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, ptr)); \
+	free(ptr); ptr = NULL; \
+
+
 /* Object functions */
-Object* Object_ctor(const char* name);
+Object* Object_ctor(void);
 
 #ifdef __cplusplus
 } // extern "C"
