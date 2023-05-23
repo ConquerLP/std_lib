@@ -29,7 +29,7 @@ private_fun double Vector3D_angle(void* vec1, void* vec2);
 /* pulbic functions */
 Vector3D* Vector3D_ctor(double x, double y, double z)
 {
-	Object* super = Object_ctor("Vector3D");
+	Object* super = Object_ctor();
 	Vector3D* this;
 	Vector3DIF* thisIF;
 	o_Vector3D* self;

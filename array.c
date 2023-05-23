@@ -57,7 +57,6 @@
 		return true; \
 	} \
 
-
 /* function prototypes */
 /* overriding methods */ 
 private_fun char* Array_toString(void* obj);
@@ -79,7 +78,7 @@ Array* Array_ctor(const char* name, size_t length)
 	if (length < 0) return NULL;
 	if (!name) return NULL;
 	if (!basic_isAllowedType(name)) return NULL;
-	Object* super = Object_ctor("Array");
+	Object* super = Object_ctor();
 
 	Array* this;
 	ArrayIF* thisIF;

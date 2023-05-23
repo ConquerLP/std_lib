@@ -106,11 +106,20 @@ private_fun int String_parseInt(void* obj);
 private_fun size_t String_parseSize_t(void* obj);
 String* String_join(void* obj);
 
+/* Polymorphic cases MACROS */
+#define STRING_NONSTRING_TO_STRING_1(to_object, return_type, function_name) \
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, to_object)) { \
+		String* TMP = String_ctor(to_object); \
+		return_type result = function_name(obj, TMP); \
+		delete(TMP); \
+		return result; \
+	};
+
 /* public functions */
 String* String_ctor(const char* text)
 {
 	if (!text) return NULL;
-	Object* super = Object_ctor("String");
+	Object* super = Object_ctor();
 
 	String* this;
 	StringIF* thisIF;
@@ -551,6 +560,7 @@ private_fun void String_insertCharAt(void* obj, char c, size_t index)
 private_fun boolean String_startsWithString(void* obj, void* str)
 {
 	CAST(String, obj, false, );
+	STRING_NONSTRING_TO_STRING_1(str, boolean, String_startsWithString);
 	CAST(String, str, false, 1);
 	if (self1->length > self->length) return false;
 	if (self->length == 0 || self1->length == 0) return false;
@@ -1096,6 +1106,7 @@ private_fun size_t String_parseSize_t(void* obj)
 
 String* String_join(void* obj)
 {
+	/*
 	if (!obj) return NULL;
 	String* result = String_ctor("");
 	if (basic_strcmp("Array", Object_getName(obj))) {
@@ -1116,6 +1127,10 @@ String* String_join(void* obj)
 		delete(result);
 		return NULL;
 	}
+	
+	*/
+
+	return NULL;
 }
 
 /* Helper functions */

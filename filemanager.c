@@ -57,7 +57,7 @@ Filemanager* Filemanager_ctor(const char* filename_path, const char* mode)
 		&& !basic_strcmp("w+", mode)
 		&& !basic_strcmp("a+", mode)) return NULL;
 
-	Object* super = Object_ctor("Filemanager");
+	Object* super = Object_ctor();
 
 	Filemanager* this;
 	FilemanagerIF* thisIF;

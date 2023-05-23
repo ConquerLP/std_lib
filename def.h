@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#define boolean unsigned short
+#define boolean char
 #define true 1
 #define false 0
 #define global_var static
@@ -14,85 +14,82 @@ extern "C"
 #define perm_var static
 #define ARRAY_SIZE(ptr) (sizeof((ptr)) / sizeof((*ptr)))
 
-#define DEF_DEBUG true
-
-#define PRINT_DEBUG_MEMORY //PRINT_DEBUG_MEMORY
+#define DEF_HASH_TABLE_SIZE 10000
+#define DEF_DEBUG_MODE true
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void mem_fail(void);
+
+/* hashtable for memory allocation logging */
+typedef struct _Def_Hashentry {
+	void* key;
+	boolean part_of_object;
+	boolean freed;
+	char* type;
+	char* file;
+	size_t line;
+	size_t count;
+	struct _Def_Hashentry* next;
+}Def_Hashentry;
+
+typedef struct _Def_Hashtable {
+	Def_Hashentry** entries;
+}Def_Hashtable;
+
+size_t def_counter(void);
+size_t def_hash_ptr(void* ptr);
+Def_Hashtable* def_hashtable_create(void);
+Def_Hashentry* def_hashentry_create(void* key, boolean is_obj, boolean freed,
+	const char* type, char* file, size_t line, size_t count);
+void def_hashtable_set(Def_Hashtable* table, void* key, boolean is_obj, boolean freed,
+	const char* type, char* file, size_t line, size_t count);
+boolean def_hashtable_is_object(Def_Hashtable* table, void* key);
+void def_hashtable_print(Def_Hashtable* table);
+void def_hashtable_delete(Def_Hashtable* table);
+char* def_hashtable_get_type(Def_Hashtable* table, void* key);
+size_t def_hashtable_get_count(Def_Hashtable* table, void* key);
+
+#define DEF_GLOBAL_HASHTABLE def_global_hashtable
+extern Def_Hashtable* DEF_GLOBAL_HASHTABLE;
+#define DEF_START_UP DEF_GLOBAL_HASHTABLE = def_hashtable_create();
+#define DEF_CLEAR_MEM def_hashtable_delete(DEF_GLOBAL_HASHTABLE);
+
+#define _PRINT_DEBUG_MEMORY //_PRINT_DEBUG_MEMORY
+#if DEF_DEBUG_MODE
+
+#define _PRINT_DEBUG_MEMORY def_hashtable_print(DEF_GLOBAL_HASHTABLE);
+
+#endif
 
 /*
 * Memory allocation functions
 */
 
-#define MALLOC(data_type, size, ptr) (ptr) = malloc(sizeof(data_type) * (size)); \
-if(!ptr) mem_fail(); \
+#define _MALLOC(data_type, size, ptr) \
+	(ptr) = malloc(sizeof(data_type) * (size)); \
+	if(!ptr) mem_fail(); \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, false, false, #data_type, __FILE__, __LINE__, def_counter()); \
 
-#define REALLOC(data_type, size, old_ptr) data_type* ptr0 = realloc((void*)old_ptr, sizeof(data_type) * (size)); \
-if(!ptr0) mem_fail(); \
-else old_ptr = ptr0; \
+#define _REALLOC(data_type, size, old_ptr) \
+	data_type* ptr0 = realloc((void*)old_ptr, sizeof(data_type) * (size)); \
+	if(!ptr0) mem_fail(); \
+	if(ptr0 != old_ptr) def_hashtable_set(DEF_GLOBAL_HASHTABLE, old_ptr, false, true, #data_type, __FILE__, __LINE__, \
+	def_counter()); \
+	old_ptr = ptr0; \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr0, false, false, #data_type, __FILE__, __LINE__, \
+	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, old_ptr)); \
 
-#define FREE(ptr) free(ptr); ptr = NULL;
+#define _FREE(ptr) \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, false, true, \
+	def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), __FILE__, __LINE__, \
+	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, ptr)); \
+	free(ptr); ptr = NULL; \
 
 #endif
-
-/*
-* Memory allocation functions for debugging
-*/
-
-#if DEF_DEBUG
-
-#define MALLOC DEBUG_MALLOC
-#define REALLOC DEBUG_REALLOC
-#define FREE DEBUG_FREE
-
-extern char def_line[100];
-boolean def_pointerDebugList_match(void* address, size_t* index);
-void def_pointerDebugList_add(void* address);
-void def_pointerDebugList_remove(void* address);
-void def_pointerDebugList_print(void);
-size_t def_counter(void);
-char* def_trim_filename(char* filename);
-
-#define DEBUG_MALLOC(data_type, size, ptr) (ptr) = malloc(sizeof(data_type) * (size)); \
-if(!ptr) mem_fail(); \
-def_pointerDebugList_add((void*)ptr); \
-fprintf(stdout, "%s\n", def_line); \
-fprintf(stdout, "#%zu.:\n", def_counter()); \
-fprintf(stdout, "Malloc: Datatype: '%s' Amount: %zu Bytes: %zu\nIn File: %s\nAt Line: '%d'\n", #data_type, size, sizeof(data_type), def_trim_filename(__FILE__), __LINE__); \
-fprintf(stdout, "Pointer adress: 0x%p\n", ptr); \
-fprintf(stdout, "%s\n", def_line); \
-
-#define DEBUG_REALLOC(data_type, size, old_ptr) fprintf(stdout, "%s\n", def_line); \
-fprintf(stdout, "#%zu.:\n", def_counter()); \
-fprintf(stdout, "Old Pointer address: 0x%p\n", old_ptr); \
-data_type* ptr0 = realloc((void*)old_ptr, sizeof(data_type) * (size)); \
-if(!ptr0) mem_fail(); \
-if(ptr0 != old_ptr) {def_pointerDebugList_add((void*)ptr0); def_pointerDebugList_remove((void*)old_ptr); old_ptr = NULL;}\
-old_ptr = ptr0; \
-fprintf(stdout, "Realloc: Datatype: '%s' Amount: %zu Bytes: %zu\nIn File: %s\nAt Line: '%d'\n", #data_type, size, sizeof(data_type), def_trim_filename(__FILE__), __LINE__); \
-fprintf(stdout, "New Pointer address: 0x%p\n", ptr0); \
-fprintf(stdout, "%s\n", def_line); \
-
-/*
-#define DEBUG_FREE(ptr) fprintf(stdout, "%s\n", def_line); \
-fprintf(stdout, "Freed.\nIn File: %s\nAt Line: '%d'\n", def_trim_filename(__FILE__), __LINE__); \
-fprintf(stdout, "Freed Pointer: 0x%p\n", ptr); \
-def_pointerDebugList_remove((void*)ptr); \
-free(ptr); ptr = NULL; \
-fprintf(stdout, "%s\n", def_line); \
-*/
-
-#define DEBUG_FREE(ptr) def_pointerDebugList_remove((void*)ptr); \
-free(ptr); ptr = NULL; \
-
-#define PRINT_DEBUG_MEMORY def_pointerDebugList_print();
-
 
 #ifdef __cplusplus
 } // extern "C"
-#endif
-
 #endif
