@@ -106,6 +106,15 @@ private_fun int String_parseInt(void* obj);
 private_fun size_t String_parseSize_t(void* obj);
 String* String_join(void* obj);
 
+/* Polymorphic cases MACROS */
+#define STRING_NONSTRING_TO_STRING_1(to_object, return_type, function_name) \
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, to_object)) { \
+		String* TMP = String_ctor(to_object); \
+		return_type result = function_name(obj, TMP); \
+		delete(TMP); \
+		return result; \
+	};
+
 /* public functions */
 String* String_ctor(const char* text)
 {
