@@ -1335,29 +1335,26 @@ private_fun size_t String_parseSize_t(void* obj)
 
 String* String_join(void* obj)
 {
-	//todo
 	if (!obj) return NULL;
-	String* result = String_ctor("");
-	if (basic_strcmp("Array", Object_getName(obj))) {
-		CAST(Array, obj, NULL, 1);
-		for (size_t i = 0; i < self1->length; ++i) {
-			result->stringIF->append(result, this1->arrayIF->get(this1, i));
+	if (def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, obj)) {
+		String* result = String_ctor("");
+		if (basic_strcmp(def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, obj), "Array")) {
+			CAST(Array, obj, NULL, 1);
+			for (size_t i = 0; i < self1->length; ++i) {
+				result->stringIF->append(result, this1->arrayIF->get(this1, i));
+			}
+			return result;
 		}
-		return result;
-	}
-	else if (basic_strcmp("List", Object_getName(obj))) {
-		CAST(List, obj, NULL, 2);
-		for (size_t i = 0; i < self2->length; ++i) {
-			result->stringIF->append(result, this2->listIF->get(this2, i));
+		else if (basic_strcmp(def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, obj), "List")) {
+			CAST(List, obj, NULL, 2);
+			for (size_t i = 0; i < self2->length; ++i) {
+				result->stringIF->append(result, this2->listIF->get(this2, i));
+			}
+			return result;
 		}
-		return result;
+		else return NULL;
 	}
-	else {
-		delete(result);
-		return NULL;
-	}
-
-	return NULL;
+	else return NULL;
 }
 
 /* Helper functions */
