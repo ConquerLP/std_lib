@@ -15,7 +15,7 @@ extern "C"
 #define ARRAY_SIZE(ptr) (sizeof((ptr)) / sizeof((*ptr)))
 
 #define DEF_HASH_TABLE_SIZE 10000
-#define DEF_DEBUG_MODE true
+#define DEF_DEBUG_MODE false
 
 #include <stdlib.h>
 #include <stdio.h>

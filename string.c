@@ -106,15 +106,6 @@ private_fun int String_parseInt(void* obj);
 private_fun size_t String_parseSize_t(void* obj);
 String* String_join(void* obj);
 
-/* Polymorphic cases MACROS */
-#define STRING_NONSTRING_TO_STRING_1(to_object, return_type, function_name) \
-	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, to_object)) { \
-		String* TMP = String_ctor(to_object); \
-		return_type result = function_name(obj, TMP); \
-		delete(TMP); \
-		return result; \
-	};
-
 /* public functions */
 String* String_ctor(const char* text)
 {
@@ -560,7 +551,12 @@ private_fun void String_insertCharAt(void* obj, char c, size_t index)
 private_fun boolean String_startsWithString(void* obj, void* str)
 {
 	CAST(String, obj, false, );
-	STRING_NONSTRING_TO_STRING_1(str, boolean, String_startsWithString);
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		boolean result = String_startsWithString(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, false, 1);
 	if (self1->length > self->length) return false;
 	if (self->length == 0 || self1->length == 0) return false;
@@ -571,6 +567,12 @@ private_fun boolean String_startsWithString(void* obj, void* str)
 private_fun boolean String_endsWithString(void* obj, void* str)
 {
 	CAST(String, obj, false, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		boolean result = String_endsWithString(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, false, 1);
 	if (self1->length > self->length) return false;
 	if (self->length == 0 || self1->length == 0) return false;
@@ -580,11 +582,23 @@ private_fun boolean String_endsWithString(void* obj, void* str)
 
 private_fun boolean String_containsSubstring(void* obj, void* str)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		boolean result = String_containsSubstring(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	return String_containsSubstringOffset(obj, str, 0);
 }
 private_fun boolean String_containsSubstringOffset(void* obj, void* str, size_t offset)
 {
 	CAST(String, obj, false, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		boolean result = String_containsSubstringOffset(obj, tmp, offset);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, false, 1);
 
 	if (offset >= self->length) return false;
@@ -605,12 +619,24 @@ private_fun boolean String_containsSubstringOffset(void* obj, void* str, size_t 
 
 private_fun size_t String_countSubstringOccurences(void* obj, void* str)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		size_t result = String_countSubstringOccurences(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	return String_countSubstringOccurencesOffset(obj, str, 0);
 }
 
 private_fun size_t String_countSubstringOccurencesOffset(void* obj, void* str, size_t offset)
 {
 	CAST(String, obj, -1, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		size_t result = String_countSubstringOccurencesOffset(obj, tmp, offset);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, -1, 1);
 	if (offset >= self->length) return -1;
 	if (self1->length > self->length) return -1;
@@ -627,15 +653,33 @@ private_fun size_t String_countSubstringOccurencesOffset(void* obj, void* str, s
 
 private_fun size_t String_findFirstString(void* obj, void* str)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		size_t result = String_findFirstString(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	return String_findFirstStringOffset(obj, str, 0);
 }
 private_fun size_t String_findLastString(void* obj, void* str)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		size_t result = String_findLastString(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	return String_findLastStringOffset(obj, str, 0);
 }
 private_fun size_t String_findLastStringOffset(void* obj, void* str, size_t offset)
 {
 	CAST(String, obj, -1, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		size_t result = String_findLastStringOffset(obj, tmp, offset);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, -1, 1);
 	if (offset >= self->length) return -1;
 	if (self1->length > self->length) return -1;
@@ -657,6 +701,12 @@ private_fun size_t String_findLastStringOffset(void* obj, void* str, size_t offs
 private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t offset)
 {
 	CAST(String, obj, -1, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		size_t result = String_findFirstStringOffset(obj, tmp, offset);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, -1, 1);
 	if (offset >= self->length) return -1;
 	if (self1->length > self->length) return -1;
@@ -676,12 +726,24 @@ private_fun size_t String_findFirstStringOffset(void* obj, void* str, size_t off
 
 private_fun Array* String_findAllSubstrings(void* obj, void* str)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		Array* result = String_findAllSubstrings(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	return String_findAllSubstringsOffset(obj, str, 0);
 }
 
 private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t offset)
 {
 	CAST(String, obj, NULL, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		Array* result = String_findAllSubstringsOffset(obj, tmp, offset);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, NULL, 1);
 	size_t count = String_countSubstringOccurencesOffset(obj, str, offset);
 	if (count == 0) return NULL;
@@ -699,6 +761,12 @@ private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t o
 private_fun Array* String_split(void* obj, void* str)
 {
 	CAST(String, obj, NULL, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		Array* result = String_split(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str, NULL, 1);
 
 	size_t start = 0;
@@ -727,22 +795,90 @@ private_fun Array* String_split(void* obj, void* str)
 
 private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacement)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub) ||
+		!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+		String* tmp = NULL;
+		String* tmp1 = NULL;
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+			String* tmp = String_ctor(sub);
+		}
+		else tmp = String_clone(sub);
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+			String* tmp1 = String_ctor(replacement);
+		}
+		else tmp1 = String_clone(replacement);
+		String_replaceAllSubstring(obj, tmp, tmp1);
+		delete(tmp);
+		delete(tmp1);
+		return;
+	}
 	String_replaceAllSubstringOffset(obj, sub, replacement, 0);
 }
 
 private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replacement)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub) ||
+		!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+		String* tmp = NULL;
+		String* tmp1 = NULL;
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+			String* tmp = String_ctor(sub);
+		}
+		else tmp = String_clone(sub);
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+			String* tmp1 = String_ctor(replacement);
+		}
+		else tmp1 = String_clone(replacement);
+		String_replaceFirstSubstring(obj, tmp, tmp1);
+		delete(tmp);
+		delete(tmp1);
+		return;
+	}
 	String_replaceFirstSubstringOffset(obj, sub, replacement, 0);
 }
 
 private_fun void String_replaceLastSubstring(void* obj, void* sub, void* replacement)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub) ||
+		!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+		String* tmp = NULL;
+		String* tmp1 = NULL;
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+			String* tmp = String_ctor(sub);
+		}
+		else tmp = String_clone(sub);
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+			String* tmp1 = String_ctor(replacement);
+		}
+		else tmp1 = String_clone(replacement);
+		String_replaceLastSubstring(obj, tmp, tmp1);
+		delete(tmp);
+		delete(tmp1);
+		return;
+	}
 	String_replaceLastSubstringOffset(obj, sub, replacement, 0);
 }
 
 private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* replacement, size_t offset)
 {
 	CAST(String, obj, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub) ||
+		!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+		String* tmp = NULL;
+		String* tmp1 = NULL;
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+			String* tmp = String_ctor(sub);
+		}
+		else tmp = String_clone(sub);
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+			String* tmp1 = String_ctor(replacement);
+		}
+		else tmp1 = String_clone(replacement);
+		String_replaceAllSubstringOffset(obj, tmp, tmp1, offset);
+		delete(tmp);
+		delete(tmp1);
+		return;
+	}
 	CAST(String, sub, , 1);
 	CAST(String, replacement, , 2);
 	if (offset >= self->length) return;
@@ -786,6 +922,23 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* replacement, size_t offset)
 {
 	CAST(String, obj, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub) ||
+		!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+		String* tmp = NULL;
+		String* tmp1 = NULL;
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+			String* tmp = String_ctor(sub);
+		}
+		else tmp = String_clone(sub);
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+			String* tmp1 = String_ctor(replacement);
+		}
+		else tmp1 = String_clone(replacement);
+		String_replaceFirstSubstringOffset(obj, tmp, tmp1, offset);
+		delete(tmp);
+		delete(tmp1);
+		return;
+	}
 	CAST(String, sub, , 1);
 	CAST(String, replacement, , 2);
 	if (offset >= self->length) return;
@@ -807,6 +960,23 @@ private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* 
 private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* replacement, size_t offset)
 {
 	CAST(String, obj, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub) ||
+		!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+		String* tmp = NULL;
+		String* tmp1 = NULL;
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+			String* tmp = String_ctor(sub);
+		}
+		else tmp = String_clone(sub);
+		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
+			String* tmp1 = String_ctor(replacement);
+		}
+		else tmp1 = String_clone(replacement);
+		String_replaceLastSubstringOffset(obj, tmp, tmp1, offset);
+		delete(tmp);
+		delete(tmp1);
+		return;
+	}
 	CAST(String, sub, , 1);
 	CAST(String, replacement, , 2);
 	if (offset >= self->length) return;
@@ -827,22 +997,46 @@ private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* r
 
 private_fun void String_removeAllSubstring(void* obj, void* sub)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+		String* tmp = String_ctor(sub);
+		String_removeAllSubstring(obj, tmp);
+		delete(tmp);
+		return;
+	}
 	String_removeAllSubstringOffset(obj, sub, 0);
 }
 
 private_fun void String_removeFirstSubstring(void* obj, void* sub)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+		String* tmp = String_ctor(sub);
+		String_removeFirstSubstring(obj, tmp);
+		delete(tmp);
+		return;
+	}
 	String_removeFirstSubstringOffset(obj, sub, 0);
 }
 
 private_fun void String_removeLastSubstring(void* obj, void* sub)
 {
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+		String* tmp = String_ctor(sub);
+		String_removeLastSubstring(obj, tmp);
+		delete(tmp);
+		return;
+	}
 	String_removeLastSubstringOffset(obj, sub, 0);
 }
 
 private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t offset)
 {
 	CAST(String, obj, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+		String* tmp = String_ctor(sub);
+		String_removeAllSubstringOffset(obj, tmp, offset);
+		delete(tmp);
+		return;
+	}
 	CAST(String, sub, , 1);
 	if (offset >= self->length) return;
 	if (self1->length > self->length) return;
@@ -881,6 +1075,12 @@ private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t of
 private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t offset)
 {
 	CAST(String, obj, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+		String* tmp = String_ctor(sub);
+		String_removeFirstSubstringOffset(obj, tmp, offset);
+		delete(tmp);
+		return;
+	}
 	CAST(String, sub, , 1);
 	if (offset >= self->length) return;
 	if (self1->length > self->length) return;
@@ -900,6 +1100,12 @@ private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t 
 private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t offset)
 {
 	CAST(String, obj, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
+		String* tmp = String_ctor(sub);
+		String_removeLastSubstringOffset(obj, tmp, offset);
+		delete(tmp);
+		return;
+	}
 	CAST(String, sub, , 1);
 	if (offset >= self->length) return;
 	if (self1->length > self->length) return;
@@ -919,6 +1125,12 @@ private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t o
 private_fun void String_insertStringAt(void* obj, void* str, size_t index)
 {
 	CAST(String, obj, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		String_insertStringAt(obj, tmp, index);
+		delete(tmp);
+		return;
+	}
 	CAST(String, str, , 1);
 	if (self->length <= 1) return;
 	if (self1->length <= 1) return;
@@ -936,6 +1148,12 @@ private_fun void String_insertStringAt(void* obj, void* str, size_t index)
 private_fun boolean String_compare(void* obj, void* str2)
 {
 	CAST(String, obj, false, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str2)) {
+		String* tmp = String_ctor(str2);
+		boolean result = String_compare(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str2, false, 1);
 	return basic_strcmp(self->str, self1->str);
 }
@@ -943,8 +1161,13 @@ private_fun boolean String_compare(void* obj, void* str2)
 private_fun boolean String_compareIgnCase(void* obj, void* str2)
 {
 	CAST(String, obj, false, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str2)) {
+		String* tmp = String_ctor(str2);
+		boolean result = String_compareIgnCase(obj, tmp);
+		delete(tmp);
+		return result;
+	}
 	CAST(String, str2, false, 1);
-
 	return basic_strcmpIgnCase(self->str, self1->str);
 }
 
@@ -958,6 +1181,12 @@ private_fun boolean String_isEmpty(void* obj)
 private_fun void String_append(void* str1, void* str2)
 {
 	CAST(String, str1, , );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str2)) {
+		String* tmp = String_ctor(str2);
+		String_append(str1, tmp);
+		delete(tmp);
+		return;
+	}
 	CAST(String, str2, , 1);
 	size_t new_length = self->length + self1->length - 1;
 	self->length = new_length;
@@ -1106,7 +1335,7 @@ private_fun size_t String_parseSize_t(void* obj)
 
 String* String_join(void* obj)
 {
-	/*
+	//todo
 	if (!obj) return NULL;
 	String* result = String_ctor("");
 	if (basic_strcmp("Array", Object_getName(obj))) {
@@ -1127,8 +1356,6 @@ String* String_join(void* obj)
 		delete(result);
 		return NULL;
 	}
-	
-	*/
 
 	return NULL;
 }
