@@ -109,9 +109,6 @@ String* String_join(void* obj);
 
 #define _setS(string, new_str) string->stringIF->setText(string, new_str);
 #define _printS(string) string->objectIF->toString(string)
-#define _containsS(string, sub) string->stringIF->containsSubstring(string, String_ctor(sub))
-#define _compareS(string, cmp) string->stringIF->compare(string, String_ctor(cmp))
-#define _compareIgnCaseS(string, cmp) string->stringIF->compareIgnCase(string, String_ctor(cmp))
 
 #ifdef __cplusplus
 } // extern "C"

@@ -800,11 +800,11 @@ private_fun void String_replaceAllSubstring(void* obj, void* sub, void* replacem
 		String* tmp = NULL;
 		String* tmp1 = NULL;
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
-			String* tmp = String_ctor(sub);
+			tmp = String_ctor(sub);
 		}
 		else tmp = String_clone(sub);
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
-			String* tmp1 = String_ctor(replacement);
+			tmp1 = String_ctor(replacement);
 		}
 		else tmp1 = String_clone(replacement);
 		String_replaceAllSubstring(obj, tmp, tmp1);
@@ -822,11 +822,11 @@ private_fun void String_replaceFirstSubstring(void* obj, void* sub, void* replac
 		String* tmp = NULL;
 		String* tmp1 = NULL;
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
-			String* tmp = String_ctor(sub);
+			tmp = String_ctor(sub);
 		}
 		else tmp = String_clone(sub);
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
-			String* tmp1 = String_ctor(replacement);
+			tmp1 = String_ctor(replacement);
 		}
 		else tmp1 = String_clone(replacement);
 		String_replaceFirstSubstring(obj, tmp, tmp1);
@@ -844,11 +844,11 @@ private_fun void String_replaceLastSubstring(void* obj, void* sub, void* replace
 		String* tmp = NULL;
 		String* tmp1 = NULL;
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
-			String* tmp = String_ctor(sub);
+			tmp = String_ctor(sub);
 		}
 		else tmp = String_clone(sub);
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
-			String* tmp1 = String_ctor(replacement);
+			tmp1 = String_ctor(replacement);
 		}
 		else tmp1 = String_clone(replacement);
 		String_replaceLastSubstring(obj, tmp, tmp1);
@@ -867,11 +867,11 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 		String* tmp = NULL;
 		String* tmp1 = NULL;
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
-			String* tmp = String_ctor(sub);
+			tmp = String_ctor(sub);
 		}
 		else tmp = String_clone(sub);
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
-			String* tmp1 = String_ctor(replacement);
+			tmp1 = String_ctor(replacement);
 		}
 		else tmp1 = String_clone(replacement);
 		String_replaceAllSubstringOffset(obj, tmp, tmp1, offset);
@@ -927,11 +927,11 @@ private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* 
 		String* tmp = NULL;
 		String* tmp1 = NULL;
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
-			String* tmp = String_ctor(sub);
+			tmp = String_ctor(sub);
 		}
 		else tmp = String_clone(sub);
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
-			String* tmp1 = String_ctor(replacement);
+			tmp1 = String_ctor(replacement);
 		}
 		else tmp1 = String_clone(replacement);
 		String_replaceFirstSubstringOffset(obj, tmp, tmp1, offset);
@@ -965,11 +965,11 @@ private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* r
 		String* tmp = NULL;
 		String* tmp1 = NULL;
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, sub)) {
-			String* tmp = String_ctor(sub);
+			tmp = String_ctor(sub);
 		}
 		else tmp = String_clone(sub);
 		if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, replacement)) {
-			String* tmp1 = String_ctor(replacement);
+			tmp1 = String_ctor(replacement);
 		}
 		else tmp1 = String_clone(replacement);
 		String_replaceLastSubstringOffset(obj, tmp, tmp1, offset);
