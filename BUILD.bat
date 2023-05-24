@@ -17,6 +17,22 @@ move *.r files
 move *.h files
 
 cd files
+
+gcc -std=c11 -S def.c
+gcc -std=c11 -S basic.c
+gcc -std=c11 -S object.c
+gcc -std=c11 -S std_lib_math.c
+gcc -std=c11 -S vector.c
+gcc -std=c11 -S list.c
+gcc -std=c11 -S string.c
+gcc -std=c11 -S array.c
+gcc -std=c11 -S filemanager.c 
+gcc -std=c11 -S template.c
+gcc -std=c11 -S main.c 
+
+mkdir assembly
+move *.S assembly
+
 gcc -std=c11 -c def.c
 gcc -std=c11 -c basic.c
 gcc -std=c11 -c object.c
