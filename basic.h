@@ -34,8 +34,8 @@ extern "C"
 	datatype##IF* thisIF; \
 	o_##datatype* self; \
 	MALLOC(datatype, 1, this); \
-	MALLOC(datatype##IF, 1, thisIF); \
-	MALLOC(o_##datatype, 1, self); \
+	_MALLOC(datatype##IF, 1, thisIF); \
+	_MALLOC(o_##datatype, 1, self); \
 	Object* super = Object_ctor(#datatype, this); \
 	this->super = super; \
 	this->self = self; \

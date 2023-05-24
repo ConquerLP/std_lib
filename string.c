@@ -205,10 +205,10 @@ String* String_ctor(const char* text)
 private_fun void String_dtor(void* obj)
 {
 	CAST(String, obj, , );
-	FREE(this->_StringIF);
-	FREE(self->str);
+	_FREE(this->_StringIF);
+	_FREE(self->str);
 	Object_dtor(this->super);
-	FREE(self);
+	_FREE(self);
 	FREE(this);
 }
 

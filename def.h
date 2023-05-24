@@ -15,7 +15,7 @@ extern "C"
 #define ARRAY_SIZE(ptr) (sizeof((ptr)) / sizeof((*ptr)))
 
 #define DEF_HASH_TABLE_SIZE 10000
-#define DEF_DEBUG_MODE false
+#define DEF_DEBUG_MODE true
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,7 +26,7 @@ void mem_fail(void);
 /* hashtable for memory allocation logging */
 typedef struct _Def_Hashentry {
 	void* key;
-	boolean part_of_object;
+	boolean is_object;
 	boolean freed;
 	char* type;
 	char* file;

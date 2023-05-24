@@ -55,7 +55,7 @@ Def_Hashentry* def_hashentry_create(void* key, boolean is_obj, boolean freed,
 	Def_Hashentry* entry = malloc(sizeof(Def_Hashentry));
 	if (!entry) mem_fail();
 	entry->key = key;
-	entry->part_of_object = is_obj;
+	entry->is_object = is_obj;
 	entry->freed = freed;
 	char* entry_type = malloc(sizeof(char) * strlen(type) + 1);
 	if (!entry_type) mem_fail();
@@ -91,7 +91,7 @@ void def_hashtable_set(
 	Def_Hashentry* prev = NULL;
 	while (entry != NULL) {
 		if (entry->key == key) {
-			entry->part_of_object = is_obj;
+			entry->is_object = is_obj;
 			entry->freed = freed;
 			return;
 		}
@@ -111,7 +111,7 @@ boolean def_hashtable_is_object(Def_Hashtable* table, void* key)
 	if (!entry) return false;
 	while (entry != NULL) {
 		if (entry->key == key) {
-			return entry->part_of_object;
+			return entry->is_object;
 		}
 		entry = entry->next;
 	}
@@ -159,14 +159,14 @@ void def_hashtable_print(Def_Hashtable* table)
 	size_t freed = 0;
 	fprintf(stdout, "\n%s%s\nMemorymap:%s%s|\n", line, line, blank, blank);
 	fprintf(stdout, "%s%s\n", line, line);
-	fprintf(stdout, "Slot[       ] |");
-	fprintf(stdout, " Address[                  ] |");
-	fprintf(stdout, " When[     ] |");
-	fprintf(stdout, " Object[   ] |");
-	fprintf(stdout, " Datatype[          ] |");
-	fprintf(stdout, " Line#[     ] |");
-	fprintf(stdout, " File[                    ] |");
-	fprintf(stdout, " Freed[   ] |\n");
+	fprintf(stdout, "Slot[*******] |");
+	fprintf(stdout, " Address[0x****************] |");
+	fprintf(stdout, " When[*****] |");
+	fprintf(stdout, " Object[y/n] |");
+	fprintf(stdout, " Datatype[**********] |");
+	fprintf(stdout, " Line#[*****] |");
+	fprintf(stdout, " File[................\\*.c] |");
+	fprintf(stdout, " Freed[y/n] |\n");
 	
 	for (size_t i = 0, j = 0; i < DEF_HASH_TABLE_SIZE; ++i) {
 		Def_Hashentry* entry = table->entries[i];
@@ -178,10 +178,11 @@ void def_hashtable_print(Def_Hashtable* table)
 			k++;
 			char* flag0 = "yes";
 			char* flag1 = "yes";
-			if (!entry->part_of_object) flag0 = " no";
+			if (!entry->is_object) flag0 = " no";
 			if (!entry->freed) flag1 = " no";
 			else freed++;
-			fprintf(stdout, "        [0x%p] |     [%5zu] |       [%3s] |         [%10s] |      [%5zu] |     [%20s] |      [%s] |", 
+			fprintf(stdout,
+				"        [0x%p] |     [%5zu] |       [%3s] |         [%10s] |      [%5zu] |     [%20s] |      [%s] |", 
 				 entry->key,
 				 entry->count,
 				 flag0,

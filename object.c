@@ -25,8 +25,8 @@ Object* Object_ctor(const char* info, void* link)
 	ObjectIF* thisIF;
 	o_Object* self;
 	MALLOC(Object, 1, this);
-	MALLOC(ObjectIF, 1, thisIF);
-	MALLOC(o_Object, 1, self);
+	_MALLOC(ObjectIF, 1, thisIF);
+	_MALLOC(o_Object, 1, self);
 	
 	self->sub = link;
 	self->toString = basic_strcpy(info);
@@ -45,9 +45,9 @@ Object* Object_ctor(const char* info, void* link)
 void Object_dtor(void* obj)
 {
 	CAST_OBJECT(obj, , );
-	FREE(self->toString);
-	FREE(this->o_IF);
-	FREE(this->self);
+	_FREE(self->toString);
+	_FREE(this->o_IF);
+	_FREE(this->self);
 	FREE(this);
 }
 
