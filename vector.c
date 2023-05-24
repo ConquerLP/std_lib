@@ -13,49 +13,36 @@
 
 /* function prototpyes */
 /* overriding Object methods */
-private_fun char* Vector3D_toString(void* obj);
-private_fun void* Vector3D_clone(void* obj);
-private_fun void Vector3D_dtor(void* obj);
-private_fun boolean Vector3D_equals(void* obj, void* obj2);
+private_fun char* Vector_toString(void* obj);
+private_fun void* Vector_clone(void* obj);
+private_fun void Vector_dtor(void* obj);
+private_fun boolean Vector_equals(void* obj, void* obj2);
 
-/* Vector3D methods */
-private_fun double Vector3D_get(void* obj, char index);
-private_fun void Vector3D_set(void* obj, char index, double value);
-private_fun double Vector3D_calcDotP(void* vec1, void* vec2);
-private_fun void Vector3D_rotate(void* obj, double angle, char axis);
-private_fun double Vector3D_getLength(void* obj);
-private_fun double Vector3D_angle(void* vec1, void* vec2);
+/* Vector methods */
+private_fun double Vector_get(void* obj, char index);
+private_fun void Vector_set(void* obj, char index, double value);
+private_fun double Vector_calcDotP(void* vec1, void* vec2);
+private_fun void Vector_rotate(void* obj, double angle, char axis);
+private_fun double Vector_getLength(void* obj);
+private_fun double Vector_angle(void* vec1, void* vec2);
 
 /* pulbic functions */
-Vector3D* Vector3D_ctor(double x, double y, double z)
+Vector* Vector_ctor(double x, double y, double z)
 {
-	Object* super = Object_ctor();
-	Vector3D* this;
-	Vector3DIF* thisIF;
-	o_Vector3D* self;
-	MALLOC(Vector3D, 1, this);
-	MALLOC(Vector3DIF, 1, thisIF);
-	MALLOC(o_Vector3D, 1, self);
-	((o_Object*)super->self)->sub = this;
-	this->super = super;
-	this->self = self;
-	this->vector3dIF = thisIF;
-	this->objectIF = super->objectIF;
+	BASIC_CTOR(Vector);
+	super->o_IF->toString = &Vector_toString;
+	super->o_IF->clone = &Vector_clone;
+	super->o_IF->dtor = &Vector_dtor;
+	super->o_IF->equals = &Vector_equals;
 
-	super->objectIF->toString = &Vector3D_toString;
-	super->objectIF->clone = &Vector3D_clone;
-	super->objectIF->dtor = &Vector3D_dtor;
-	super->objectIF->equals = &Vector3D_equals;
-
-	thisIF->get = &Vector3D_get;
-	thisIF->set = &Vector3D_set;
-	thisIF->calcDotP = &Vector3D_calcDotP;
-	thisIF->rotate = &Vector3D_rotate;
-	thisIF->getLength = &Vector3D_getLength;
-	thisIF->getAngle = &Vector3D_angle;
+	thisIF->get = &Vector_get;
+	thisIF->set = &Vector_set;
+	thisIF->calcDotP = &Vector_calcDotP;
+	thisIF->rotate = &Vector_rotate;
+	thisIF->getLength = &Vector_getLength;
+	thisIF->getAngle = &Vector_angle;
 
 	self->sub = NULL;
-	self->toString = basic_strcpy("");
 	self->values[0] = x;
 	self->values[1] = y;
 	self->values[2] = z;
@@ -63,48 +50,48 @@ Vector3D* Vector3D_ctor(double x, double y, double z)
 }
 
 /* overriding Object methods */
-private_fun char* Vector3D_toString(void* obj)
+private_fun char* Vector_toString(void* obj)
 {
-	CAST(Vector3D, obj, NULL, );
-	FREE(self->toString);
+	CAST(Vector, obj, NULL, );
+	CAST_OBJECT(this->super, NULL, 1);
+	FREE(self1->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
 	snprintf(tmp, 100, "X: %lf\nY: %lf\nZ: %lf\n", self->values[0], self->values[1], self->values[2]);
-	self->toString = basic_strcpy(tmp);
+	self1->toString = basic_strcpy(tmp);
 	FREE(tmp);
-	return self->toString;
+	return self1->toString;
 }
 
-private_fun void* Vector3D_clone(void* obj)
+private_fun void* Vector_clone(void* obj)
 {
-	CAST(Vector3D, obj, NULL, );
-	return Vector3D_ctor(self->values[0], self->values[1], self->values[2]);
+	CAST(Vector, obj, NULL, );
+	return Vector_ctor(self->values[0], self->values[1], self->values[2]);
 }
 
-private_fun void Vector3D_dtor(void* obj)
+private_fun void Vector_dtor(void* obj)
 {
-	CAST(Vector3D, obj, , );
-	FREE(self->toString);
-	FREE(this->vector3dIF);
+	CAST(Vector, obj, , );
+	FREE(this->_VectorIF);
 	Object_dtor(this->super);
 	FREE(this);
 }
 
-private_fun boolean Vector3D_equals(void* obj, void* obj2)
+private_fun boolean Vector_equals(void* obj, void* obj2)
 {
-	CAST(Vector3D, obj, false, );
-	CAST(Vector3D, obj2, false, 1);
+	CAST(Vector, obj, false, );
+	CAST(Vector, obj2, false, 1);
 	for (size_t i = 0; i < 3; ++i) {
 		if (self->values[i] != self1->values[i]) return false;
 	}
 	return true;
 }
 
-/* Vector3D methods */
-private_fun double Vector3D_get(void* obj, char index)
+/* Vector methods */
+private_fun double Vector_get(void* obj, char index)
 {
-	CAST(Vector3D, obj, 0.0, );
+	CAST(Vector, obj, 0.0, );
 	switch (index) {
 	case 'x': return self->values[0]; break;
 	case 'y': return self->values[1]; break;
@@ -113,9 +100,9 @@ private_fun double Vector3D_get(void* obj, char index)
 	}
 }
 
-private_fun void Vector3D_set(void* obj, char index, double value)
+private_fun void Vector_set(void* obj, char index, double value)
 {
-	CAST(Vector3D, obj, , );
+	CAST(Vector, obj, , );
 	switch (index) {
 	case 'x': self->values[0] = value; break;
 	case 'y': self->values[1] = value; break;
@@ -124,21 +111,21 @@ private_fun void Vector3D_set(void* obj, char index, double value)
 	}
 }
 
-private_fun double Vector3D_calcDotP(void* vec1, void* vec2)
+private_fun double Vector_calcDotP(void* vec1, void* vec2)
 {
-	CAST(Vector3D, vec1, 0.0, );
-	CAST(Vector3D, vec2, 0.0, 1);
+	CAST(Vector, vec1, 0.0, );
+	CAST(Vector, vec2, 0.0, 1);
 	return self->values[0] * self1->values[0] + self->values[1] * self1->values[1] + self->values[2] * self1->values[2];
 }
 
-private_fun double Vector3D_angle(void* vec1, void* vec2)
+private_fun double Vector_angle(void* vec1, void* vec2)
 {
-	return acos(Vector3D_calcDotP(vec1, vec2) / (Vector3D_getLength(vec1) * Vector3D_getLength(vec2)));
+	return acos(Vector_calcDotP(vec1, vec2) / (Vector_getLength(vec1) * Vector_getLength(vec2)));
 }
 
-private_fun void Vector3D_rotate(void* obj, double angle, char axis)
+private_fun void Vector_rotate(void* obj, double angle, char axis)
 {
-	CAST(Vector3D, obj, , );
+	CAST(Vector, obj, , );
 	double tmp0 = 0.0;
 	double tmp1 = 0.0;
 	switch (axis) {
@@ -164,9 +151,9 @@ private_fun void Vector3D_rotate(void* obj, double angle, char axis)
 	}
 }
 
-private_fun double Vector3D_getLength(void* obj)
+private_fun double Vector_getLength(void* obj)
 {
-	CAST(Vector3D, obj, 0.0, );
+	CAST(Vector, obj, 0.0, );
 	return sqrt(
 		self->values[0] * self->values[0] +
 		self->values[1] * self->values[1] +

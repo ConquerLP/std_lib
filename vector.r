@@ -7,7 +7,6 @@
 typedef struct {
 	void* sub;
 	double values[3];
-	char* toString;
-}o_Vector3D;
+}o_Vector;
 
 #endif

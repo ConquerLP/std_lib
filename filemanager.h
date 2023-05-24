@@ -36,8 +36,8 @@ typedef struct _FilemanagerIF {
 typedef struct _Filemanager {
 	void* super; // must be first
 	void* self;
-	FilemanagerIF* filemanagerIF;
-	ObjectIF* objectIF;
+	FilemanagerIF* _FilemanagerIF;
+	ObjectIF* o_IF;
 }Filemanager;
 
 /* modes: */

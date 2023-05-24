@@ -140,7 +140,7 @@ size_t def_hashtable_get_count(Def_Hashtable* table, void* key)
 	if (!key) return 0;
 	size_t slot = def_hash_ptr(key);
 	Def_Hashentry* entry = table->entries[slot];
-	if (!entry) return NULL;
+	if (!entry) return 0;
 	while (entry != NULL) {
 		if (entry->key == key) {
 			return entry->count;

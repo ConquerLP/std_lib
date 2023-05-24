@@ -89,8 +89,8 @@ typedef struct {
 typedef struct _String {
 	void* super; // must be first
 	void* self;
-	ObjectIF* objectIF;
-	StringIF* stringIF;
+	ObjectIF* o_IF;
+	StringIF* _StringIF;
 }String;
 
 /* public functions */
@@ -107,8 +107,8 @@ String* String_stringAt(void* obj, size_t index);
 String* String_subString(void* obj, size_t start, size_t end);
 String* String_join(void* obj);
 
-#define _setS(string, new_str) string->stringIF->setText(string, new_str);
-#define _printS(string) string->objectIF->toString(string)
+#define _setS(string, new_str) string->_StringIF->setText(string, new_str);
+#define _printS(string) string->o_IF->toString(string)
 
 #ifdef __cplusplus
 } // extern "C"

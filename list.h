@@ -30,8 +30,8 @@ typedef struct {
 typedef struct _List {
 	void* super; // must be first
 	void* self;
-	ObjectIF* objectIF;
-	ListIF* listIF;
+	ObjectIF* o_IF;
+	ListIF* _ListIF;
 }List;
 
 /* public functions */

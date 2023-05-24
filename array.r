@@ -11,7 +11,6 @@ typedef struct {
 	void** arr;
 	size_t length;
 	char* name;
-	char* toString;
 }o_Array;
 
 #endif

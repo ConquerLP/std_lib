@@ -18,7 +18,7 @@
 #define ARRAY_SET_PRIMITIVE(datatype) \
 	if(basic_strcmp(self->name, #datatype)) { \
 		datatype* tmp; \
-		MALLOC(datatype, 1, tmp); \
+		_MALLOC(datatype, 1, tmp); \
 		basic_bin_copy(tmp, data, sizeof(datatype), 0); \
 		*(ptr + index) = tmp; \
 	} \
@@ -26,7 +26,7 @@
 #define ARRAY_SET_CLASS(datatype) \
 	if(basic_strcmp(self->name, #datatype)) { \
 		datatype* tmp = data; \
-		*(ptr + index) = tmp->objectIF->clone(data); \
+		*(ptr + index) = tmp->o_IF->clone(data); \
 	} \
 
 #define ARRAY_CMP_PRIMITIVE(datatype) \
@@ -52,7 +52,7 @@
 			tmp1 = Array_get(this1, i); \
 			if(!tmp) return false; \
 			if(!tmp1) return false; \
-			if (!tmp->objectIF->equals(tmp, tmp1)) return false; \
+			if (!tmp->o_IF->equals(tmp, tmp1)) return false; \
 		} \
 		return true; \
 	} \
@@ -78,25 +78,12 @@ Array* Array_ctor(const char* name, size_t length)
 	if (length < 0) return NULL;
 	if (!name) return NULL;
 	if (!basic_isAllowedType(name)) return NULL;
-	Object* super = Object_ctor();
 
-	Array* this;
-	ArrayIF* thisIF;
-	o_Array* self;
-	MALLOC(Array, 1, this);
-	MALLOC(ArrayIF, 1, thisIF);
-	MALLOC(o_Array, 1, self);
-
-	((o_Object*)super->self)->sub = this;
-	this->super = super;
-	this->self = self;
-	this->arrayIF = thisIF;
-	this->objectIF = super->objectIF;
-
-	super->objectIF->clone = &Array_clone;
-	super->objectIF->toString = &Array_toString;
-	super->objectIF->dtor = &Array_dtor;
-	super->objectIF->equals = &Array_equals;
+	BASIC_CTOR(Array);
+	super->o_IF->clone = &Array_clone;
+	super->o_IF->toString = &Array_toString;
+	super->o_IF->dtor = &Array_dtor;
+	super->o_IF->equals = &Array_equals;
 
 	thisIF->get = &Array_get;
 	thisIF->set = &Array_set;
@@ -111,7 +98,6 @@ Array* Array_ctor(const char* name, size_t length)
 	MALLOC(void*, length, data);
 	self->arr = data;
 	self->name = basic_strcpy(name);
-	self->toString = basic_strcpy("");
 	return this;
 }
 
@@ -121,14 +107,15 @@ Array* Array_ctor(const char* name, size_t length)
 private_fun char* Array_toString(void* obj)
 {
 	CAST(Array, obj, NULL, );
-	FREE(self->toString);
+	CAST_OBJECT(this->super, false, 1);
+	FREE(self1->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
 	snprintf(tmp, 100, "This array contains: %zu '%s's", self->length, self->name);
-	self->toString = basic_strcpy(tmp);
+	self1->toString = basic_strcpy(tmp);
 	FREE(tmp);
-	return self->toString;
+	return self1->toString;
 }
 
 private_fun void Array_dtor(void* obj)
@@ -136,7 +123,7 @@ private_fun void Array_dtor(void* obj)
 	CAST(Array, obj, , );
 	void** ptr = self->arr;
 
-	for (size_t i = 0; i < this->arrayIF->length(obj); ++i) {
+	for (size_t i = 0; i < this->_ArrayIF->length(obj); ++i) {
 		if (basic_strcmp(self->name, "String")) {
 			delete(*(ptr + i));
 		}
@@ -146,12 +133,11 @@ private_fun void Array_dtor(void* obj)
 			continue;
 		}
 	}
-	FREE(self->toString);
 	FREE(self->name);
 	FREE(self->arr);
 	FREE(self);
 
-	FREE(this->arrayIF);
+	FREE(this->_ArrayIF);
 	Object_dtor(this->super);
 	FREE(this);
 }
@@ -161,7 +147,7 @@ private_fun void* Array_clone(void* obj)
 	CAST(Array, obj, NULL, );
 	Array* clone = Array_ctor(self->name, self->length);
 	for (size_t i = 0; i < self->length; ++i) {
-		clone->arrayIF->set(clone, this->arrayIF->get(this, i), i);
+		clone->_ArrayIF->set(clone, this->_ArrayIF->get(this, i), i);
 	}
 	return clone;
 }
@@ -250,7 +236,7 @@ private_fun void Array_resize(void* obj, size_t new_length)
 			}
 			//primitive types
 			else {
-				FREE(*(ptr + i));
+				_FREE(*(ptr + i));
 				continue;
 			}
 		}

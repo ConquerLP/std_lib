@@ -44,38 +44,21 @@ private_fun size_t Filemanager_getLineCount(void* obj);
 private_fun void Filemanager_setAppend(void* obj, const char* append);
 
 /* helper functions */
+boolean Filemanager_allowed_modes(const char* cmp);
 
 /* public functions */
 Filemanager* Filemanager_ctor(const char* filename_path, const char* mode)
 {
 	if (!filename_path) return NULL;
 	if (basic_strlen(filename_path) - 1 > FILENAME_MAX) return NULL;
-	if (!basic_strcmp("r", mode)
-		&& !basic_strcmp("w", mode)
-		&& !basic_strcmp("a", mode)
-		&& !basic_strcmp("r+", mode)
-		&& !basic_strcmp("w+", mode)
-		&& !basic_strcmp("a+", mode)) return NULL;
+	if (!Filemanager_allowed_modes(mode)) return NULL;
 
-	Object* super = Object_ctor();
+	BASIC_CTOR(Filemanager);
 
-	Filemanager* this;
-	FilemanagerIF* thisIF;
-	o_Filemanager* self;
-	MALLOC(Filemanager, 1, this);
-	MALLOC(FilemanagerIF, 1, thisIF);
-	MALLOC(o_Filemanager, 1, self);
-
-	((o_Object*)super->self)->sub = this;
-	this->super = super;
-	this->self = self;
-	this->filemanagerIF = thisIF;
-	this->objectIF = super->objectIF;
-
-	super->objectIF->clone = &Filemanager_clone;
-	super->objectIF->toString = &Filemanager_toString;
-	super->objectIF->dtor = &Filemanager_dtor;
-	super->objectIF->equals = &Filemanager_equals;
+	super->o_IF->clone = &Filemanager_clone;
+	super->o_IF->toString = &Filemanager_toString;
+	super->o_IF->dtor = &Filemanager_dtor;
+	super->o_IF->equals = &Filemanager_equals;
 	
 	thisIF->scanCompleteFile = &Filemanager_scanCompleteFile;
 	thisIF->getLineAsString = &Filemanager_getLineAsString;
@@ -133,7 +116,7 @@ private_fun void Filemanager_dtor(void* obj)
 	FREE(self->mode);
 	FREE(self);
 	Object_dtor(this->super);
-	FREE(this->filemanagerIF);
+	FREE(this->_FilemanagerIF);
 	FREE(this);
 }
 
@@ -152,10 +135,10 @@ private_fun Array* Filemanager_scanCompleteFile(void* obj)
 	Array* arr = Array_ctor("String", Filemanager_getLineCount(obj));
 	if (!arr) return NULL;
 	char buffer[BUFFER_SIZE] = {0};
-	for (size_t i = 0; i < arr->arrayIF->length(arr); ++i) {
+	for (size_t i = 0; i < arr->_ArrayIF->length(arr); ++i) {
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 		String* tmp = String_ctor(buffer);
-		arr->arrayIF->set(arr, tmp, i);
+		arr->_ArrayIF->set(arr, tmp, i);
 		delete(tmp);
 	}
 	RESET_FILE;
@@ -185,7 +168,7 @@ private_fun double Filemanager_getLineAsDouble(void* obj)
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 	}
 	String* tmp = String_ctor(buffer);
-	double result = tmp->stringIF->parseDouble(tmp);
+	double result = tmp->_StringIF->parseDouble(tmp);
 	delete(tmp);
 	RESET_FILE;
 	return result;
@@ -201,7 +184,7 @@ private_fun float Filemanager_getLineAsFloat(void* obj)
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 	}
 	String* tmp = String_ctor(buffer);
-	float result = tmp->stringIF->parseFloat(tmp);
+	float result = tmp->_StringIF->parseFloat(tmp);
 	delete(tmp);
 	RESET_FILE;
 	return result;
@@ -217,7 +200,7 @@ private_fun int Filemanager_getLineAsInt(void* obj)
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 	}
 	String* tmp = String_ctor(buffer);
-	int result = tmp->stringIF->parseInt(tmp);
+	int result = tmp->_StringIF->parseInt(tmp);
 	delete(tmp);
 	RESET_FILE;
 	return result;
@@ -233,7 +216,7 @@ private_fun size_t Filemanager_getLineAsSize_t(void* obj)
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 	}
 	String* tmp = String_ctor(buffer);
-	size_t result = tmp->stringIF->parseSize_t(tmp);
+	size_t result = tmp->_StringIF->parseSize_t(tmp);
 	delete(tmp);
 	RESET_FILE;
 	return result;
@@ -249,7 +232,7 @@ private_fun boolean Filemanager_getLineAsBoolean(void* obj)
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 	}
 	String* tmp = String_ctor(buffer);
-	boolean result = tmp->stringIF->parseInt(tmp);
+	boolean result = tmp->_StringIF->parseInt(tmp);
 	delete(tmp);
 	RESET_FILE;
 	if (result >= 1) return true;
@@ -260,9 +243,15 @@ private_fun boolean Filemanager_getLineAsBoolean(void* obj)
 private_fun void Filemanager_writeAsString(void* obj, void* str)
 {
 	CAST(Filemanager, obj, , );
-	CAST(String, str, , 1);
 	//file is only for reading
 	if (basic_strcmp(self->mode, "r")) return;
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, str)) {
+		String* tmp = String_ctor(str);
+		Filemanager_writeAsString(obj, tmp);
+		delete(tmp);
+		return;
+	}
+	CAST(String, str, , 1);
 	fflush(self->file_stream);
 	fprintf(self->file_stream, "%s%s", self1->str, self->std_append);
 }
@@ -323,4 +312,22 @@ private_fun void Filemanager_setAppend(void* obj, const char* append)
 	CAST(Filemanager, obj, , );
 	FREE(self->std_append);
 	self->std_append = basic_strcpy(append);
+}
+
+/* helper functions */
+boolean Filemanager_allowed_modes(const char* mode)
+{
+	if (!mode) return false;
+	char* allowed_mode[] = {
+		"r",
+		"w",
+		"a",
+		"r+",
+		"w+",
+		"a+"
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(allowed_mode); ++i) {
+		if (basic_strcmp(allowed_mode[i], mode)) return true;
+	}
+	return false;
 }

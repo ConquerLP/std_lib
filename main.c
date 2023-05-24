@@ -13,9 +13,6 @@ int main(void) {
 
 
 
-
-
-	
 	/* End of your actual program */
 	_PRINT_DEBUG_MEMORY;
 	DEF_CLEAR_MEM;

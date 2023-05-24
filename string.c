@@ -110,28 +110,14 @@ String* String_join(void* obj);
 String* String_ctor(const char* text)
 {
 	if (!text) return NULL;
-	Object* super = Object_ctor();
+	BASIC_CTOR(String);
 
-	String* this;
-	StringIF* thisIF;
-	o_String* self;
-	MALLOC(String, 1, this);
-	MALLOC(StringIF, 1, thisIF);
-	MALLOC(o_String, 1, self);
-
-	((o_Object*)super->self)->sub = this;
-	this->super = super; 
-	this->self = self; 
-	this->stringIF = thisIF; 
-	this->objectIF = super->objectIF; 
-
-	super->objectIF->toString = &String_toString;
-	super->objectIF->clone = &String_clone;
-	super->objectIF->dtor = &String_dtor;
-	super->objectIF->equals = &String_equals;
+	this->o_IF->clone = &String_clone;
+	this->o_IF->toString = &String_toString;
+	this->o_IF->dtor = &String_dtor;
+	this->o_IF->equals = &String_equals;
 
 	thisIF->setText = &String_setText;
-
 	thisIF->charAt = &String_charAt;
 	thisIF->length = &String_length;
 	thisIF->toLowerCase = &String_toLowerCase;
@@ -219,10 +205,8 @@ String* String_ctor(const char* text)
 private_fun void String_dtor(void* obj)
 {
 	CAST(String, obj, , );
-
-	FREE(this->stringIF);
+	FREE(this->_StringIF);
 	FREE(self->str);
-
 	Object_dtor(this->super);
 	FREE(self);
 	FREE(this);
@@ -414,7 +398,7 @@ private_fun Array* String_findAllCharOffset(void* obj, char c, size_t offset)
 	for (size_t i = offset, j = 0; i < self->length; ++i) {
 		if (String_cmpChar(String_charAt(this, i), c, false)) {
 			*tmp = i;
-			arr->arrayIF->set(arr, tmp, j);
+			arr->_ArrayIF->set(arr, tmp, j);
 			j++;
 		}
 	}
@@ -512,7 +496,7 @@ private_fun void String_removeFirstCharOffset(void* obj, char old, size_t offset
 	String* part1 = String_subString(obj, 0, index);
 	String* part2 = String_stringAt(obj, index + 1);
 	String_append(part1, part2);
-	String_setText(obj, part1->objectIF->toString(part1));
+	String_setText(obj, part1->o_IF->toString(part1));
 	delete(part1);
 	delete(part2);
 }
@@ -528,7 +512,7 @@ private_fun void String_removeLastCharOffset(void* obj, char old, size_t offset)
 	String* part1 = String_subString(obj, 0, index);
 	String* part2 = String_stringAt(obj, index + 1);
 	String_append(part1, part2);
-	String_setText(obj, part1->objectIF->toString(part1));
+	String_setText(obj, part1->o_IF->toString(part1));
 	delete(part1);
 	delete(part2);
 }
@@ -753,7 +737,7 @@ private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t o
 		index = String_findFirstStringOffset(obj, str, offset);
 		if (index >= self->length) break;
 		offset = index + self1->length - 1;
-		arr->arrayIF->set(arr, &index, i);
+		arr->_ArrayIF->set(arr, &index, i);
 	}
 	return arr;
 }
@@ -778,17 +762,17 @@ private_fun Array* String_split(void* obj, void* str)
 		size_t index = String_findFirstStringOffset(obj, str, start);
 		if (index >= self->length) {
 			word = String_subString(obj, start, self->length - 1);
-			list->listIF->append(list, word);
+			list->_ListIF->append(list, word);
 			delete(word);
 			break;
 		}
 		if (start == index) word = String_ctor("?");
 		else word = String_subString(obj, start, index);
-		list->listIF->append(list, word);
+		list->_ListIF->append(list, word);
 		delete(word);
 		start = index + self1->length - 1;
 	}
-	Array* result = list->listIF->toArray(list);
+	Array* result = list->_ListIF->toArray(list);
 	delete(list);
 	return result;
 }
@@ -1341,14 +1325,14 @@ String* String_join(void* obj)
 		if (basic_strcmp(def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, obj), "Array")) {
 			CAST(Array, obj, NULL, 1);
 			for (size_t i = 0; i < self1->length; ++i) {
-				result->stringIF->append(result, this1->arrayIF->get(this1, i));
+				result->_StringIF->append(result, this1->_ArrayIF->get(this1, i));
 			}
 			return result;
 		}
 		else if (basic_strcmp(def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, obj), "List")) {
 			CAST(List, obj, NULL, 2);
 			for (size_t i = 0; i < self2->length; ++i) {
-				result->stringIF->append(result, this2->listIF->get(this2, i));
+				result->_StringIF->append(result, this2->_ListIF->get(this2, i));
 			}
 			return result;
 		}

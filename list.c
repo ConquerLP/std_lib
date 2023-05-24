@@ -36,7 +36,7 @@
 			b = List_get(this, i); \
 			if(!a) return false; \
 			if(!b) return false; \
-			if (!a->objectIF->equals(a, b)) return false; \
+			if (!a->o_IF->equals(a, b)) return false; \
 		} \
 		return true; \
 	} \
@@ -44,7 +44,7 @@
 #define LIST_SET_ELEMENT(datatype) \
 	if (basic_strcmp(self->name, #datatype)) { \
 		datatype* tmp; \
-		MALLOC(datatype, 1, tmp); \
+		_MALLOC(datatype, 1, tmp); \
 		basic_bin_copy(tmp, data, sizeof(datatype), 0); \
 		node->data = tmp; \
 		return; \
@@ -53,7 +53,7 @@
 #define LIST_SET_ELEMENT_CLASS(datatype) \
 	if (basic_strcmp(self->name, #datatype)) { \
 		datatype* ptr = data; \
-		node->data = ptr->objectIF->clone(data); \
+		node->data = ptr->o_IF->clone(data); \
 		return; \
 	} \
 	
@@ -86,26 +86,12 @@ private_fun Node* List_getNode(List* this, size_t index);
 List* List_ctor(const char* name)
 {
 	if (!basic_isAllowedType(name)) return NULL;
+	BASIC_CTOR(List);
 
-	Object* super = Object_ctor();
-	List* this;
-	ListIF* thisIF;
-	o_List* self;
-
-	MALLOC(List, 1, this);
-	MALLOC(ListIF, 1, thisIF);
-	MALLOC(o_List, 1, self);
-
-	((o_Object*)super->self)->sub = this;
-	this->super = super;
-	this->self = self;
-	this->listIF = thisIF;
-	this->objectIF = super->objectIF;
-
-	super->objectIF->clone = &List_clone;
-	super->objectIF->dtor = &List_dtor;
-	super->objectIF->toString = &List_toString;
-	super->objectIF->equals = &List_equals;
+	super->o_IF->clone = &List_clone;
+	super->o_IF->dtor = &List_dtor;
+	super->o_IF->toString = &List_toString;
+	super->o_IF->equals = &List_equals;
 
 	thisIF->get = &List_get;
 	thisIF->set = &List_set;
@@ -125,7 +111,6 @@ List* List_ctor(const char* name)
 	self->head = NULL;
 	self->tail = NULL;
 	self->name = basic_strcpy(name);
-	self->toString = basic_strcpy("");
 
 	return this;
 }
@@ -136,14 +121,15 @@ List* List_ctor(const char* name)
 private_fun char* List_toString(void* obj)
 {
 	CAST(List, obj, NULL, );
-	FREE(self->toString);
+	CAST_OBJECT(this->super, NULL, 1);
+	FREE(self1->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
 	snprintf(tmp, 100, "This List contains: %zu '%s's", self->length, self->name);
-	self->toString = basic_strcpy(tmp);
+	self1->toString = basic_strcpy(tmp);
 	FREE(tmp);
-	return self->toString;
+	return self1->toString;
 }
 
 private_fun void List_dtor(void* obj)
@@ -153,11 +139,10 @@ private_fun void List_dtor(void* obj)
 	self->head = NULL;
 	self->tail = NULL;
 	FREE(self->name);
-	FREE(self->toString);
 	self->sub = NULL;
 	FREE(self);
 
-	FREE(this->listIF);
+	FREE(this->_ListIF);
 	this->self = NULL;
 	Object_dtor(this->super);
 	FREE(this);
@@ -275,7 +260,7 @@ private_fun void List_delete(void* obj, size_t index)
 	}
 	//primitive types
 	else {
-		FREE(node->data);
+		_FREE(node->data);
 	}
 
 	//rearrange the nodes, head, tail
@@ -364,7 +349,7 @@ private_fun Array* List_toArray(void* obj)
 	if (self->length == 0) return NULL;
 	Array* arr = Array_ctor(self->name, self->length);
 	for (size_t i = 0; i < self->length; ++i) {
-		arr->arrayIF->set(arr, List_get(obj, i), i);
+		arr->_ArrayIF->set(arr, List_get(obj, i), i);
 	}
 	return arr;
 }

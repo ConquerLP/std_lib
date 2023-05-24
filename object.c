@@ -13,26 +13,30 @@ void delete(void* obj)
 	if (!obj) return;
 	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, obj)) return;
 	Object** this = obj;
-	(*this)->objectIF->dtor(obj);
+	(*this)->o_IF->dtor(obj);
 }
 
 /* protected functions */
-Object* Object_ctor(void)
+Object* Object_ctor(const char* info, void* link)
 {
+	if (!info) return NULL;
+	if (!link) return NULL;
 	Object* this;
-	o_Object* self;
 	ObjectIF* thisIF;
+	o_Object* self;
 	MALLOC(Object, 1, this);
-	MALLOC(o_Object, 1, self);
 	MALLOC(ObjectIF, 1, thisIF);
+	MALLOC(o_Object, 1, self);
 	
-	self->sub = NULL;
-	this->objectIF = thisIF;
+	self->sub = link;
+	self->toString = basic_strcpy(info);
 	this->self = self;
-	thisIF->toString = &Object_toString;
+	this->o_IF = thisIF;
 	thisIF->clone = &Object_clone;
-	thisIF->dtor = &Object_dtor;
+	thisIF->toString = &Object_toString;
 	thisIF->equals = &Object_equals;
+	thisIF->dtor = &Object_dtor;
+
 	return this;
 }
 
@@ -41,7 +45,8 @@ Object* Object_ctor(void)
 void Object_dtor(void* obj)
 {
 	CAST_OBJECT(obj, , );
-	FREE(this->objectIF);
+	FREE(self->toString);
+	FREE(this->o_IF);
 	FREE(this->self);
 	FREE(this);
 }
@@ -49,13 +54,13 @@ void Object_dtor(void* obj)
 private_fun char* Object_toString(void* obj)
 {
 	CAST_OBJECT(obj, NULL, );
-	return "Object";
+	return self->toString;
 }
 
 private_fun void* Object_clone(void* obj)
 {
-	if (!obj) return NULL;
-	return Object_ctor();
+	CAST_OBJECT(obj, NULL, );
+	return Object_ctor(self->toString, self->sub);
 }
 
 private_fun boolean Object_equals(void* obj, void* obj2)

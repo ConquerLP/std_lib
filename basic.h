@@ -29,10 +29,22 @@ extern "C"
 	if(!this##n->self) return _return; \
 	self##n = this##n->self; \
 
+#define BASIC_CTOR(datatype) \
+	datatype* this; \
+	datatype##IF* thisIF; \
+	o_##datatype* self; \
+	MALLOC(datatype, 1, this); \
+	MALLOC(datatype##IF, 1, thisIF); \
+	MALLOC(o_##datatype, 1, self); \
+	Object* super = Object_ctor(#datatype, this); \
+	this->super = super; \
+	this->self = self; \
+	this->_##datatype##IF = thisIF; \
+	this->o_IF = super->o_IF; \
+
 /* list of allowed datatypes in the array & list */
 #define BASIC_DATATYPE_LENGTH 6
 extern char* basic_datatype_list[BASIC_DATATYPE_LENGTH];
-extern size_t basic_datatype_list_length;
 boolean basic_isAllowedType(const char* cmp);
 #define BASIC_LONGEST_NUM 20
 
@@ -71,7 +83,7 @@ void* basic_return_by_type(void* source, const char* type, size_t index);
 
 
 /* Object functions */
-Object* Object_ctor(void);
+Object* Object_ctor(const char* info, void* link);
 
 #ifdef __cplusplus
 } // extern "C"

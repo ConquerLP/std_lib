@@ -13,7 +13,7 @@ typedef struct _ObjectIF {
 
 typedef struct _Object {
 	void* self; 
-	ObjectIF* objectIF;
+	ObjectIF* o_IF;
 }Object;
 
 /* public d_tor for every possible class */

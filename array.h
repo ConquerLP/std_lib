@@ -21,8 +21,8 @@ typedef struct _ArrayIF {
 typedef struct _Array {
 	void* super; // must be first
 	void* self;
-	ArrayIF* arrayIF;
-	ObjectIF* objectIF;
+	ArrayIF* _ArrayIF;
+	ObjectIF* o_IF;
 }Array;
 
 Array* Array_ctor(const char* name, size_t length);

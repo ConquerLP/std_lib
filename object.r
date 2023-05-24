@@ -8,6 +8,7 @@
 
 typedef struct {
 	void* sub;
+	char* toString;
 }o_Object;
 
 void Object_dtor(void* obj);

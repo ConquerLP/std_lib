@@ -21,7 +21,7 @@ typedef struct _Class {
 	void* super; // must be first
 	void* self;
 	ClassIF* classIF;
-	ObjectIF* objectIF;
+	ObjectIF* o_IF;
 }Class;
 
 #ifdef __cplusplus
