@@ -64,7 +64,7 @@ char* basic_strcpy(const char* str)
 {
 	if (!str) return NULL;
 	char* tmp;
-	MALLOC(char, basic_strlen(str) + 1, tmp);
+	_MALLOC(char, basic_strlen(str) + 1, tmp);
 	size_t i = 0;
 	while (*(str + i) != '\0') {
 		*(tmp + i) = *(str + i);

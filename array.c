@@ -95,7 +95,7 @@ Array* Array_ctor(const char* name, size_t length)
 	self->length = length;
 
 	void** data;
-	MALLOC(void*, length, data);
+	_MALLOC(void*, length, data);
 	self->arr = data;
 	self->name = basic_strcpy(name);
 	return this;
@@ -108,13 +108,13 @@ private_fun char* Array_toString(void* obj)
 {
 	CAST(Array, obj, NULL, );
 	CAST_OBJECT(this->super, false, 1);
-	FREE(self1->toString);
+	_FREE(self1->toString);
 	char* tmp;
-	MALLOC(char, 100, tmp);
+	_MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
 	snprintf(tmp, 100, "This array contains: %zu '%s's", self->length, self->name);
 	self1->toString = basic_strcpy(tmp);
-	FREE(tmp);
+	_FREE(tmp);
 	return self1->toString;
 }
 
@@ -129,15 +129,15 @@ private_fun void Array_dtor(void* obj)
 		}
 		//primitive types
 		else {
-			FREE(*(ptr + i));
+			_FREE(*(ptr + i));
 			continue;
 		}
 	}
-	FREE(self->name);
-	FREE(self->arr);
-	FREE(self);
+	_FREE(self->name);
+	_FREE(self->arr);
+	_FREE(self);
 
-	FREE(this->_ArrayIF);
+	_FREE(this->_ArrayIF);
 	Object_dtor(this->super);
 	FREE(this);
 }
@@ -241,6 +241,6 @@ private_fun void Array_resize(void* obj, size_t new_length)
 			}
 		}
 	}
-	REALLOC(void*, new_length, ptr);
+	_REALLOC(void*, new_length, ptr);
 	self->length = new_length;
 }

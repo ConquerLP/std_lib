@@ -122,13 +122,13 @@ private_fun char* List_toString(void* obj)
 {
 	CAST(List, obj, NULL, );
 	CAST_OBJECT(this->super, NULL, 1);
-	FREE(self1->toString);
+	_FREE(self1->toString);
 	char* tmp;
-	MALLOC(char, 100, tmp);
+	_MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
 	snprintf(tmp, 100, "This List contains: %zu '%s's", self->length, self->name);
 	self1->toString = basic_strcpy(tmp);
-	FREE(tmp);
+	_FREE(tmp);
 	return self1->toString;
 }
 
@@ -138,11 +138,11 @@ private_fun void List_dtor(void* obj)
 	List_clear(obj);
 	self->head = NULL;
 	self->tail = NULL;
-	FREE(self->name);
+	_FREE(self->name);
 	self->sub = NULL;
-	FREE(self);
+	_FREE(self);
 
-	FREE(this->_ListIF);
+	_FREE(this->_ListIF);
 	this->self = NULL;
 	Object_dtor(this->super);
 	FREE(this);
@@ -208,7 +208,7 @@ private_fun void List_append(void* obj, void* data)
 	if (!data) return;
 	CAST(List, obj, , );
 	Node* node;
-	MALLOC(Node, 1, node);
+	_MALLOC(Node, 1, node);
 	if (self->length == 0) {
 		self->head = node;
 		self->tail = node;
@@ -241,7 +241,7 @@ private_fun void List_insert(void* obj, void* data, size_t index)
 	Node* node = List_getNode(this, index);
 	if (!node) return;
 	Node* new;
-	MALLOC(Node, 1, new);
+	_MALLOC(Node, 1, new);
 	new->prev = node->prev;
 	new->next = node;
 	node->prev = new;
@@ -280,7 +280,7 @@ private_fun void List_delete(void* obj, size_t index)
 	}
 	node->next = NULL;
 	node->prev = NULL;
-	FREE(node);
+	_FREE(node);
 	self->length--;
 }
 

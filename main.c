@@ -11,6 +11,7 @@ int main(void) {
 	DEF_START_UP;
 	/* Your actual program */
 
+	String* tmp = String_ctor("test");
 
 
 	/* End of your actual program */
