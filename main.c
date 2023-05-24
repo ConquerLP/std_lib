@@ -13,6 +13,7 @@ int main(void) {
 
 	String* tmp = String_ctor("test");
 	tmp->_StringIF->replaceAllChar(tmp, 't', 'f');
+	tmp->_StringIF->append(tmp, " fun");
 
 	printf("%s\n", _printS(tmp));
 

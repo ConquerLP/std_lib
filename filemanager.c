@@ -111,12 +111,12 @@ private_fun void Filemanager_dtor(void* obj)
 {
 	CAST(Filemanager, obj, , );
 	fclose(self->file_stream);
-	FREE(self->filename_path);
-	FREE(self->std_append);
-	FREE(self->mode);
-	FREE(self);
+	_FREE(self->filename_path);
+	_FREE(self->std_append);
+	_FREE(self->mode);
+	_FREE(self);
 	Object_dtor(this->super);
-	FREE(this->_FilemanagerIF);
+	_FREE(this->_FilemanagerIF);
 	FREE(this);
 }
 
@@ -310,7 +310,7 @@ private_fun size_t Filemanager_getLineCount(void* obj)
 private_fun void Filemanager_setAppend(void* obj, const char* append)
 {
 	CAST(Filemanager, obj, , );
-	FREE(self->std_append);
+	_FREE(self->std_append);
 	self->std_append = basic_strcpy(append);
 }
 

@@ -237,7 +237,7 @@ private_fun boolean String_equals(void* obj, void* obj2)
 private_fun void String_setText(void* obj, const char* text)
 {
 	CAST(String, obj, , );
-	FREE(self->str);
+	_FREE(self->str);
 	self->str = basic_strcpy(text);
 	self->length = basic_strlen(text);
 }
@@ -271,9 +271,9 @@ String* String_subString(void* obj, size_t start, size_t end)
 	CAST(String, sub, NULL, 1);
 	size_t sub_length = end - start + 1;
 	self1->length = sub_length;
-	FREE(self1->str);
+	_FREE(self1->str);
 	char* tmp;
-	MALLOC(char, sub_length, tmp);
+	_MALLOC(char, sub_length, tmp);
 	basic_bin_copy(tmp, self->str + start, sub_length, 0);
 	basic_memset(tmp + sub_length - 1, '\0', 1);
 	self1->str = tmp;
@@ -393,7 +393,7 @@ private_fun Array* String_findAllCharOffset(void* obj, char c, size_t offset)
 	if (count == 0) return NULL;
 	Array* arr = Array_ctor("size_t", count);
 	size_t* tmp;
-	MALLOC(size_t, 1, tmp);
+	_MALLOC(size_t, 1, tmp);
 	*tmp = 0;
 	for (size_t i = offset, j = 0; i < self->length; ++i) {
 		if (String_cmpChar(String_charAt(this, i), c, false)) {
@@ -402,7 +402,7 @@ private_fun Array* String_findAllCharOffset(void* obj, char c, size_t offset)
 			j++;
 		}
 	}
-	FREE(tmp);
+	_FREE(tmp);
 	return arr;
 }
 
@@ -469,7 +469,7 @@ private_fun void String_removeAllCharOffset(void* obj, char old, size_t offset)
 	if (self->length == 0) return;
 	size_t count = 0;
 	char* tmp;
-	MALLOC(char, self->length, tmp);
+	_MALLOC(char, self->length, tmp);
 	basic_bin_copy(tmp, self->str, offset, 0);
 	for (size_t i = offset, j = offset; i < self->length; ++i) {
 		if (String_cmpChar(String_charAt(this, i), old, false)) {
@@ -479,9 +479,9 @@ private_fun void String_removeAllCharOffset(void* obj, char old, size_t offset)
 		basic_memset(tmp + j, String_charAt(obj, i), 1);
 		++j;
 	}
-	REALLOC(char, self->length - count, tmp);
+	_REALLOC(char, self->length - count, tmp);
 	self->length -= count;
-	FREE(self->str);
+	_FREE(self->str);
 	self->str = tmp;
 }
 
@@ -523,11 +523,11 @@ private_fun void String_insertCharAt(void* obj, char c, size_t index)
 	if (self->length <= 1) return;
 	if (index >= self->length) index = self->length - 1;
 	char* tmp;
-	MALLOC(char, self->length + 1, tmp);
+	_MALLOC(char, self->length + 1, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
 	basic_memset(tmp + index, c, 1);
 	basic_bin_copy(tmp, self->str + index, self->length - index, index + 1);
-	FREE(self->str);
+	_FREE(self->str);
 	self->length++;
 	self->str = tmp;
 }
@@ -880,7 +880,7 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 	}
 	char* tmp;
 	size_t new_length = count * new_length_inc + self->length;
-	MALLOC(char, new_length, tmp);
+	_MALLOC(char, new_length, tmp);
 	basic_memset(tmp + new_length - 1, '\0', 1);
 	basic_bin_copy(tmp, self->str, offset, 0);
 	size_t i = offset;
@@ -898,7 +898,7 @@ private_fun void String_replaceAllSubstringOffset(void* obj, void* sub, void* re
 			j++;
 		}
 	}
-	FREE(self->str);
+	_FREE(self->str);
 	self->str = tmp;
 	self->length = new_length;
 }
@@ -932,11 +932,11 @@ private_fun void String_replaceFirstSubstringOffset(void* obj, void* sub, void* 
 	size_t index = String_findFirstStringOffset(obj, sub, offset);
 	if (index >= self->length) return;
 	char* tmp;
-	MALLOC(char, new_length, tmp);
+	_MALLOC(char, new_length, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
 	basic_bin_copy(tmp, self2->str, self2->length - 1, index);
 	basic_bin_copy(tmp, self->str + index + self1->length - 1, self->length - index - self1->length + 1, index + self2->length - 1);
-	FREE(self->str);
+	_FREE(self->str);
 	self->length = new_length;
 	self->str = tmp;
 }
@@ -970,11 +970,11 @@ private_fun void String_replaceLastSubstringOffset(void* obj, void* sub, void* r
 	size_t index = String_findLastStringOffset(obj, sub, offset);
 	if (index >= self->length) return;
 	char* tmp;
-	MALLOC(char, new_length, tmp);
+	_MALLOC(char, new_length, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
 	basic_bin_copy(tmp, self2->str, self2->length - 1, index);
 	basic_bin_copy(tmp, self->str + index + self1->length - 1, self->length - index - self1->length + 1, index + self2->length - 1);
-	FREE(self->str);
+	_FREE(self->str);
 	self->length = new_length;
 	self->str = tmp;
 }
@@ -1026,7 +1026,7 @@ private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t of
 	if (self1->length > self->length) return;
 	if (self1->length == self->length && offset == 0) {
 		self->length = 0;
-		FREE(self->str);
+		_FREE(self->str);
 		self->str = basic_strcpy("");
 		return;
 	}
@@ -1034,7 +1034,7 @@ private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t of
 	if (count == 0) return;
 	size_t new_size = (-1) * (self1->length - 1) * count + self->length;
 	char* tmp;
-	MALLOC(char, new_size, tmp);
+	_MALLOC(char, new_size, tmp);
 	size_t i = offset;
 	size_t j = offset;
 	basic_bin_copy(tmp, self->str, offset, 0);
@@ -1051,7 +1051,7 @@ private_fun void String_removeAllSubstringOffset(void* obj, void* sub, size_t of
 			j++;
 		}
 	}
-	FREE(self->str);
+	_FREE(self->str);
 	self->str = tmp;
 	self->length = new_size;
 }
@@ -1072,11 +1072,11 @@ private_fun void String_removeFirstSubstringOffset(void* obj, void* sub, size_t 
 	if (index >= self->length) return;
 	size_t new_size = self->length - self1->length + 1;
 	char* tmp;
-	MALLOC(char, new_size, tmp);
+	_MALLOC(char, new_size, tmp);
 	basic_memset(tmp + new_size - 1, '\0', 1);
 	basic_bin_copy(tmp, self->str, index, 0);
 	basic_bin_copy(tmp, self->str + index + self1->length - 1, self->length - index - self1->length + 1, index);
-	FREE(self->str);
+	_FREE(self->str);
 	self->length = new_size;
 	self->str = tmp;
 }
@@ -1097,11 +1097,11 @@ private_fun void String_removeLastSubstringOffset(void* obj, void* sub, size_t o
 	if (index >= self->length) return;
 	size_t new_size = self->length - self1->length + 1;
 	char* tmp;
-	MALLOC(char, new_size, tmp);
+	_MALLOC(char, new_size, tmp);
 	basic_memset(tmp + new_size - 1, '\0', 1);
 	basic_bin_copy(tmp, self->str, index, 0);
 	basic_bin_copy(tmp, self->str + index + self1->length - 1, self->length - index - self1->length + 1, index);
-	FREE(self->str);
+	_FREE(self->str);
 	self->length = new_size;
 	self->str = tmp;
 }
@@ -1120,11 +1120,11 @@ private_fun void String_insertStringAt(void* obj, void* str, size_t index)
 	if (self1->length <= 1) return;
 	if (index >= self->length) return;
 	char* tmp;
-	MALLOC(char, self->length + self1->length, tmp);
+	_MALLOC(char, self->length + self1->length, tmp);
 	basic_bin_copy(tmp, self->str, index, 0);
 	basic_bin_copy(tmp, self1->str, self1->length - 1, index);
 	basic_bin_copy(tmp, self->str + index, self->length - index, index + self1->length - 1);
-	FREE(self->str);
+	_FREE(self->str);
 	self->str = tmp;
 	self->length = basic_strlen(tmp);
 }
@@ -1175,12 +1175,12 @@ private_fun void String_append(void* str1, void* str2)
 	size_t new_length = self->length + self1->length - 1;
 	self->length = new_length;
 	char* copy_str1 = basic_strcpy(self->str);
-	FREE(self->str);
+	_FREE(self->str);
 	char* self_str;
-	MALLOC(char, new_length, self_str);
+	_MALLOC(char, new_length, self_str);
 	basic_bin_copy(self_str, copy_str1, basic_strlen(copy_str1) - 1, 0);
 	basic_bin_copy(self_str, self1->str, self1->length, basic_strlen(copy_str1) - 1);
-	FREE(copy_str1);
+	_FREE(copy_str1);
 	self->str = self_str;
 }
 

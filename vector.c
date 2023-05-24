@@ -54,13 +54,13 @@ private_fun char* Vector_toString(void* obj)
 {
 	CAST(Vector, obj, NULL, );
 	CAST_OBJECT(this->super, NULL, 1);
-	FREE(self1->toString);
+	_FREE(self1->toString);
 	char* tmp;
 	MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
 	snprintf(tmp, 100, "X: %lf\nY: %lf\nZ: %lf\n", self->values[0], self->values[1], self->values[2]);
 	self1->toString = basic_strcpy(tmp);
-	FREE(tmp);
+	_FREE(tmp);
 	return self1->toString;
 }
 
@@ -73,7 +73,7 @@ private_fun void* Vector_clone(void* obj)
 private_fun void Vector_dtor(void* obj)
 {
 	CAST(Vector, obj, , );
-	FREE(this->_VectorIF);
+	_FREE(this->_VectorIF);
 	Object_dtor(this->super);
 	FREE(this);
 }
