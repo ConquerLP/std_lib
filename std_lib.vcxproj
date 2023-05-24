@@ -146,6 +146,7 @@
   <ItemGroup>
     <None Include="array.r" />
     <None Include="basic.h" />
+    <None Include="BUILD.bat" />
     <None Include="filemanager.r" />
     <None Include="list.r" />
     <None Include="object.r" />

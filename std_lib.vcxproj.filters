@@ -86,6 +86,9 @@
     <None Include="RUN_ME.bat">
       <Filter>Quelldateien</Filter>
     </None>
+    <None Include="BUILD.bat">
+      <Filter>Quelldateien</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
