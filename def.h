@@ -57,11 +57,10 @@ extern Def_Hashtable* DEF_GLOBAL_HASHTABLE;
 #define DEF_START_UP DEF_GLOBAL_HASHTABLE = def_hashtable_create();
 #define DEF_CLEAR_MEM def_hashtable_delete(DEF_GLOBAL_HASHTABLE);
 
-#define _PRINT_DEBUG_MEMORY //_PRINT_DEBUG_MEMORY
 #if DEF_DEBUG_MODE
-
-#define _PRINT_DEBUG_MEMORY def_hashtable_print(DEF_GLOBAL_HASHTABLE);
-
+	#define _PRINT_DEBUG_MEMORY def_hashtable_print(DEF_GLOBAL_HASHTABLE);
+#else 
+	#define _PRINT_DEBUG_MEMORY //_PRINT_DEBUG_MEMORY
 #endif
 
 /*

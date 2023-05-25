@@ -42,12 +42,8 @@ gcc -std=c11 -c string.c
 gcc -std=c11 -c array.c
 gcc -std=c11 -c filemanager.c 
 gcc -std=c11 -c template.c
-cls
-gcc -shared -o std_lib.dll -Wl,--out-implib,libtstdll.a std_lib_dll.o
-pause
-::gcc -std=c11 -c main.c 
-::gcc -std=c11 def.o basic.o object.o std_lib_math.o vector.o list.o string.o array.o filemanager.o template.o main.o -o prog.exe
-gcc -o prog main.c -L. -lstd_lib.dll
+gcc -std=c11 -c main.c 
+gcc -std=c11 def.o basic.o object.o std_lib_math.o vector.o list.o string.o array.o filemanager.o template.o main.o -o prog.exe
 pause
 
 cls
