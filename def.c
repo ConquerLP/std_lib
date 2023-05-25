@@ -182,7 +182,8 @@ void def_hashtable_print(Def_Hashtable* table)
 			if (!entry->freed) flag1 = " no";
 			else freed++;
 			fprintf(stdout,
-				"        [0x%p] |     [%5zu] |       [%3s] |         [%10s] |      [%5zu] |     [%20s] |      [%s] |", 
+				"        [0x%*p] |     [%5zu] |       [%3s] |         [%10s] |      [%5zu] |     [%20s] |      [%s] |", 
+				 16,
 				 entry->key,
 				 entry->count,
 				 flag0,

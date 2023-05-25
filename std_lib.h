@@ -2,6 +2,8 @@
 	Latest Update: 24.05.2023
 */
 
+__declspec(dllexport);
+
 #ifndef STD_LIB_H
 
 #define STD_LIB_H

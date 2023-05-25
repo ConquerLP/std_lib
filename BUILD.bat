@@ -17,7 +17,6 @@ move *.r files
 move *.h files
 
 cd files
-
 gcc -std=c11 -S def.c
 gcc -std=c11 -S basic.c
 gcc -std=c11 -S object.c
@@ -43,11 +42,14 @@ gcc -std=c11 -c string.c
 gcc -std=c11 -c array.c
 gcc -std=c11 -c filemanager.c 
 gcc -std=c11 -c template.c
-gcc -std=c11 -c main.c 
-gcc -std=c11 def.o basic.o object.o std_lib_math.o vector.o list.o string.o array.o filemanager.o template.o main.o -o prog.exe
-cd ..
-move files\prog.exe %~dp0
-cd /d %~dp0
+cls
+gcc -shared -o std_lib.dll -Wl,--out-implib,libtstdll.a std_lib_dll.o
+pause
+::gcc -std=c11 -c main.c 
+::gcc -std=c11 def.o basic.o object.o std_lib_math.o vector.o list.o string.o array.o filemanager.o template.o main.o -o prog.exe
+gcc -o prog main.c -L. -lstd_lib.dll
+pause
+
 cls
 @echo start of the program
 
