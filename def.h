@@ -83,8 +83,8 @@ extern Def_Hashtable* DEF_GLOBAL_HASHTABLE;
 
 #define _FREE(ptr) \
 	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, false, true, \
-	def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), __FILE__, __LINE__, \
-	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, ptr)); \
+						def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), __FILE__, __LINE__, \
+						def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, ptr)); \
 	free(ptr); ptr = NULL; \
 
 #endif

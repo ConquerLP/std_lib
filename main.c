@@ -10,13 +10,7 @@ int main(void) {
 	*/
 	DEF_START_UP;
 	/* Your actual program */
-
-	String* tmp = String_ctor("test");
-	tmp->_StringIF->replaceAllChar(tmp, 't', 'f');
-	String* str = String_ctor("train");
-	tmp->_StringIF->append(tmp, str);
-
-	printf("%s\n", _printS(tmp));
+	
 
 	/* End of your actual program */
 	_PRINT_DEBUG_MEMORY;

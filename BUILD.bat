@@ -44,6 +44,7 @@ gcc -std=c11 -c filemanager.c
 gcc -std=c11 -c template.c
 gcc -std=c11 -c main.c 
 gcc -std=c11 def.o basic.o object.o std_lib_math.o vector.o list.o string.o array.o filemanager.o template.o main.o -o prog.exe
+del *.o
 pause
 
 cls

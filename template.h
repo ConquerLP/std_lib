@@ -20,7 +20,7 @@ typedef struct _ClassIF {
 typedef struct _Class {
 	void* super; // must be first
 	void* self;
-	ClassIF* classIF;
+	ClassIF* _classIF;
 	ObjectIF* o_IF;
 }Class;
 

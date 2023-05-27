@@ -135,6 +135,7 @@
     <ClInclude Include="array.h" />
     <ClInclude Include="def.h" />
     <ClInclude Include="filemanager.h" />
+    <ClInclude Include="hashtable.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="std_lib.h" />
@@ -148,6 +149,7 @@
     <None Include="basic.h" />
     <None Include="BUILD.bat" />
     <None Include="filemanager.r" />
+    <None Include="hashtable.r" />
     <None Include="list.r" />
     <None Include="object.r" />
     <None Include="RUN_ME.bat" />
@@ -160,6 +162,7 @@
     <ClCompile Include="basic.c" />
     <ClCompile Include="def.c" />
     <ClCompile Include="filemanager.c" />
+    <ClCompile Include="hashtable.c" />
     <ClCompile Include="list.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="object.c" />

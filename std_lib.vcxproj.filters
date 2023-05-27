@@ -57,6 +57,9 @@
     <ClInclude Include="std_lib_math.h">
       <Filter>Headerdateien\math</Filter>
     </ClInclude>
+    <ClInclude Include="hashtable.h">
+      <Filter>Headerdateien\std_lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="array.r">
@@ -88,6 +91,9 @@
     </None>
     <None Include="BUILD.bat">
       <Filter>Quelldateien</Filter>
+    </None>
+    <None Include="hashtable.r">
+      <Filter>Headerdateien\std_lib</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +129,9 @@
     </ClCompile>
     <ClCompile Include="std_lib_math.c">
       <Filter>Quelldateien\math</Filter>
+    </ClCompile>
+    <ClCompile Include="hashtable.c">
+      <Filter>Quelldateien\std_lib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
