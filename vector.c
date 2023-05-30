@@ -11,6 +11,17 @@
 #include <stdlib.h>
 #include "std_lib_math.h"
 
+/* MACROS */
+#define VECTOR_SET(datatype) \
+	datatype* values; \
+	_MALLOC(datatype, dim, values); \
+	va_list arg; \
+	va_start(arg, dim); \
+	for (size_t i = 0; i < dim; ++i) { \
+		values[i] = va_arg(arg, datatype); \
+	} \
+	va_end(arg); 
+
 /* function prototpyes */
 /* overriding Object methods */
 private_fun char* Vector_toString(void* obj);
@@ -27,8 +38,10 @@ private_fun double Vector_getLength(void* obj);
 private_fun double Vector_angle(void* vec1, void* vec2);
 
 /* pulbic functions */
-Vector* Vector_ctor(double x, double y, double z)
+Vector* Vector_ctor(Vector_types t, unsigned int dim, ...)
 {
+	if (t >= VT_COUNT) return NULL;
+	if (dim <= 0) return NULL;
 	BASIC_CTOR(Vector);
 	super->o_IF->toString = &Vector_toString;
 	super->o_IF->clone = &Vector_clone;
@@ -43,11 +56,28 @@ Vector* Vector_ctor(double x, double y, double z)
 	thisIF->getAngle = &Vector_angle;
 
 	self->sub = NULL;
-	self->values[0] = x;
-	self->values[1] = y;
-	self->values[2] = z;
+	switch (t) {
+	case VT_INT: {
+		VECTOR_SET(int);
+		break;
+	}
+	case VT_FLOAT: {
+		VECTOR_SET(float);
+		break;
+	}
+	case VT_DOUBLE: {
+		VECTOR_SET(double);
+		break;
+	}
+	case VT_UNSIGNED_INT: {
+		VECTOR_SET(unsigned int);
+		break;
+	}
+	default: return NULL;
+	}
 	return this;
 }
+
 
 /* overriding Object methods */
 private_fun char* Vector_toString(void* obj)
@@ -107,7 +137,7 @@ private_fun void Vector_set(void* obj, char index, double value)
 	case 'x': self->values[0] = value; break;
 	case 'y': self->values[1] = value; break;
 	case 'z': self->values[2] = value; break;
-	default: ; break;
+	default:; break;
 	}
 }
 

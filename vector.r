@@ -4,9 +4,13 @@
 
 /* Vector Class */
 
+#include "Vector.h"
+
 typedef struct {
 	void* sub;
-	double values[3];
+	void* values;
+	Vector_types type;
+	unsigned int dim;
 }o_Vector;
 
 #endif
