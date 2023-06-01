@@ -73,12 +73,10 @@ private_fun void Array_fill(void* obj, void* data);
 
 /* public functions */
 
-Array* Array_ctor(const char* name, size_t length)
+Array* Array_ctor(DEF_ALLOWED_TYPES_ARRAY_LIST t, size_t length)
 {
 	if (length < 0) return NULL;
-	if (!name) return NULL;
-	if (!basic_isAllowedType(name)) return NULL;
-
+	if (!basic_isAllowedType(t)) return NULL;
 	BASIC_CTOR(Array);
 	super->o_IF->clone = &Array_clone;
 	super->o_IF->toString = &Array_toString;
@@ -97,7 +95,6 @@ Array* Array_ctor(const char* name, size_t length)
 	void** data;
 	_MALLOC(void*, length, data);
 	self->arr = data;
-	self->name = basic_strcpy(name);
 	return this;
 }
 
@@ -112,8 +109,31 @@ private_fun char* Array_toString(void* obj)
 	char* tmp;
 	_MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
-	snprintf(tmp, 100, "This array contains: %zu '%s's", self->length, self->name);
-	self1->toString = basic_strcpy(tmp);
+	String* str = String_ctor("");
+	CAST(String, str, NULL, 2);
+	snprintf(tmp, 100, "This array contains: %zu '%s's.\n", self->length, basic_BATAL_to_string(self->type));
+	str->_StringIF->append(str, tmp);
+	for (size_t i = 0; i < self->length; ++i) {
+		switch (self->type) {
+			case DATAL_INT:
+				snprintf(tmp, 100, "Value(%zu): %i\n", i, *((int*)Array_get(obj, i)));
+				break;
+			case DATAL_FLOAT:
+				snprintf(tmp, 100, "Value(%zu): %f\n", i, *((float*)Array_get(obj, i)));
+				break;
+			case DATAL_DOUBLE:
+				snprintf(tmp, 100, "Value(%zu): %lf\n", i, *((double*)Array_get(obj, i)));
+				break;
+			case DATAL_SIZE_T: 
+				snprintf(tmp, 100, "Value(%zu): %zu\n", i, *((size_t*)Array_get(obj, i)));
+				break;
+			default: 
+				break;
+		}
+		str->_StringIF->append(str, tmp);
+	}
+	self1->toString = basic_strcpy(self2->str);
+	delete(str);
 	_FREE(tmp);
 	return self1->toString;
 }
@@ -124,19 +144,28 @@ private_fun void Array_dtor(void* obj)
 	void** ptr = self->arr;
 
 	for (size_t i = 0; i < this->_ArrayIF->length(obj); ++i) {
-		if (basic_strcmp(self->name, "String")) {
-			delete(*(ptr + i));
-		}
-		//primitive types
-		else {
+		switch (self->type) {
+		case DATAL_INT: 
 			_FREE(*(ptr + i));
-			continue;
+			break;
+		case DATAL_FLOAT:
+			_FREE(*(ptr + i));
+			break;
+		case DATAL_DOUBLE:
+			_FREE(*(ptr + i));
+			break;
+		case DATAL_SIZE_T:
+			_FREE(*(ptr + i));
+			break;
+		case DATAL_STRING:
+			delete(*(ptr + i));
+			break;
+		default:
+			break;
 		}
 	}
-	_FREE(self->name);
 	_FREE(self->arr);
 	_FREE(self);
-
 	_FREE(this->_ArrayIF);
 	Object_dtor(this->super);
 	FREE(this);

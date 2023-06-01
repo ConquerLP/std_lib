@@ -10,7 +10,7 @@ typedef struct {
 	void* sub;
 	void** arr;
 	size_t length;
-	char* name;
+	DEF_ALLOWED_TYPES_ARRAY_LIST type;
 }o_Array;
 
 #endif

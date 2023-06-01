@@ -23,6 +23,18 @@ extern "C"
 
 void mem_fail(void);
 
+/* allowed types for list and array */
+typedef enum {
+	DATAL_INT = 0,
+	DATAL_FLOAT,
+	DATAL_DOUBLE,
+	DATAL_SIZE_T,
+	DATAL_STRING,
+	DATAL_COUNT
+}DEF_ALLOWED_TYPES_ARRAY_LIST;
+
+boolean def_isAllowedType(DEF_ALLOWED_TYPES_ARRAY_LIST t);
+
 /* hashtable for memory allocation logging */
 typedef struct _Def_Hashentry {
 	void* key;

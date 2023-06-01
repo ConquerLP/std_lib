@@ -11,8 +11,7 @@ int main(void) {
 	DEF_START_UP;
 	/* Your actual program */
 	
-	Vector* v = Vector_ctor(VT_FLOAT, 1, 0.5f);
-
+	Array_ctor(23, 2);
 
 	/* End of your actual program */
 	_PRINT_DEBUG_MEMORY;

@@ -1,22 +1,24 @@
 #include "basic.h"
+#include "def.h"
 
-char* basic_datatype_list[BASIC_DATATYPE_LENGTH] = {
-	"double",
-	"float",
-	"char",
-	"int",
-	"size_t",
-	// classes
-	"String"
-};
-
-boolean basic_isAllowedType(const char* cmp)
+char* basic_BATAL_to_string(DEF_ALLOWED_TYPES_ARRAY_LIST t)
 {
-	if (!cmp) return false;
-	for (size_t i = 0; i < BASIC_DATATYPE_LENGTH; ++i) {
-		if (basic_strcmp(basic_datatype_list[i], cmp)) return true;
+	if (!def_isAllowedType(t)) return NULL;
+	switch (t) {
+		case DATAL_INT: {
+			return "int";
+		}
+		case DATAL_FLOAT: {
+			return "float";
+		}
+		case DATAL_DOUBLE: {
+			return "double";
+		}
+		case DATAL_SIZE_T: {
+			return "size_t";
+		}
+		default: return NULL;
 	}
-	return false;
 }
 
 size_t basic_strlen(const char* str)

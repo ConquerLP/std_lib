@@ -42,11 +42,8 @@ extern "C"
 	this->_##datatype##IF = thisIF; \
 	this->o_IF = super->o_IF; \
 
-/* list of allowed datatypes in the array & list */
-#define BASIC_DATATYPE_LENGTH 6
-extern char* basic_datatype_list[BASIC_DATATYPE_LENGTH];
-boolean basic_isAllowedType(const char* cmp);
 #define BASIC_LONGEST_NUM 20
+char* basic_BATAL_to_string(DEF_ALLOWED_TYPES_ARRAY_LIST t);
 
 /* Helper functions */
 size_t basic_strlen(const char* str);
