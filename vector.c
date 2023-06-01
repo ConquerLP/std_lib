@@ -4,6 +4,9 @@
 #include "object.h"
 #include "object.r"
 
+#include "string.h"
+#include "string.r"
+
 #include "def.h"
 #include "basic.h"
 
@@ -12,13 +15,15 @@
 #include "std_lib_math.h"
 
 /* MACROS */
-#define VECTOR_SET(datatype) \
-	datatype* values; \
-	_MALLOC(datatype, dim, values); \
+
+#define VECTOR_INIT(datatype) \
+	tmp = Array_ctor(#datatype, dim); \
 	va_list arg; \
 	va_start(arg, dim); \
+	datatype value; \
 	for (size_t i = 0; i < dim; ++i) { \
-		values[i] = va_arg(arg, datatype); \
+		value = va_arg(arg, datatype); \
+		tmp->_ArrayIF->set(tmp, &value, i); \
 	} \
 	va_end(arg); 
 
@@ -30,15 +35,19 @@ private_fun void Vector_dtor(void* obj);
 private_fun boolean Vector_equals(void* obj, void* obj2);
 
 /* Vector methods */
-private_fun double Vector_get(void* obj, char index);
-private_fun void Vector_set(void* obj, char index, double value);
+private_fun double Vector_get(void* obj, size_t index);
+private_fun void Vector_set(void* obj, size_t index, double value);
 private_fun double Vector_calcDotP(void* vec1, void* vec2);
-private_fun void Vector_rotate(void* obj, double angle, char axis);
+private_fun void Vector_rotate3D(void* obj, double angle, Vector_axis axis);
+private_fun void Vector_rotate2D(void* obj, double angle);
 private_fun double Vector_getLength(void* obj);
 private_fun double Vector_angle(void* vec1, void* vec2);
 
+/* helper fucntions */
+private_fun void Vector_setDim(void* obj, size_t dim);
+
 /* pulbic functions */
-Vector* Vector_ctor(Vector_types t, unsigned int dim, ...)
+Vector* Vector_ctor(Vector_types t, size_t dim, ...)
 {
 	if (t >= VT_COUNT) return NULL;
 	if (dim <= 0) return NULL;
@@ -47,34 +56,35 @@ Vector* Vector_ctor(Vector_types t, unsigned int dim, ...)
 	super->o_IF->clone = &Vector_clone;
 	super->o_IF->dtor = &Vector_dtor;
 	super->o_IF->equals = &Vector_equals;
-
 	thisIF->get = &Vector_get;
 	thisIF->set = &Vector_set;
 	thisIF->calcDotP = &Vector_calcDotP;
-	thisIF->rotate = &Vector_rotate;
+	thisIF->rotate3D = &Vector_rotate3D;
+	thisIF->rotate2D = &Vector_rotate2D;
 	thisIF->getLength = &Vector_getLength;
 	thisIF->getAngle = &Vector_angle;
-
 	self->sub = NULL;
+	Array* tmp = NULL;
 	switch (t) {
-	case VT_INT: {
-		VECTOR_SET(int);
-		break;
-	}
-	case VT_FLOAT: {
-		VECTOR_SET(float);
-		break;
-	}
-	case VT_DOUBLE: {
-		VECTOR_SET(double);
-		break;
-	}
-	case VT_UNSIGNED_INT: {
-		VECTOR_SET(unsigned int);
-		break;
-	}
-	default: return NULL;
-	}
+		case VT_INT: {
+			VECTOR_INIT(int);
+			break;
+		}
+		case VT_FLOAT: {
+			VECTOR_INIT(float);
+			break;
+		}
+		case VT_DOUBLE: {
+			VECTOR_INIT(double);
+			break;
+		}
+		case VT_SIZE_T: {
+			VECTOR_INIT(size_t);
+			break;
+		}
+		default: return NULL;
+		}
+	self->values = tmp;
 	return this;
 }
 
@@ -85,11 +95,17 @@ private_fun char* Vector_toString(void* obj)
 	CAST(Vector, obj, NULL, );
 	CAST_OBJECT(this->super, NULL, 1);
 	_FREE(self1->toString);
+	String* str = String_ctor("");
+	CAST(String, str, NULL, 2);
 	char* tmp;
-	MALLOC(char, 100, tmp);
+	_MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
-	snprintf(tmp, 100, "X: %lf\nY: %lf\nZ: %lf\n", self->values[0], self->values[1], self->values[2]);
-	self1->toString = basic_strcpy(tmp);
+	for (size_t i = 0; i < self->dim; ++i) {
+		snprintf(tmp, 100, "V(%zu): %lf\n", i, Vector_get(obj, i));
+		str->_StringIF->append(str, tmp);
+	}
+	self1->toString = basic_strcpy(self2->str);
+	delete(str);
 	_FREE(tmp);
 	return self1->toString;
 }
@@ -97,13 +113,20 @@ private_fun char* Vector_toString(void* obj)
 private_fun void* Vector_clone(void* obj)
 {
 	CAST(Vector, obj, NULL, );
-	return Vector_ctor(self->values[0], self->values[1], self->values[2]);
+	Vector* tmp = Vector_ctor(self->type, 1, 0.0);
+	Vector_setDim(tmp, self->dim);
+	for (size_t i = 0; i < self->dim; ++i) {
+		Vector_set(tmp, i, Vector_get(obj, i));
+	}
+	return tmp;
 }
 
 private_fun void Vector_dtor(void* obj)
 {
 	CAST(Vector, obj, , );
 	_FREE(this->_VectorIF);
+	_FREE(self->values);
+	delete(self->values);
 	Object_dtor(this->super);
 	FREE(this);
 }
@@ -112,40 +135,37 @@ private_fun boolean Vector_equals(void* obj, void* obj2)
 {
 	CAST(Vector, obj, false, );
 	CAST(Vector, obj2, false, 1);
-	for (size_t i = 0; i < 3; ++i) {
-		if (self->values[i] != self1->values[i]) return false;
+	if (self->dim != self1->dim) return false;
+	for (size_t i = 0; i < self->dim; ++i) {
+		if (Vector_get(obj, i) != Vector_get(obj2, i)) return false;
 	}
 	return true;
 }
 
 /* Vector methods */
-private_fun double Vector_get(void* obj, char index)
+private_fun double Vector_get(void* obj, size_t index)
 {
 	CAST(Vector, obj, 0.0, );
-	switch (index) {
-	case 'x': return self->values[0]; break;
-	case 'y': return self->values[1]; break;
-	case 'z': return self->values[2]; break;
-	default: return 0.0; break;
-	}
+	double* result = self->values->_ArrayIF->get(self->values, index);
+	return *result;
 }
 
-private_fun void Vector_set(void* obj, char index, double value)
+private_fun void Vector_set(void* obj, size_t index, double value)
 {
 	CAST(Vector, obj, , );
-	switch (index) {
-	case 'x': self->values[0] = value; break;
-	case 'y': self->values[1] = value; break;
-	case 'z': self->values[2] = value; break;
-	default:; break;
-	}
+	self->values->_ArrayIF->set(self->values, &value, index);
 }
 
 private_fun double Vector_calcDotP(void* vec1, void* vec2)
 {
 	CAST(Vector, vec1, 0.0, );
 	CAST(Vector, vec2, 0.0, 1);
-	return self->values[0] * self1->values[0] + self->values[1] * self1->values[1] + self->values[2] * self1->values[2];
+	if (self->dim != self1->dim) return 0.0;
+	double result = 0.0;
+	for (size_t i = 0; i < self->dim; ++i) {
+		result += Vector_get(vec1, i) * Vector_get(vec2, i);
+	}
+	return result;
 }
 
 private_fun double Vector_angle(void* vec1, void* vec2)
@@ -153,40 +173,63 @@ private_fun double Vector_angle(void* vec1, void* vec2)
 	return acos(Vector_calcDotP(vec1, vec2) / (Vector_getLength(vec1) * Vector_getLength(vec2)));
 }
 
-private_fun void Vector_rotate(void* obj, double angle, char axis)
+private_fun void Vector_rotate3D(void* obj, double angle, Vector_axis axis)
 {
 	CAST(Vector, obj, , );
+	if (self->dim != 3) return;
 	double tmp0 = 0.0;
 	double tmp1 = 0.0;
 	switch (axis) {
-	case 'x': {
-		tmp0 = self->values[1] * cos(std_lib_math_degToRad(angle)) + (-1) * cos(std_lib_math_degToRad(angle)) * self->values[2];
-		tmp1 = self->values[1] * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * self->values[2];
-		self->values[1] = tmp0;
-		self->values[2] = tmp1;
+	case VA_X: {
+		tmp0 = Vector_get(obj, 1) * cos(std_lib_math_degToRad(angle)) + (-1) * cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
+		tmp1 = Vector_get(obj, 1) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
+		Vector_set(obj, 1, tmp0);
+		Vector_set(obj, 2, tmp1);
 	} break;
-	case 'y': {
-		tmp0 = self->values[0] * cos(std_lib_math_degToRad(angle)) + sin(std_lib_math_degToRad(angle)) * self->values[2];
-		tmp1 = self->values[0] * (-1) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * self->values[2];
-		self->values[0] = tmp0;
-		self->values[2] = tmp1;
+	case VA_Y: {
+		tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
+		tmp1 = Vector_get(obj, 0) * (-1) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
+		Vector_set(obj, 0, tmp0);
+		Vector_set(obj, 2, tmp1);
 	} break;
-	case 'z': {
-		tmp0 = self->values[0] * cos(std_lib_math_degToRad(angle)) + (-1) * sin(std_lib_math_degToRad(angle)) * self->values[1];
-		tmp1 = self->values[0] * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * self->values[1];
-		self->values[0] = tmp0;
-		self->values[1] = tmp1;
+	case VA_Z: {
+		tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + (-1) * sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
+		tmp1 = Vector_get(obj, 0) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
+		Vector_set(obj, 0, tmp0);
+		Vector_set(obj, 1, tmp1);
 	} break;
 	default:; break;
 	}
 }
 
+private_fun void Vector_rotate2D(void* obj, double angle)
+{
+	CAST(Vector, obj, , );
+	if (self->dim != 2) return;
+	double tmp0 = 0.0;
+	double tmp1 = 0.0;
+	tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + (-1) * sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
+	tmp1 = Vector_get(obj, 0) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
+	Vector_set(obj, 0, tmp0);
+	Vector_set(obj, 1, tmp1);
+}
+
 private_fun double Vector_getLength(void* obj)
 {
 	CAST(Vector, obj, 0.0, );
-	return sqrt(
-		self->values[0] * self->values[0] +
-		self->values[1] * self->values[1] +
-		self->values[2] * self->values[2]
-	);
+	double sum = 0.0;
+	for (size_t i = 0; i < self->dim; ++i) {
+		sum += Vector_get(obj, i) * Vector_get(obj, i);
+	}
+	return sqrt(sum);
+}
+
+/* helper functions */
+private_fun void Vector_setDim(void* obj, size_t dim)
+{
+	CAST(Vector, obj, , );
+	if (dim <= 0) return;
+	if (dim == self->dim) return;
+	self->values->_ArrayIF->resize(self->values, dim);
+	self->dim = dim;
 }

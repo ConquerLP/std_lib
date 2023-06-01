@@ -4,13 +4,14 @@
 
 /* Vector Class */
 
-#include "Vector.h"
+#include "vector.h"
+#include "array.h"
 
 typedef struct {
 	void* sub;
-	void* values;
+	Array* values;
 	Vector_types type;
-	unsigned int dim;
+	size_t dim;
 }o_Vector;
 
 #endif
