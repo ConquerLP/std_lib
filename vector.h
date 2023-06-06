@@ -5,27 +5,19 @@
 #include "object.h"
 #include <stdlib.h>
 
-typedef enum {
-	VT_INT = 0,
-	VT_FLOAT,
-	VT_DOUBLE,
-	VT_SIZE_T,
-	VT_COUNT
-}Vector_types;
-
-
-typedef enum {
-	VA_X = 0,
-	VA_Y,
-	VA_Z,
-	VA_COUNT
-}Vector_axis;
+enum {
+	VEC_AXIS_X = 0,
+	VEC_AXIS_Y,
+	VEC_AXIS_Z,
+	VEC_AXIS_LAST,
+};
+extern size_t VEC_AXIS[VEC_AXIS_LAST];
 
 typedef struct _VectorIF {
 	double (*get)(void* obj, unsigned int index);
 	void (*set)(void* obj, unsigned int index, double value);
 	double (*calcDotP)(void* vec1, void* vec2);
-	void (*rotate3D)(void* obj, double angle, Vector_axis axis); //3D only
+	void (*rotate3D)(void* obj, double angle, size_t axis); //3D only
 	void (*rotate2D)(void* obj, double angle); //2D only
 	double (*getLength)(void* obj);
 	double (*getAngle)(void* vec1, void* vec2);
@@ -38,7 +30,7 @@ typedef struct _Vector {
 	ObjectIF* o_IF;
 }Vector;
 
-Vector* Vector_ctor(Vector_types t, size_t dim, ...);
-Vector* Vector_sum(Vector_types t, void* vec1, void* vec2);
+Vector* Vector_ctor(size_t datatype, size_t dim, ...);
+Vector* Vector_sum(size_t datatype, void* vec1, void* vec2);
 
 #endif // !VECTOR_H

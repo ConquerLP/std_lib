@@ -43,9 +43,10 @@ extern "C"
 	this->o_IF = super->o_IF; \
 
 #define BASIC_LONGEST_NUM 20
-char* basic_BATAL_to_string(DEF_ALLOWED_TYPES_ARRAY_LIST t);
 
 /* Helper functions */
+boolean basic_isAllowedType(size_t datatype);
+char* basic_typeToString(size_t datatype);
 size_t basic_strlen(const char* str);
 boolean basic_strcmp(const char* s1, const char* s2);
 boolean basic_strcmpIgnCase(const char* s1, const char* s2);

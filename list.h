@@ -19,7 +19,7 @@ typedef struct {
 	void (*clear)(void* obj);
 	void (*insert)(void* obj, void* data, size_t index);
 	void (*delete)(void* obj, size_t index);
-	size_t(*find)(void* obj, void* toFind);
+	size_t (*find)(void* obj, void* toFind);
 	void (*addAll)(void* obj, void* listToAdd);
 	boolean (*isEmpty)(void* obj);
 	size_t (*size)(void* obj);
@@ -35,7 +35,7 @@ typedef struct _List {
 }List;
 
 /* public functions */
-List* List_ctor(const char* name);
+List* List_ctor(size_t datatype);
 
 
 #ifdef __cplusplus

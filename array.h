@@ -15,7 +15,7 @@ typedef struct _ArrayIF {
 	void (*fill)(void* obj, void* data);
 	void (*resize)(void* obj, size_t new_length);
 	void* (*get)(void* obj, size_t index);
-	size_t(*length)(void* obj);
+	size_t (*length)(void* obj);
 }ArrayIF;
 
 typedef struct _Array {
@@ -25,7 +25,7 @@ typedef struct _Array {
 	ObjectIF* o_IF;
 }Array;
 
-Array* Array_ctor(DEF_ALLOWED_TYPES_ARRAY_LIST t, size_t length);
+Array* Array_ctor(size_t datatype, size_t length);
 
 #ifdef __cplusplus
 } // extern "C"

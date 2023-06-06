@@ -16,7 +16,7 @@ typedef struct _o_List{
 	Node* head;
 	Node* tail;
 	size_t length;
-	char* name;
+	size_t type;
 	void* sub;
 }o_List;
 

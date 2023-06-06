@@ -9,12 +9,6 @@ void mem_fail(void)
 	exit(1);
 }
 
-boolean def_isAllowedType(DEF_ALLOWED_TYPES_ARRAY_LIST t)
-{
-	if (t >= DATAL_COUNT) return false;
-	else return true;
-}
-
 Def_Hashtable* DEF_GLOBAL_HASHTABLE = NULL;
 static size_t counter = 0;
 

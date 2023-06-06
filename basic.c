@@ -1,23 +1,51 @@
 #include "basic.h"
 #include "def.h"
 
-char* basic_BATAL_to_string(DEF_ALLOWED_TYPES_ARRAY_LIST t)
+size_t DEF_DATATYPES[DEF_LAST_DATATYPE] = {
+	DEF_BOOLEAN,
+	DEF_USHORT,
+	DEF_SHORT,
+	DEF_CHAR,
+	DEF_DEF_UINT,
+	DEF_INT,
+	DEF_ULONGINT,
+	DEF_LONGINT,
+	DEF_LONGLONGINT,
+	DEF_SIZE_T,
+	DEF_FLOAT,
+	DEF_DOUBLE,
+	DEF_LONGDOUBLE,
+	DEF_STRING,
+};
+
+boolean basic_isAllowedType(size_t datatype)
 {
-	if (!def_isAllowedType(t)) return NULL;
-	switch (t) {
-		case DATAL_INT: {
-			return "int";
-		}
-		case DATAL_FLOAT: {
-			return "float";
-		}
-		case DATAL_DOUBLE: {
-			return "double";
-		}
-		case DATAL_SIZE_T: {
-			return "size_t";
-		}
-		default: return NULL;
+	if (datatype < 0) return false;
+	for (size_t i = 0; i < DEF_LAST_DATATYPE; ++i) {
+		if (datatype == DEF_DATATYPES[i]) return true;
+	}
+	return false;
+}
+
+char* basic_typeToString(size_t datatype)
+{
+	if (!basic_isAllowedType(datatype)) return NULL;
+	switch (datatype) {
+	case DEF_BOOLEAN:		return "boolean"; 
+	case DEF_USHORT:		return "unsigned short"; 
+	case DEF_SHORT:			return "short"; 
+	case DEF_CHAR:			return "char"; 
+	case DEF_DEF_UINT:		return "unsigned int"; 
+	case DEF_INT:			return "int"; 
+	case DEF_ULONGINT:		return "unsigned int"; 
+	case DEF_LONGINT:		return "long int"; 
+	case DEF_LONGLONGINT:	return "long long int"; 
+	case DEF_SIZE_T:		return "size_t"; 
+	case DEF_FLOAT:			return "float"; 
+	case DEF_DOUBLE:		return "double"; 
+	case DEF_LONGDOUBLE:	return "longe double"; 
+	case DEF_STRING:		return "String"; 
+	default:				return NULL;
 	}
 }
 

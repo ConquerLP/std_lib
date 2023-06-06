@@ -24,16 +24,25 @@ extern "C"
 void mem_fail(void);
 
 /* allowed types for list and array */
-typedef enum {
-	DATAL_INT = 0,
-	DATAL_FLOAT,
-	DATAL_DOUBLE,
-	DATAL_SIZE_T,
-	DATAL_STRING,
-	DATAL_COUNT
-}DEF_ALLOWED_TYPES_ARRAY_LIST;
+enum {
+	DEF_BOOLEAN = 0,
+	DEF_USHORT,
+	DEF_SHORT,
+	DEF_CHAR,
+	DEF_DEF_UINT,
+	DEF_INT,
+	DEF_ULONGINT,
+	DEF_LONGINT,
+	DEF_LONGLONGINT,
+	DEF_SIZE_T,
+	DEF_FLOAT,
+	DEF_DOUBLE,
+	DEF_LONGDOUBLE,
+	DEF_STRING,
+	DEF_LAST_DATATYPE
+};
 
-boolean def_isAllowedType(DEF_ALLOWED_TYPES_ARRAY_LIST t);
+extern size_t DEF_DATATYPES[DEF_LAST_DATATYPE];
 
 /* hashtable for memory allocation logging */
 typedef struct _Def_Hashentry {
