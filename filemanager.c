@@ -138,7 +138,6 @@ private_fun Array* Filemanager_scanCompleteFile(void* obj)
 	for (size_t i = 0; i < arr->_ArrayIF->length(arr); ++i) {
 		fgets(buffer, BUFFER_SIZE, self->file_stream);
 		String* tmp = String_ctor(buffer);
-		if (!basic_strcmp(def_hashtable_get_type(def_global_hashtable, tmp), "String")) printf("%zu\n", i);
 		arr->_ArrayIF->set(arr, tmp, i);
 		delete(tmp);
 	}

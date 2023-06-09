@@ -14,7 +14,6 @@
 #include <stdio.h>
 
 /* MACROS */
-
 #define ARRAY_SET_PRIMITIVE(data_type) \
 	data_type* tmp; \
 	_MALLOC(data_type, 1, tmp); \
@@ -22,7 +21,16 @@
 	*(ptr + index) = tmp; \
 
 #define ARRAY_SET_CLASS(data_type) \
-	data_type* tmp = data; \
+	data_type* tmp = NULL; \
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, data)) { \
+		switch (self->type) { \
+			case DEF_STRING: {tmp = String_ctor(data); break; } \
+			default: tmp = NULL; \
+		} \
+		if (!tmp) def_critical_error("Array, tried to assign invalid class"); \
+		else *(ptr + index) = tmp->o_IF->clone(data); \
+	} \
+	else tmp = data; \
 	*(ptr + index) = tmp->o_IF->clone(data); \
 
 #define ARRAY_CMP_PRIMITIVE(data_type) \

@@ -29,21 +29,21 @@ char* basic_typeToString(size_t data_type)
 {
 	if (!basic_isAllowedType(data_type)) return NULL;
 	switch (data_type) {
-	case DEF_BOOLEAN:		return "boolean"; 
-	case DEF_USHORT:		return "unsigned short"; 
-	case DEF_SHORT:			return "short"; 
-	case DEF_CHAR:			return "char"; 
-	case DEF_UINT:		return "unsigned int"; 
-	case DEF_INT:			return "int"; 
-	case DEF_ULONGINT:		return "unsigned int"; 
-	case DEF_LONGINT:		return "long int"; 
-	case DEF_LONGLONGINT:	return "long long int"; 
-	case DEF_SIZE_T:		return "size_t"; 
-	case DEF_FLOAT:			return "float"; 
-	case DEF_DOUBLE:		return "double"; 
-	case DEF_LONGDOUBLE:	return "longe double"; 
-	case DEF_STRING:		return "String"; 
-	default:				return NULL;
+		case DEF_BOOLEAN:		return "boolean"; 
+		case DEF_USHORT:		return "unsigned short"; 
+		case DEF_SHORT:			return "short"; 
+		case DEF_CHAR:			return "char"; 
+		case DEF_UINT:			return "unsigned int"; 
+		case DEF_INT:			return "int"; 
+		case DEF_ULONGINT:		return "unsigned int"; 
+		case DEF_LONGINT:		return "long int"; 
+		case DEF_LONGLONGINT:	return "long long int"; 
+		case DEF_SIZE_T:		return "size_t"; 
+		case DEF_FLOAT:			return "float"; 
+		case DEF_DOUBLE:		return "double"; 
+		case DEF_LONGDOUBLE:	return "longe double"; 
+		case DEF_STRING:		return "String"; 
+		default:				return NULL;
 	}
 }
 

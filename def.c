@@ -3,21 +3,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void mem_fail(void)
+void def_critical_error(const char* err_msg)
 {
-	fprintf(stdout, "Memory allocation failed.\n");
+	fprintf(stdout, "An critical error occured: %s.\nExit programm (exit(1))\n", err_msg);
+	DEF_CLEAR_MEM;
 	exit(1);
 }
 
 Def_Hashtable* DEF_GLOBAL_HASHTABLE = NULL;
-static size_t counter = 0;
+FILE* DEF_GLOBAL_DEBUG_OUTPUT = NULL;
+char* def_mem_fail = "Could not allocate memory";
 
 /* hash functions */
-size_t def_counter(void)
-{
-	return ++counter;
-}
-
 size_t def_hash_ptr(void* ptr)
 {
 	if (!ptr) return 0;
@@ -27,9 +24,10 @@ size_t def_hash_ptr(void* ptr)
 Def_Hashtable* def_hashtable_create(void)
 {
 	Def_Hashtable* table = malloc(sizeof(Def_Hashtable));
-	if (!table) mem_fail();
+	if (!table) def_critical_error(def_mem_fail);
 	table->entries = malloc(sizeof(Def_Hashentry*) * DEF_HASH_TABLE_SIZE);
-	if (!table->entries) mem_fail();
+	if (!table->entries) def_critical_error(def_mem_fail);
+	table->allocations = 0;
 	for (size_t i = 0; i < DEF_HASH_TABLE_SIZE; ++i) {
 		table->entries[i] = NULL;
 	}
@@ -48,37 +46,36 @@ char* def_trim_filename(char* filename)
 }
 
 Def_Hashentry* def_hashentry_create(void* key, boolean is_obj, boolean freed, 
-	const char* type, char* file, size_t line, size_t count, const char* func)
+	const char* type, char* file, size_t line, const char* func)
 {
 	if (!key) return NULL;
 	if (!type) return NULL;
 	if (!func) return NULL;
 	Def_Hashentry* entry = malloc(sizeof(Def_Hashentry));
-	if (!entry) mem_fail();
+	if (!entry) def_critical_error(def_mem_fail);
 	entry->key = key;
 	entry->is_object = is_obj;
 	entry->freed = freed;
 	char* entry_type = malloc(sizeof(char) * strlen(type) + 1);
-	if (!entry_type) mem_fail();
+	if (!entry_type) def_critical_error(def_mem_fail);
 	strcpy(entry_type, type);
 	char* entry_file = malloc(sizeof(char) * strlen(def_trim_filename(file)) + 1);
-	if (!entry_file) mem_fail();
+	if (!entry_file) def_critical_error(def_mem_fail);
 	strcpy(entry_file, def_trim_filename(file));
 	char* entry_func = malloc(sizeof(char) * strlen(func) + 1);
-	if (!entry_func) mem_fail();
+	if (!entry_func) def_critical_error(def_mem_fail);
 	strcpy(entry_func, func);
 	entry->type = entry_type;
 	entry->file = entry_file;
 	entry->func = entry_func;
 	entry->line = line;
-	entry->count = count;
 	entry->next = NULL;
 	return entry;
 }
 
 void def_hashtable_set(
 	Def_Hashtable* table, void* key, boolean is_obj, boolean freed,
-	const char* type, char* file, size_t line, size_t count, const char* func)
+	const char* type, char* file, size_t line, const char* func)
 {
 	if (!table) return;
 	if (!key) return;
@@ -88,7 +85,8 @@ void def_hashtable_set(
 	//check if the entry at this slot is NULL
 	//if so "place" the key there
 	if (entry == NULL) {
-		table->entries[slot] = def_hashentry_create(key, is_obj, freed, type, file, line, count, func);
+		table->entries[slot] = def_hashentry_create(key, is_obj, freed, type, file, line, func);
+		table->allocations++;
 		return;
 	}
 	//else traverse through each entry until the end is
@@ -96,15 +94,15 @@ void def_hashtable_set(
 	Def_Hashentry* prev = NULL;
 	while (entry != NULL) {
 		if (entry->key == key) {
-			entry->is_object = is_obj;
-			entry->freed = freed;
+			def_hashentry_update(entry, is_obj, freed, type, file, line, func);
 			return;
 		}
 		prev = entry;
 		entry = prev->next;
 	}
 	//end of chain reached without a match, create a new entry
-	prev->next = def_hashentry_create(key, is_obj, freed, type, file, line, count, func);
+	prev->next = def_hashentry_create(key, is_obj, freed, type, file, line, func);
+	table->allocations++;
 }
 
 boolean def_hashtable_is_object(Def_Hashtable* table, void* key)
@@ -139,46 +137,64 @@ char* def_hashtable_get_type(Def_Hashtable* table, void* key)
 	return NULL;
 }
 
-size_t def_hashtable_get_count(Def_Hashtable* table, void* key)
+void def_hashentry_update(Def_Hashentry* entry, boolean is_obj, boolean freed,
+	const char* type, char* file, size_t line, const char* func)
 {
-	if (!table) return 0;
-	if (!key) return 0;
-	size_t slot = def_hash_ptr(key);
-	Def_Hashentry* entry = table->entries[slot];
-	if (!entry) return 0;
-	while (entry != NULL) {
-		if (entry->key == key) {
-			return entry->count;
-		}
-		entry = entry->next;
-	}
-	return 0;
+	if (!entry) exit(1);
+	if (!type) exit(1);
+	if (!file) exit(1);
+	if (!func) exit(1);
+
+	entry->line = line;
+	entry->is_object = is_obj;
+	entry->freed = freed;
+
+	char* entry_type = malloc(sizeof(char) * strlen(type) + 1);
+	if (!entry_type) def_critical_error(def_mem_fail);
+	strcpy(entry_type, type);
+	char* entry_file = malloc(sizeof(char) * strlen(def_trim_filename(file)) + 1);
+	if (!entry_file) def_critical_error(def_mem_fail);
+	strcpy(entry_file, def_trim_filename(file));
+	char* entry_func = malloc(sizeof(char) * strlen(func) + 1);
+	if (!entry_func) def_critical_error(def_mem_fail);
+	strcpy(entry_func, func);
+
+	free(entry->file);
+	entry->file = NULL;
+	free(entry->type);
+	entry->type = NULL;
+	free(entry->func);
+	entry->func = NULL;
+
+	entry->type = entry_type;
+	entry->file = entry_file;
+	entry->func = entry_func;
 }
 
-void def_hashtable_print(Def_Hashtable* table)
+void def_hashtable_print(Def_Hashtable* table, FILE* stream)
 {
 	if (!table) return;
-	char line[] = { "--------------------------------------------------------------------------------------------------" };
-	char blank[] = { "                                                                                            " };
+	if (!stream) stream = stdout;
+	char line[] = { "-------------------------------------------------------------------------------------------" };
+	char blank[] = { "                                                                                     " };
 	size_t mod = 5;
 	size_t freed = 0;
-	fprintf(stdout, "\n%s%s\nMemorymap:%s%s |\n", line, line, blank, blank);
-	fprintf(stdout, "%s%s\n", line, line);
-	fprintf(stdout, "Slot[*******] |");
-	fprintf(stdout, " Address[0x****************] |");
-	fprintf(stdout, " When[*****] |");
-	fprintf(stdout, " Object[y/n] |");
-	fprintf(stdout, " Datatype[********************] |");
-	fprintf(stdout, " Line#[*****] |");
-	fprintf(stdout, " File[................\\*.c] |");
-	fprintf(stdout, " Function[********************] |");
-	fprintf(stdout, " Freed[y/n] |\n");
+	fprintf(stream, "\n%s%s\nMemorymap:%s%s |\n", line, line, blank, blank);
+	fprintf(stream, "%s%s\n", line, line);
+	fprintf(stream, "Slot[*******] |");
+	fprintf(stream, " Address[0x****************] |");
+	fprintf(stream, " Object[y/n] |");
+	fprintf(stream, " Datatype[********************] |");
+	fprintf(stream, " Line#[*****] |");
+	fprintf(stream, " File[................\\*.c] |");
+	fprintf(stream, " Function[********************] |");
+	fprintf(stream, " Freed[y/n] |\n");
 	
 	for (size_t i = 0, j = 0; i < DEF_HASH_TABLE_SIZE; ++i) {
 		Def_Hashentry* entry = table->entries[i];
 		if (!entry) continue;
 		else j++;
-		fprintf(stdout, "Slot[%*zu] |", 7, i);
+		fprintf(stream, "Slot[%*zu] |", 7, i);
 		size_t k = 0;
 		while (true) {
 			k++;
@@ -187,11 +203,10 @@ void def_hashtable_print(Def_Hashtable* table)
 			if (!entry->is_object) flag0 = " no";
 			if (!entry->freed) flag1 = " no";
 			else freed++;
-			fprintf(stdout,
-				"        [0x%*p] |     [%5zu] |       [%3s] |         [%20s] |      [%5zu] |     [%20s] |         [%20s] |      [%s] |",
+			fprintf(stream,
+				"        [0x%*p] |       [%3s] |         [%20s] |      [%5zu] |     [%20s] |         [%20s] |      [%s] |",
 				16,
 				entry->key,
-				entry->count,
 				flag0,
 				entry->type,
 				entry->line,
@@ -200,18 +215,18 @@ void def_hashtable_print(Def_Hashtable* table)
 				flag1
 			);
 			if (!entry->next) {
-				if (k > 1) fprintf(stdout, "\n%s%s\n", line, line);
-				else if (j % mod == 0) fprintf(stdout, "\n%s%s\n", line, line);
+				if (k > 1) fprintf(stream, "\n%s%s", line, line);
+				else if (j % mod == 0) fprintf(stream, "\n%s%s", line, line);
 				break;
 			} 
-			fprintf(stdout, "\n\t      |");
+			fprintf(stream, "\n              |");
 			entry = entry->next;
 		}
-		fprintf(stdout, "\n");
+		fprintf(stream, "\n");
 	}
-	fprintf(stdout, "%s%s\n", line, line);
-	fprintf(stdout, "[%5zu] of [%5zu] pointers were freed and [%5zu] allocations were made.\n", freed, def_counter() - 2, def_counter() - 1);
-	fprintf(stdout, "%s%s", line, line);
+	fprintf(stream, "%s%s\n", line, line);
+	fprintf(stream, "[%10zu] of [%10zu] pointers were freed.%132s|\n", freed, table->allocations, " ");
+	fprintf(stream, "%s%s", line, line);
 }
 
 void def_hashtable_delete(Def_Hashtable* table)
@@ -226,16 +241,18 @@ void def_hashtable_delete(Def_Hashtable* table)
 			if (!entry->next) {
 				free(entry->type);
 				free(entry->file);
+				free(entry->func);
 				free(entry);
 				break;
 			}
 			head = entry->next;
 			free(entry->type);
 			free(entry->file);
+			free(entry->func);
 			free(entry);
 			entry = head;
 		}
 	}
+	free(table->entries);
 	free(table);
 }
-

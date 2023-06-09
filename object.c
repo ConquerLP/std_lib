@@ -46,8 +46,8 @@ void Object_dtor(void* obj)
 {
 	CAST_OBJECT(obj, , );
 	_FREE(self->toString);
+	_FREE(self);
 	_FREE(this->o_IF);
-	_FREE(this->self);
 	FREE(this);
 }
 

@@ -45,10 +45,18 @@
 	return; \
 
 #define LIST_SET_ELEMENT_CLASS(data_type) \
-	data_type* ptr = data; \
+	data_type* ptr = NULL; \
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, data)) { \
+		switch (self->type) { \
+			case DEF_STRING: {ptr = String_ctor(data); break; } \
+			default: ptr = NULL; \
+		} \
+		if (!ptr) def_critical_error("List, tried to assign invalid class"); \
+		else node->data = ptr->o_IF->clone(data); \
+	} \
+	else ptr = data; \
 	node->data = ptr->o_IF->clone(data); \
 	return; \
-	
 
 /* function prototypes */
 /* overriding methods */

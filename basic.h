@@ -27,22 +27,20 @@ void* basic_return_by_type(void* source, const char* type, size_t index);
 
 #define MALLOC(data_type, size, ptr) \
 	(ptr) = malloc(sizeof(data_type) * (size)); \
-	if (!ptr) mem_fail(); \
-	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, true, false, #data_type, __FILE__, __LINE__, def_counter(), __func__); \
+	if (!ptr) def_critical_error(def_mem_fail); \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, true, false, #data_type, __FILE__, __LINE__, __func__); \
 
 #define REALLOC(data_type, size, old_ptr) \
 	data_type* ptr0 = realloc((void*)old_ptr, sizeof(data_type) * (size)); \
-	if (!ptr0) mem_fail(); \
-	if (ptr0 != old_ptr) def_hashtable_set(DEF_GLOBAL_HASHTABLE, old_ptr, true, true, #data_type, __FILE__, __LINE__, \
-	def_counter(), __func__); \
+	if (!ptr0) def_critical_error(def_mem_fail); \
+	if (ptr0 != old_ptr) def_hashtable_set(DEF_GLOBAL_HASHTABLE, old_ptr, true, true, \
+	#data_type, __FILE__, __LINE__, __func__); \
 	old_ptr = ptr0; \
-	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr0, true, false, #data_type, __FILE__, __LINE__, \
-	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, old_ptr), __func__); \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr0, true, false, #data_type, __FILE__, __LINE__, __func__); \
 
 #define FREE(ptr) \
 	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, true, true, \
-	def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), __FILE__, __LINE__, \
-	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, ptr), __func__); \
+	def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), __FILE__, __LINE__, __func__); \
 	free(ptr); ptr = NULL; \
 
 /* HELPER MACROS FOR ALL TYPES OF CLASSES */

@@ -110,6 +110,7 @@ String* String_join(void* obj);
 String* String_ctor(const char* text)
 {
 	if (!text) return NULL;
+	if (*text <= 0) return NULL;
 	BASIC_CTOR(String);
 
 	this->o_IF->clone = &String_clone;
@@ -220,17 +221,10 @@ private_fun char* String_toString(void* obj)
 
 private_fun void* String_clone(void* obj)
 {
-	String* this = ((void*)0); 
-	o_String* self = ((void*)0); 
-	if (!obj) return ((void*)0); 
-	if (!basic_strcmp(def_hashtable_get_type(def_global_hashtable, obj), "String")) return ((void*)0); 
-	this = obj; 
-	if (!this->self) return ((void*)0); 
-	if (!this->super) return ((void*)0); 
-	self = this->self;;
-
-
-	//CAST(String, obj, NULL, );
+	if (!def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, obj)) {
+		return String_ctor(obj);
+	}
+	CAST(String, obj, NULL, );
 	String* new = String_ctor(self->str);
 	return new;
 }
