@@ -10,7 +10,7 @@
 typedef struct {
 	void* sub;
 	Array* values;
-	Vector_types type;
+	size_t type;
 	size_t dim;
 }o_Vector;
 

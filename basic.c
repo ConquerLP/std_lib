@@ -3,10 +3,10 @@
 
 size_t DEF_DATATYPES[DEF_LAST_DATATYPE] = {
 	DEF_BOOLEAN,
+	DEF_CHAR,
 	DEF_USHORT,
 	DEF_SHORT,
-	DEF_CHAR,
-	DEF_DEF_UINT,
+	DEF_UINT,
 	DEF_INT,
 	DEF_ULONGINT,
 	DEF_LONGINT,
@@ -21,10 +21,8 @@ size_t DEF_DATATYPES[DEF_LAST_DATATYPE] = {
 boolean basic_isAllowedType(size_t datatype)
 {
 	if (datatype < 0) return false;
-	for (size_t i = 0; i < DEF_LAST_DATATYPE; ++i) {
-		if (datatype == DEF_DATATYPES[i]) return true;
-	}
-	return false;
+	if (datatype >= DEF_LAST_DATATYPE) return false;
+	else return true;
 }
 
 char* basic_typeToString(size_t datatype)
@@ -35,7 +33,7 @@ char* basic_typeToString(size_t datatype)
 	case DEF_USHORT:		return "unsigned short"; 
 	case DEF_SHORT:			return "short"; 
 	case DEF_CHAR:			return "char"; 
-	case DEF_DEF_UINT:		return "unsigned int"; 
+	case DEF_UINT:		return "unsigned int"; 
 	case DEF_INT:			return "int"; 
 	case DEF_ULONGINT:		return "unsigned int"; 
 	case DEF_LONGINT:		return "long int"; 

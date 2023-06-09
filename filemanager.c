@@ -132,7 +132,7 @@ private_fun boolean Filemanager_equals(void* obj, void* obj2)
 private_fun Array* Filemanager_scanCompleteFile(void* obj)
 {
 	CAST(Filemanager, obj, NULL, );
-	Array* arr = Array_ctor("String", Filemanager_getLineCount(obj));
+	Array* arr = Array_ctor(DEF_STRING, Filemanager_getLineCount(obj));
 	if (!arr) return NULL;
 	char buffer[BUFFER_SIZE] = {0};
 	for (size_t i = 0; i < arr->_ArrayIF->length(arr); ++i) {

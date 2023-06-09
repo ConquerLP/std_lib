@@ -15,9 +15,8 @@
 #include "std_lib_math.h"
 
 /* MACROS */
-
-#define VECTOR_INIT(datatype) \
-	tmp = Array_ctor(#datatype, dim); \
+#define VECTOR_INIT(datatype, def_datatype) \
+	tmp = Array_ctor(def_datatype, dim); \
 	va_list arg; \
 	va_start(arg, dim); \
 	datatype value; \
@@ -27,6 +26,12 @@
 	} \
 	va_end(arg); 
 
+size_t VEC_AXIS[VEC_AXIS_LAST] = {
+	VEC_AXIS_X,
+	VEC_AXIS_Y,
+	VEC_AXIS_Z
+};
+
 /* function prototpyes */
 /* overriding Object methods */
 private_fun char* Vector_toString(void* obj);
@@ -35,21 +40,22 @@ private_fun void Vector_dtor(void* obj);
 private_fun boolean Vector_equals(void* obj, void* obj2);
 
 /* Vector methods */
-private_fun double Vector_get(void* obj, size_t index);
+private_fun long double Vector_get(void* obj, size_t index);
 private_fun void Vector_set(void* obj, size_t index, double value);
 private_fun double Vector_calcDotP(void* vec1, void* vec2);
-private_fun void Vector_rotate3D(void* obj, double angle, Vector_axis axis);
+private_fun void Vector_rotate3D(void* obj, double angle, size_t axis);
 private_fun void Vector_rotate2D(void* obj, double angle);
 private_fun double Vector_getLength(void* obj);
 private_fun double Vector_angle(void* vec1, void* vec2);
 
 /* helper fucntions */
 private_fun void Vector_setDim(void* obj, size_t dim);
+boolean Vector_isAllowedType(size_t datatype);
 
 /* pulbic functions */
-Vector* Vector_ctor(Vector_types t, size_t dim, ...)
+Vector* Vector_ctor(size_t datatype, size_t dim, ...)
 {
-	if (t >= VT_COUNT) return NULL;
+	if (!Vector_isAllowedType(datatype)) return NULL;
 	if (dim <= 0) return NULL;
 	BASIC_CTOR(Vector);
 	super->o_IF->toString = &Vector_toString;
@@ -65,26 +71,22 @@ Vector* Vector_ctor(Vector_types t, size_t dim, ...)
 	thisIF->getAngle = &Vector_angle;
 	self->sub = NULL;
 	Array* tmp = NULL;
-	switch (t) {
-		case VT_INT: {
-			VECTOR_INIT(int);
-			break;
-		}
-		case VT_FLOAT: {
-			VECTOR_INIT(float);
-			break;
-		}
-		case VT_DOUBLE: {
-			VECTOR_INIT(double);
-			break;
-		}
-		case VT_SIZE_T: {
-			VECTOR_INIT(size_t);
-			break;
-		}
-		default: return NULL;
-		}
+	switch (datatype) {
+		case DEF_USHORT:		{ VECTOR_INIT(unsigned short, DEF_USHORT); break; }
+		case DEF_SHORT:			{ VECTOR_INIT(short, DEF_SHORT); break; }
+		case DEF_UINT:			{ VECTOR_INIT(unsigned int, DEF_UINT); break; }
+		case DEF_INT:			{ VECTOR_INIT(int, DEF_INT); break; }
+		case DEF_ULONGINT:		{ VECTOR_INIT(unsigned long int, DEF_ULONGINT); break; }
+		case DEF_LONGINT:		{ VECTOR_INIT(long int, DEF_LONGINT); break; }
+		case DEF_LONGLONGINT:	{ VECTOR_INIT(long long int, DEF_LONGLONGINT); break; }
+		case DEF_SIZE_T:		{ VECTOR_INIT(size_t, DEF_SIZE_T); break; }
+		case DEF_FLOAT:			{ VECTOR_INIT(float, DEF_FLOAT); break; }
+		case DEF_DOUBLE:		{ VECTOR_INIT(double, DEF_DOUBLE); break; }
+		case DEF_LONGDOUBLE:	{ VECTOR_INIT(long double, DEF_LONGDOUBLE); break; }
+		default:				return NULL;
+	}
 	self->values = tmp;
+	self->type = datatype;
 	return this;
 }
 
@@ -143,10 +145,10 @@ private_fun boolean Vector_equals(void* obj, void* obj2)
 }
 
 /* Vector methods */
-private_fun double Vector_get(void* obj, size_t index)
+private_fun long double Vector_get(void* obj, size_t index)
 {
 	CAST(Vector, obj, 0.0, );
-	double* result = self->values->_ArrayIF->get(self->values, index);
+	long double* result = self->values->_ArrayIF->get(self->values, index);
 	return *result;
 }
 
@@ -173,26 +175,26 @@ private_fun double Vector_angle(void* vec1, void* vec2)
 	return acos(Vector_calcDotP(vec1, vec2) / (Vector_getLength(vec1) * Vector_getLength(vec2)));
 }
 
-private_fun void Vector_rotate3D(void* obj, double angle, Vector_axis axis)
+private_fun void Vector_rotate3D(void* obj, double angle, size_t axis)
 {
 	CAST(Vector, obj, , );
 	if (self->dim != 3) return;
 	double tmp0 = 0.0;
 	double tmp1 = 0.0;
 	switch (axis) {
-	case VA_X: {
+	case VEC_AXIS_X: {
 		tmp0 = Vector_get(obj, 1) * cos(std_lib_math_degToRad(angle)) + (-1) * cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
 		tmp1 = Vector_get(obj, 1) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
 		Vector_set(obj, 1, tmp0);
 		Vector_set(obj, 2, tmp1);
 	} break;
-	case VA_Y: {
+	case VEC_AXIS_Y: {
 		tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
 		tmp1 = Vector_get(obj, 0) * (-1) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
 		Vector_set(obj, 0, tmp0);
 		Vector_set(obj, 2, tmp1);
 	} break;
-	case VA_Z: {
+	case VEC_AXIS_Z: {
 		tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + (-1) * sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
 		tmp1 = Vector_get(obj, 0) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
 		Vector_set(obj, 0, tmp0);
@@ -232,4 +234,11 @@ private_fun void Vector_setDim(void* obj, size_t dim)
 	if (dim == self->dim) return;
 	self->values->_ArrayIF->resize(self->values, dim);
 	self->dim = dim;
+}
+
+boolean Vector_isAllowedType(size_t datatype)
+{
+	if (datatype < DEF_USHORT) return false;
+	if (datatype > DEF_LONGDOUBLE) return false;
+	else return true;
 }

@@ -391,7 +391,7 @@ private_fun Array* String_findAllCharOffset(void* obj, char c, size_t offset)
 	if (offset >= self->length) return NULL;
 	size_t count = String_countOccurencesCharOffset(obj, c, offset);
 	if (count == 0) return NULL;
-	Array* arr = Array_ctor("size_t", count);
+	Array* arr = Array_ctor(DEF_SIZE_T, count);
 	size_t* tmp;
 	_MALLOC(size_t, 1, tmp);
 	*tmp = 0;
@@ -731,7 +731,7 @@ private_fun Array* String_findAllSubstringsOffset(void* obj, void* str, size_t o
 	CAST(String, str, NULL, 1);
 	size_t count = String_countSubstringOccurencesOffset(obj, str, offset);
 	if (count == 0) return NULL;
-	Array* arr = Array_ctor("size_t", count);
+	Array* arr = Array_ctor(DEF_SIZE_T, count);
 	size_t index = 0;
 	for (size_t i = 0; i < count; ++i) {
 		index = String_findFirstStringOffset(obj, str, offset);
@@ -756,7 +756,7 @@ private_fun Array* String_split(void* obj, void* str)
 	size_t start = 0;
 	size_t count = String_countSubstringOccurences(obj, str);
 	if (count == 0) return NULL;
-	List* list = List_ctor("String");
+	List* list = List_ctor(DEF_STRING);
 	String* word = NULL;
 	while (true) {
 		size_t index = String_findFirstStringOffset(obj, str, start);

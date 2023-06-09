@@ -292,7 +292,7 @@ private_fun Array* Hashtable_getMappedIndices(void* obj)
 {
 	CAST(Hashtable, obj, NULL, );
 	if (self->number_of_elements == 0) return NULL;
-	Array* tmp = Array_ctor("size_t", self->number_of_elements);
+	Array* tmp = Array_ctor(DEF_SIZE_T, self->number_of_elements);
 	o_Hashentry* entry = NULL;
 	for (size_t i = 0, j = 0; i < self->number_of_elements; ++i) {
 		entry = self->entries[i];

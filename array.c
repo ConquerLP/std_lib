@@ -143,7 +143,7 @@ private_fun void Array_dtor(void* obj)
 			case DEF_USHORT: _FREE(*(ptr + i)); break;
 			case DEF_SHORT: _FREE(*(ptr + i)); break;
 			case DEF_CHAR: _FREE(*(ptr + i)); break;
-			case DEF_DEF_UINT: _FREE(*(ptr + i)); break;
+			case DEF_UINT: _FREE(*(ptr + i)); break;
 			case DEF_INT: _FREE(*(ptr + i)); break;
 			case DEF_ULONGINT: _FREE(*(ptr + i)); break;
 			case DEF_LONGINT: _FREE(*(ptr + i)); break;
@@ -184,7 +184,7 @@ private_fun boolean Array_equals(void* obj, void* obj2)
 		case DEF_USHORT:		{ ARRAY_CMP_PRIMITIVE(unsigned short);}
 		case DEF_SHORT:			{ ARRAY_CMP_PRIMITIVE(short);}
 		case DEF_CHAR:			{ ARRAY_CMP_PRIMITIVE(char);}
-		case DEF_DEF_UINT:		{ ARRAY_CMP_PRIMITIVE(unsigned int);}
+		case DEF_UINT:			{ ARRAY_CMP_PRIMITIVE(unsigned int);}
 		case DEF_INT:			{ ARRAY_CMP_PRIMITIVE(int);}
 		case DEF_ULONGINT:		{ ARRAY_CMP_PRIMITIVE(unsigned long int);}
 		case DEF_LONGINT:		{ ARRAY_CMP_PRIMITIVE(long int);}
@@ -221,7 +221,7 @@ private_fun void Array_set(void* obj, void* data, size_t index)
 		case DEF_USHORT:		{ ARRAY_SET_PRIMITIVE(unsigned short); break;	}
 		case DEF_SHORT:			{ ARRAY_SET_PRIMITIVE(short); break;			}
 		case DEF_CHAR:			{ ARRAY_SET_PRIMITIVE(char); break;				}
-		case DEF_DEF_UINT:		{ ARRAY_SET_PRIMITIVE(unsigned int); break;		}
+		case DEF_UINT:			{ ARRAY_SET_PRIMITIVE(unsigned int); break;		}
 		case DEF_INT:			{ ARRAY_SET_PRIMITIVE(int); break;				}
 		case DEF_ULONGINT:		{ ARRAY_SET_PRIMITIVE(unsigned long int); break;}
 		case DEF_LONGINT:		{ ARRAY_SET_PRIMITIVE(long int); break;			}
@@ -246,7 +246,7 @@ private_fun void Array_fill(void* obj, void* data)
 			case DEF_USHORT:		{ ARRAY_SET_PRIMITIVE(unsigned short); break;	}
 			case DEF_SHORT:			{ ARRAY_SET_PRIMITIVE(short); break;			}
 			case DEF_CHAR:			{ ARRAY_SET_PRIMITIVE(char); break;				}
-			case DEF_DEF_UINT:		{ ARRAY_SET_PRIMITIVE(unsigned int); break;		}
+			case DEF_UINT:		{ ARRAY_SET_PRIMITIVE(unsigned int); break;		}
 			case DEF_INT:			{ ARRAY_SET_PRIMITIVE(int); break;				}
 			case DEF_ULONGINT:		{ ARRAY_SET_PRIMITIVE(unsigned long int); break;}
 			case DEF_LONGINT:		{ ARRAY_SET_PRIMITIVE(long int); break;			}
@@ -279,7 +279,7 @@ private_fun void Array_resize(void* obj, size_t new_length)
 				case DEF_USHORT: _FREE(*(ptr + i)); break;
 				case DEF_SHORT: _FREE(*(ptr + i)); break;
 				case DEF_CHAR: _FREE(*(ptr + i)); break;
-				case DEF_DEF_UINT: _FREE(*(ptr + i)); break;
+				case DEF_UINT: _FREE(*(ptr + i)); break;
 				case DEF_INT: _FREE(*(ptr + i)); break;
 				case DEF_ULONGINT: _FREE(*(ptr + i)); break;
 				case DEF_LONGINT: _FREE(*(ptr + i)); break;

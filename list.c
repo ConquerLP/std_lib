@@ -157,7 +157,7 @@ private_fun boolean List_equals(void* obj, void* obj2)
 		case DEF_USHORT:		{ LIST_COMPARE_ELEMENT(unsigned short);	  }
 		case DEF_SHORT:			{ LIST_COMPARE_ELEMENT(short);			  }
 		case DEF_CHAR:			{ LIST_COMPARE_ELEMENT(char);			  }
-		case DEF_DEF_UINT:		{ LIST_COMPARE_ELEMENT(unsigned int);	  }
+		case DEF_UINT:		{ LIST_COMPARE_ELEMENT(unsigned int);	  }
 		case DEF_INT:			{ LIST_COMPARE_ELEMENT(int);			  }
 		case DEF_ULONGINT:		{ LIST_COMPARE_ELEMENT(unsigned long int);}
 		case DEF_LONGINT:		{ LIST_COMPARE_ELEMENT(long int);		  }
@@ -189,7 +189,7 @@ private_fun void List_set(void* obj, void* data, size_t index)
 		case DEF_USHORT:		{ LIST_SET_ELEMENT(unsigned short);	  }
 		case DEF_SHORT:			{ LIST_SET_ELEMENT(short);			  }
 		case DEF_CHAR:			{ LIST_SET_ELEMENT(char);			  }
-		case DEF_DEF_UINT:		{ LIST_SET_ELEMENT(unsigned int);	  }
+		case DEF_UINT:		{ LIST_SET_ELEMENT(unsigned int);	  }
 		case DEF_INT:			{ LIST_SET_ELEMENT(int);			  }
 		case DEF_ULONGINT:		{ LIST_SET_ELEMENT(unsigned long int);}
 		case DEF_LONGINT:		{ LIST_SET_ELEMENT(long int);		  }
@@ -259,7 +259,7 @@ private_fun void List_delete(void* obj, size_t index)
 		case DEF_USHORT: _FREE(node->data); break;
 		case DEF_SHORT: _FREE(node->data); break;
 		case DEF_CHAR: _FREE(node->data); break;
-		case DEF_DEF_UINT: _FREE(node->data); break;
+		case DEF_UINT: _FREE(node->data); break;
 		case DEF_INT: _FREE(node->data); break;
 		case DEF_ULONGINT: _FREE(node->data); break;
 		case DEF_LONGINT: _FREE(node->data); break;

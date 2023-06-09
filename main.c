@@ -11,7 +11,6 @@ int main(void) {
 	DEF_START_UP;
 	/* Your actual program */
 	
-	Array_ctor(23, 2);
 
 	/* End of your actual program */
 	_PRINT_DEBUG_MEMORY;
