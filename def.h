@@ -14,7 +14,7 @@ extern "C"
 #define perm_var static
 #define ARRAY_SIZE(ptr) (sizeof((ptr)) / sizeof((*ptr)))
 
-#define DEF_HASH_TABLE_SIZE 10000
+#define DEF_HASH_TABLE_SIZE 100000
 #define DEF_DEBUG_MODE true
 
 #include <stdlib.h>
@@ -51,6 +51,7 @@ typedef struct _Def_Hashentry {
 	boolean freed;
 	char* type;
 	char* file;
+	char* func;
 	size_t line;
 	size_t count;
 	struct _Def_Hashentry* next;
@@ -64,9 +65,9 @@ size_t def_counter(void);
 size_t def_hash_ptr(void* ptr);
 Def_Hashtable* def_hashtable_create(void);
 Def_Hashentry* def_hashentry_create(void* key, boolean is_obj, boolean freed,
-	const char* type, char* file, size_t line, size_t count);
+	const char* type, char* file, size_t line, size_t count, const char* func);
 void def_hashtable_set(Def_Hashtable* table, void* key, boolean is_obj, boolean freed,
-	const char* type, char* file, size_t line, size_t count);
+	const char* type, char* file, size_t line, size_t count, const char* func);
 boolean def_hashtable_is_object(Def_Hashtable* table, void* key);
 void def_hashtable_print(Def_Hashtable* table);
 void def_hashtable_delete(Def_Hashtable* table);
@@ -91,21 +92,21 @@ extern Def_Hashtable* DEF_GLOBAL_HASHTABLE;
 #define _MALLOC(data_type, size, ptr) \
 	(ptr) = malloc(sizeof(data_type) * (size)); \
 	if(!ptr) mem_fail(); \
-	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, false, false, #data_type, __FILE__, __LINE__, def_counter()); \
+	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, false, false, #data_type, __FILE__, __LINE__, def_counter(), __func__); \
 
 #define _REALLOC(data_type, size, old_ptr) \
 	data_type* ptr0 = realloc((void*)old_ptr, sizeof(data_type) * (size)); \
 	if(!ptr0) mem_fail(); \
 	if(ptr0 != old_ptr) def_hashtable_set(DEF_GLOBAL_HASHTABLE, old_ptr, false, true, #data_type, __FILE__, __LINE__, \
-	def_counter()); \
+	def_counter(), __func__); \
 	old_ptr = ptr0; \
 	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr0, false, false, #data_type, __FILE__, __LINE__, \
-	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, old_ptr)); \
+	def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, old_ptr), __func__); \
 
 #define _FREE(ptr) \
 	def_hashtable_set(DEF_GLOBAL_HASHTABLE, ptr, false, true, \
 						def_hashtable_get_type(DEF_GLOBAL_HASHTABLE, ptr), __FILE__, __LINE__, \
-						def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, ptr)); \
+						def_hashtable_get_count(DEF_GLOBAL_HASHTABLE, ptr), __func__); \
 	free(ptr); ptr = NULL; \
 
 #endif
