@@ -48,10 +48,11 @@ char* def_trim_filename(char* filename)
 }
 
 Def_Hashentry* def_hashentry_create(void* key, boolean is_obj, boolean freed, 
-	const char* type, char* file, size_t line, size_t count)
+	const char* type, char* file, size_t line, size_t count, const char* func)
 {
 	if (!key) return NULL;
 	if (!type) return NULL;
+	if (!func) return NULL;
 	Def_Hashentry* entry = malloc(sizeof(Def_Hashentry));
 	if (!entry) mem_fail();
 	entry->key = key;
@@ -63,8 +64,12 @@ Def_Hashentry* def_hashentry_create(void* key, boolean is_obj, boolean freed,
 	char* entry_file = malloc(sizeof(char) * strlen(def_trim_filename(file)) + 1);
 	if (!entry_file) mem_fail();
 	strcpy(entry_file, def_trim_filename(file));
+	char* entry_func = malloc(sizeof(char) * strlen(func) + 1);
+	if (!entry_func) mem_fail();
+	strcpy(entry_func, func);
 	entry->type = entry_type;
 	entry->file = entry_file;
+	entry->func = entry_func;
 	entry->line = line;
 	entry->count = count;
 	entry->next = NULL;
@@ -73,7 +78,7 @@ Def_Hashentry* def_hashentry_create(void* key, boolean is_obj, boolean freed,
 
 void def_hashtable_set(
 	Def_Hashtable* table, void* key, boolean is_obj, boolean freed,
-	const char* type, char* file, size_t line, size_t count)
+	const char* type, char* file, size_t line, size_t count, const char* func)
 {
 	if (!table) return;
 	if (!key) return;
@@ -83,7 +88,7 @@ void def_hashtable_set(
 	//check if the entry at this slot is NULL
 	//if so "place" the key there
 	if (entry == NULL) {
-		table->entries[slot] = def_hashentry_create(key, is_obj, freed, type, file, line, count);
+		table->entries[slot] = def_hashentry_create(key, is_obj, freed, type, file, line, count, func);
 		return;
 	}
 	//else traverse through each entry until the end is
@@ -99,7 +104,7 @@ void def_hashtable_set(
 		entry = prev->next;
 	}
 	//end of chain reached without a match, create a new entry
-	prev->next = def_hashentry_create(key, is_obj, freed, type, file, line, count);
+	prev->next = def_hashentry_create(key, is_obj, freed, type, file, line, count, func);
 }
 
 boolean def_hashtable_is_object(Def_Hashtable* table, void* key)
@@ -153,19 +158,20 @@ size_t def_hashtable_get_count(Def_Hashtable* table, void* key)
 void def_hashtable_print(Def_Hashtable* table)
 {
 	if (!table) return;
-	char line[] = { "-----------------------------------------------------------------------------" };
-	char blank[] = { "                                                                       " };
+	char line[] = { "--------------------------------------------------------------------------------------------------" };
+	char blank[] = { "                                                                                            " };
 	size_t mod = 5;
 	size_t freed = 0;
-	fprintf(stdout, "\n%s%s\nMemorymap:%s%s|\n", line, line, blank, blank);
+	fprintf(stdout, "\n%s%s\nMemorymap:%s%s |\n", line, line, blank, blank);
 	fprintf(stdout, "%s%s\n", line, line);
 	fprintf(stdout, "Slot[*******] |");
 	fprintf(stdout, " Address[0x****************] |");
 	fprintf(stdout, " When[*****] |");
 	fprintf(stdout, " Object[y/n] |");
-	fprintf(stdout, " Datatype[**********] |");
+	fprintf(stdout, " Datatype[********************] |");
 	fprintf(stdout, " Line#[*****] |");
 	fprintf(stdout, " File[................\\*.c] |");
+	fprintf(stdout, " Function[********************] |");
 	fprintf(stdout, " Freed[y/n] |\n");
 	
 	for (size_t i = 0, j = 0; i < DEF_HASH_TABLE_SIZE; ++i) {
@@ -182,19 +188,20 @@ void def_hashtable_print(Def_Hashtable* table)
 			if (!entry->freed) flag1 = " no";
 			else freed++;
 			fprintf(stdout,
-				"        [0x%*p] |     [%5zu] |       [%3s] |         [%10s] |      [%5zu] |     [%20s] |      [%s] |", 
-				 16,
-				 entry->key,
-				 entry->count,
-				 flag0,
-				 entry->type,
-				 entry->line,
-				 entry->file,
-				 flag1
+				"        [0x%*p] |     [%5zu] |       [%3s] |         [%20s] |      [%5zu] |     [%20s] |         [%20s] |      [%s] |",
+				16,
+				entry->key,
+				entry->count,
+				flag0,
+				entry->type,
+				entry->line,
+				entry->file,
+				entry->func,
+				flag1
 			);
 			if (!entry->next) {
-				if(k > 1) fprintf(stdout, "\n%s%s\n", line, line);
-				else if(j % mod == 0) fprintf(stdout, "\n%s%s\n", line, line);
+				if (k > 1) fprintf(stdout, "\n%s%s\n", line, line);
+				else if (j % mod == 0) fprintf(stdout, "\n%s%s\n", line, line);
 				break;
 			} 
 			fprintf(stdout, "\n\t      |");

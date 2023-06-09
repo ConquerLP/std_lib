@@ -15,36 +15,36 @@
 
 /* MACROS */
 
-#define ARRAY_SET_PRIMITIVE(datatype) \
-	datatype* tmp; \
-	_MALLOC(datatype, 1, tmp); \
-	basic_bin_copy(tmp, data, sizeof(datatype), 0); \
+#define ARRAY_SET_PRIMITIVE(data_type) \
+	data_type* tmp; \
+	_MALLOC(data_type, 1, tmp); \
+	basic_bin_copy(tmp, data, sizeof(data_type), 0); \
 	*(ptr + index) = tmp; \
 
-#define ARRAY_SET_CLASS(datatype) \
-	datatype* tmp = data; \
+#define ARRAY_SET_CLASS(data_type) \
+	data_type* tmp = data; \
 	*(ptr + index) = tmp->o_IF->clone(data); \
 
-#define ARRAY_CMP_PRIMITIVE(datatype) \
-	datatype* tmp; \
-	datatype* tmp1; \
+#define ARRAY_CMP_PRIMITIVE(data_type) \
+	data_type* tmp; \
+	data_type* tmp1; \
 	for (size_t i = 0; i < Array_length(this); ++i) { \
 		tmp = Array_get(this, i); \
 		tmp1 = Array_get(this1, i); \
-		if(!tmp) return false; \
-		if(!tmp1) return false; \
+		if (!tmp) return false; \
+		if (!tmp1) return false; \
 		if (*tmp != *tmp1) return false; \
 		} \
 	return true; \
 
-#define ARRAY_CMP_CLASS(datatype) \
-	datatype* tmp; \
-	datatype* tmp1; \
+#define ARRAY_CMP_CLASS(data_type) \
+	data_type* tmp; \
+	data_type* tmp1; \
 	for (size_t i = 0; i < Array_length(this); ++i) { \
 		tmp = Array_get(this, i); \
 		tmp1 = Array_get(this1, i); \
-		if(!tmp) return false; \
-		if(!tmp1) return false; \
+		if (!tmp) return false; \
+		if (!tmp1) return false; \
 		if (!tmp->o_IF->equals(tmp, tmp1)) return false; \
 	} \
 	return true; \
@@ -65,10 +65,10 @@ private_fun void Array_fill(void* obj, void* data);
 
 /* public functions */
 
-Array* Array_ctor(size_t datatype, size_t length)
+Array* Array_ctor(size_t data_type, size_t length)
 {
 	if (length < 0) return NULL;
-	if (!basic_isAllowedType(datatype)) return NULL;
+	if (!basic_isAllowedType(data_type)) return NULL;
 	BASIC_CTOR(Array);
 	super->o_IF->clone = &Array_clone;
 	super->o_IF->toString = &Array_toString;
@@ -83,10 +83,13 @@ Array* Array_ctor(size_t datatype, size_t length)
 
 	self->sub = NULL;
 	self->length = length;
-	self->type = datatype;
+	self->type = data_type;
 
 	void** data;
 	_MALLOC(void*, length, data);
+	for (size_t i = 0; i < length; ++i) {
+		*(data + i) = NULL;
+	}
 	self->arr = data;
 	return this;
 }
@@ -176,7 +179,7 @@ private_fun void* Array_clone(void* obj)
 private_fun boolean Array_equals(void* obj, void* obj2)
 {
 	CAST(Array, obj, false, );
-	CAST(Array, obj, false, 1);
+	CAST(Array, obj2, false, 1);
 	if (self->type != self1->type) return false;
 	if (Array_length(self) != Array_length(self1)) return false;
 	switch (self->type) {
@@ -204,8 +207,8 @@ private_fun void* Array_get(void* obj, size_t index)
 {
 	CAST(Array, obj, NULL, );
 	if (index < 0) return NULL;
-	void** ptr = self->arr;
 	if (index >= self->length) return NULL;
+	void** ptr = self->arr;
 	return *(ptr + index);
 }
 

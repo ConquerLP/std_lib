@@ -30,7 +30,7 @@ typedef struct _Vector {
 	ObjectIF* o_IF;
 }Vector;
 
-Vector* Vector_ctor(size_t datatype, size_t dim, ...);
-Vector* Vector_sum(size_t datatype, void* vec1, void* vec2);
+Vector* Vector_ctor(size_t data_type, size_t dim, ...);
+Vector* Vector_sum(size_t data_type, void* vec1, void* vec2);
 
 #endif // !VECTOR_H

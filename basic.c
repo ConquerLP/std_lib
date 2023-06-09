@@ -18,17 +18,17 @@ size_t DEF_DATATYPES[DEF_LAST_DATATYPE] = {
 	DEF_STRING,
 };
 
-boolean basic_isAllowedType(size_t datatype)
+boolean basic_isAllowedType(size_t data_type)
 {
-	if (datatype < 0) return false;
-	if (datatype >= DEF_LAST_DATATYPE) return false;
+	if (data_type < 0) return false;
+	if (data_type >= DEF_LAST_DATATYPE) return false;
 	else return true;
 }
 
-char* basic_typeToString(size_t datatype)
+char* basic_typeToString(size_t data_type)
 {
-	if (!basic_isAllowedType(datatype)) return NULL;
-	switch (datatype) {
+	if (!basic_isAllowedType(data_type)) return NULL;
+	switch (data_type) {
 	case DEF_BOOLEAN:		return "boolean"; 
 	case DEF_USHORT:		return "unsigned short"; 
 	case DEF_SHORT:			return "short"; 

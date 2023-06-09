@@ -15,13 +15,13 @@
 #include "std_lib_math.h"
 
 /* MACROS */
-#define VECTOR_INIT(datatype, def_datatype) \
-	tmp = Array_ctor(def_datatype, dim); \
+#define VECTOR_INIT(data_type, def_data_type) \
+	tmp = Array_ctor(def_data_type, dim); \
 	va_list arg; \
 	va_start(arg, dim); \
-	datatype value; \
+	data_type value; \
 	for (size_t i = 0; i < dim; ++i) { \
-		value = va_arg(arg, datatype); \
+		value = va_arg(arg, data_type); \
 		tmp->_ArrayIF->set(tmp, &value, i); \
 	} \
 	va_end(arg); 
@@ -50,12 +50,12 @@ private_fun double Vector_angle(void* vec1, void* vec2);
 
 /* helper fucntions */
 private_fun void Vector_setDim(void* obj, size_t dim);
-boolean Vector_isAllowedType(size_t datatype);
+boolean Vector_isAllowedType(size_t data_type);
 
 /* pulbic functions */
-Vector* Vector_ctor(size_t datatype, size_t dim, ...)
+Vector* Vector_ctor(size_t data_type, size_t dim, ...)
 {
-	if (!Vector_isAllowedType(datatype)) return NULL;
+	if (!Vector_isAllowedType(data_type)) return NULL;
 	if (dim <= 0) return NULL;
 	BASIC_CTOR(Vector);
 	super->o_IF->toString = &Vector_toString;
@@ -71,7 +71,7 @@ Vector* Vector_ctor(size_t datatype, size_t dim, ...)
 	thisIF->getAngle = &Vector_angle;
 	self->sub = NULL;
 	Array* tmp = NULL;
-	switch (datatype) {
+	switch (data_type) {
 		case DEF_USHORT:		{ VECTOR_INIT(unsigned short, DEF_USHORT); break; }
 		case DEF_SHORT:			{ VECTOR_INIT(short, DEF_SHORT); break; }
 		case DEF_UINT:			{ VECTOR_INIT(unsigned int, DEF_UINT); break; }
@@ -86,7 +86,7 @@ Vector* Vector_ctor(size_t datatype, size_t dim, ...)
 		default:				return NULL;
 	}
 	self->values = tmp;
-	self->type = datatype;
+	self->type = data_type;
 	return this;
 }
 
@@ -103,7 +103,7 @@ private_fun char* Vector_toString(void* obj)
 	_MALLOC(char, 100, tmp);
 	basic_memset(tmp, '\0', 100);
 	for (size_t i = 0; i < self->dim; ++i) {
-		snprintf(tmp, 100, "V(%zu): %lf\n", i, Vector_get(obj, i));
+		snprintf(tmp, 100, "V(%zu): %Lf\n", i, Vector_get(obj, i));
 		str->_StringIF->append(str, tmp);
 	}
 	self1->toString = basic_strcpy(self2->str);
@@ -236,9 +236,9 @@ private_fun void Vector_setDim(void* obj, size_t dim)
 	self->dim = dim;
 }
 
-boolean Vector_isAllowedType(size_t datatype)
+boolean Vector_isAllowedType(size_t data_type)
 {
-	if (datatype < DEF_USHORT) return false;
-	if (datatype > DEF_LONGDOUBLE) return false;
+	if (data_type < DEF_USHORT) return false;
+	if (data_type > DEF_LONGDOUBLE) return false;
 	else return true;
 }

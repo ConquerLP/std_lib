@@ -60,7 +60,7 @@ Hashtable* Hashtable_ctor(
 	if (!f) return NULL;
 	if (!k) return NULL;
 	if (!v) return NULL;
-	//if (!datatype) return NULL;
+	//if (!data_type) return NULL;
 	if (size <= 0) return NULL;
 	if (factor < 0) return NULL;
 	BASIC_CTOR(Hashtable);
@@ -87,7 +87,7 @@ Hashtable* Hashtable_ctor(
 	self->calcHash = f;
 	self->compareKey = k;
 	self->compareValue = v;
-	//self->datatype = basic_strcpy(datatype);
+	//self->data_type = basic_strcpy(data_type);
 	self->number_of_elements = 0;
 	self->factor = factor;
 	self->size = size;
@@ -145,14 +145,14 @@ private_fun void* Hashtable_clone(void* obj)
 	CAST(Hashtable, obj, NULL, );
 	return Hashtable_ctor(self->size, self->factor, 
 		self->calcHash, self->compareKey, 
-		self->compareValue, self->datatype);
+		self->compareValue, self->data_type);
 }
 
 private_fun void Hashtable_dtor(void* obj)
 {
 	CAST(Hashtable, obj, , );
 	_FREE(self->entries);
-	_FREE(self->datatype);
+	_FREE(self->data_type);
 	_FREE(this->_HashtableIF);
 	Object_dtor(this->super);
 	FREE(this);
@@ -166,7 +166,7 @@ private_fun boolean Hashtable_equals(void* obj, void* obj2)
 	if (self->compareKey != self1->compareKey) return false;
 	if (self->compareValue != self1->compareValue) return false;
 	if (self->number_of_elements != self1->number_of_elements) return false;
-	if (basic_strcmp(self->datatype, self1->datatype)) return false;
+	if (basic_strcmp(self->data_type, self1->data_type)) return false;
 	return true;
 }
 

@@ -13,39 +13,39 @@
 #include <stdlib.h>
 
 /* MACROS */
-#define LIST_COMPARE_ELEMENT(datatype) \
-	datatype* a = NULL; \
-	datatype* b = NULL; \
+#define LIST_COMPARE_ELEMENT(data_type) \
+	data_type* a = NULL; \
+	data_type* b = NULL; \
 	for (size_t i = 0; i < self->length; ++i) { \
 		a = List_get(this, i); \
 		b = List_get(this1, i); \
-		if(!a) return false; \
-		if(!b) return false; \
+		if (!a) return false; \
+		if (!b) return false; \
 		if (*a != *b) return false; \
 	} \
 	return true; \
 
-#define LIST_COMPARE_ELEMENT_CLASS(datatype) \
-	datatype* a = NULL; \
-	datatype* b = NULL; \
+#define LIST_COMPARE_ELEMENT_CLASS(data_type) \
+	data_type* a = NULL; \
+	data_type* b = NULL; \
 	for (size_t i = 0; i < self->length; ++i) { \
 		a = List_get(this, i); \
 		b = List_get(this, i); \
-		if(!a) return false; \
-		if(!b) return false; \
+		if (!a) return false; \
+		if (!b) return false; \
 		if (!a->o_IF->equals(a, b)) return false; \
 	} \
 	return true; \
 
-#define LIST_SET_ELEMENT(datatype) \
-	datatype* tmp; \
-	_MALLOC(datatype, 1, tmp); \
-	basic_bin_copy(tmp, data, sizeof(datatype), 0); \
+#define LIST_SET_ELEMENT(data_type) \
+	data_type* tmp; \
+	_MALLOC(data_type, 1, tmp); \
+	basic_bin_copy(tmp, data, sizeof(data_type), 0); \
 	node->data = tmp; \
 	return; \
 
-#define LIST_SET_ELEMENT_CLASS(datatype) \
-	datatype* ptr = data; \
+#define LIST_SET_ELEMENT_CLASS(data_type) \
+	data_type* ptr = data; \
 	node->data = ptr->o_IF->clone(data); \
 	return; \
 	
@@ -75,9 +75,9 @@ private_fun Node* List_getNode(List* this, size_t index);
 
 
 /* public functions */
-List* List_ctor(size_t datatype)
+List* List_ctor(size_t data_type)
 {
-	if (!basic_isAllowedType(datatype)) return NULL;
+	if (!basic_isAllowedType(data_type)) return NULL;
 	BASIC_CTOR(List);
 	super->o_IF->clone = &List_clone;
 	super->o_IF->dtor = &List_dtor;
@@ -101,7 +101,7 @@ List* List_ctor(size_t datatype)
 	self->length = 0;
 	self->head = NULL;
 	self->tail = NULL;
-	self->type = datatype;
+	self->type = data_type;
 	return this;
 }
 
@@ -284,7 +284,7 @@ private_fun void List_delete(void* obj, size_t index)
 	}
 	else {
 		self->head = node->next;
-		if(node->next) node->next->prev = NULL;
+		if (node->next) node->next->prev = NULL;
 	}
 	node->next = NULL;
 	node->prev = NULL;

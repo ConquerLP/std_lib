@@ -22,7 +22,7 @@ typedef struct _o_Hashtable {
 	size_t size;
 	size_t number_of_elements;
 	float factor;
-	char* datatype;
+	char* data_type;
 }o_Hashtable;
 
 #endif

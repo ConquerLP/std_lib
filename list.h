@@ -35,7 +35,7 @@ typedef struct _List {
 }List;
 
 /* public functions */
-List* List_ctor(size_t datatype);
+List* List_ctor(size_t data_type);
 
 
 #ifdef __cplusplus

@@ -220,7 +220,17 @@ private_fun char* String_toString(void* obj)
 
 private_fun void* String_clone(void* obj)
 {
-	CAST(String, obj, NULL, );
+	String* this = ((void*)0); 
+	o_String* self = ((void*)0); 
+	if (!obj) return ((void*)0); 
+	if (!basic_strcmp(def_hashtable_get_type(def_global_hashtable, obj), "String")) return ((void*)0); 
+	this = obj; 
+	if (!this->self) return ((void*)0); 
+	if (!this->super) return ((void*)0); 
+	self = this->self;;
+
+
+	//CAST(String, obj, NULL, );
 	String* new = String_ctor(self->str);
 	return new;
 }

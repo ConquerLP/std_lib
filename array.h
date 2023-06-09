@@ -25,7 +25,7 @@ typedef struct _Array {
 	ObjectIF* o_IF;
 }Array;
 
-Array* Array_ctor(size_t datatype, size_t length);
+Array* Array_ctor(size_t data_type, size_t length);
 
 #ifdef __cplusplus
 } // extern "C"
