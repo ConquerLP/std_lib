@@ -55,8 +55,7 @@ boolean Vector_isAllowedType(size_t data_type);
 /* pulbic functions */
 Vector* Vector_ctor(size_t data_type, size_t dim, ...)
 {
-	if (!Vector_isAllowedType(data_type)) return NULL;
-	if (dim <= 0) return NULL;
+	if (!Vector_isAllowedType(data_type) || dim <= 0)  def_critical_error("Could not create new Vector");
 	BASIC_CTOR(Vector);
 	super->o_IF->toString = &Vector_toString;
 	super->o_IF->clone = &Vector_clone;

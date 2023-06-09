@@ -109,8 +109,7 @@ String* String_join(void* obj);
 /* public functions */
 String* String_ctor(const char* text)
 {
-	if (!text) return NULL;
-	if (*text <= 0) return NULL;
+	if (!text || *text <= 0) def_critical_error("Could not create new String");
 	BASIC_CTOR(String);
 
 	this->o_IF->clone = &String_clone;

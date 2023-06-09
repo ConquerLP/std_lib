@@ -75,8 +75,7 @@ private_fun void Array_fill(void* obj, void* data);
 
 Array* Array_ctor(size_t data_type, size_t length)
 {
-	if (length < 0) return NULL;
-	if (!basic_isAllowedType(data_type)) return NULL;
+	if (length < 0 || !basic_isAllowedType(data_type)) def_critical_error("Could not create new Array");
 	BASIC_CTOR(Array);
 	super->o_IF->clone = &Array_clone;
 	super->o_IF->toString = &Array_toString;
@@ -257,7 +256,7 @@ private_fun void Array_fill(void* obj, void* data)
 			case DEF_USHORT:		{ ARRAY_SET_PRIMITIVE(unsigned short); break;	}
 			case DEF_SHORT:			{ ARRAY_SET_PRIMITIVE(short); break;			}
 			case DEF_CHAR:			{ ARRAY_SET_PRIMITIVE(char); break;				}
-			case DEF_UINT:		{ ARRAY_SET_PRIMITIVE(unsigned int); break;		}
+			case DEF_UINT:			{ ARRAY_SET_PRIMITIVE(unsigned int); break;		}
 			case DEF_INT:			{ ARRAY_SET_PRIMITIVE(int); break;				}
 			case DEF_ULONGINT:		{ ARRAY_SET_PRIMITIVE(unsigned long int); break;}
 			case DEF_LONGINT:		{ ARRAY_SET_PRIMITIVE(long int); break;			}

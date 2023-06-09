@@ -49,9 +49,10 @@ boolean Filemanager_allowed_modes(const char* cmp);
 /* public functions */
 Filemanager* Filemanager_ctor(const char* filename_path, const char* mode)
 {
-	if (!filename_path) return NULL;
-	if (basic_strlen(filename_path) - 1 > FILENAME_MAX) return NULL;
-	if (!Filemanager_allowed_modes(mode)) return NULL;
+	if (!filename_path 
+		|| (basic_strlen(filename_path) - 1 > FILENAME_MAX)
+		|| !Filemanager_allowed_modes(mode))  
+			def_critical_error("Could not create new Filemanager");
 
 	BASIC_CTOR(Filemanager);
 

@@ -1,5 +1,9 @@
 /*
-	Latest Update: 24.05.2023
+	Latest Update: 09.06.2023
+	TODO:
+		toString Array
+		toString List
+		finish Hashtable
 */
 
 #ifndef STD_LIB_H
