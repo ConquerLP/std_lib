@@ -140,10 +140,10 @@ char* def_hashtable_get_type(Def_Hashtable* table, void* key)
 void def_hashentry_update(Def_Hashentry* entry, boolean is_obj, boolean freed,
 	const char* type, char* file, size_t line, const char* func)
 {
-	if (!entry) exit(1);
-	if (!type) exit(1);
-	if (!file) exit(1);
-	if (!func) exit(1);
+	if (!entry) def_critical_error("Nullptr: Def_Hashentry");
+	if (!type) def_critical_error("Nullptr: Hashtable: type");
+	if (!file) def_critical_error("Nullptr: Hashtable: file");
+	if (!func) def_critical_error("Nullptr: Hashtable: func");
 
 	entry->line = line;
 	entry->is_object = is_obj;
@@ -175,8 +175,8 @@ void def_hashtable_print(Def_Hashtable* table, FILE* stream)
 {
 	if (!table) return;
 	if (!stream) stream = stdout;
-	char line[] = { "-------------------------------------------------------------------------------------------" };
-	char blank[] = { "                                                                                     " };
+	char line[] = { "------------------------------------------------------------------------------------------------" };
+	char blank[] = { "                                                                                          " };
 	size_t mod = 5;
 	size_t freed = 0;
 	fprintf(stream, "\n%s%s\nMemorymap:%s%s |\n", line, line, blank, blank);
@@ -187,7 +187,7 @@ void def_hashtable_print(Def_Hashtable* table, FILE* stream)
 	fprintf(stream, " Datatype[********************] |");
 	fprintf(stream, " Line#[*****] |");
 	fprintf(stream, " File[................\\*.c] |");
-	fprintf(stream, " Function[********************] |");
+	fprintf(stream, " Function[******************************] |");
 	fprintf(stream, " Freed[y/n] |\n");
 	
 	for (size_t i = 0, j = 0; i < DEF_HASH_TABLE_SIZE; ++i) {
@@ -204,7 +204,7 @@ void def_hashtable_print(Def_Hashtable* table, FILE* stream)
 			if (!entry->freed) flag1 = " no";
 			else freed++;
 			fprintf(stream,
-				"        [0x%*p] |       [%3s] |         [%20s] |      [%5zu] |     [%20s] |         [%20s] |      [%s] |",
+				"        [0x%*p] |       [%3s] |         [%20s] |      [%5zu] |     [%20s] |         [%30s] |      [%s] |",
 				16,
 				entry->key,
 				flag0,
@@ -225,7 +225,7 @@ void def_hashtable_print(Def_Hashtable* table, FILE* stream)
 		fprintf(stream, "\n");
 	}
 	fprintf(stream, "%s%s\n", line, line);
-	fprintf(stream, "[%10zu] of [%10zu] pointers were freed.%132s|\n", freed, table->allocations, " ");
+	fprintf(stream, "[%10zu] of [%10zu] pointers were freed.%142s|\n", freed, table->allocations, " ");
 	fprintf(stream, "%s%s", line, line);
 }
 
@@ -237,7 +237,7 @@ void def_hashtable_delete(Def_Hashtable* table)
 		Def_Hashentry* head = entry;
 		if (!entry) continue;
 		while (true) {
-			if (!entry->freed) free(entry->key);
+			if (!entry->freed) free(entry->key); 
 			if (!entry->next) {
 				free(entry->type);
 				free(entry->file);
