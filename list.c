@@ -38,6 +38,7 @@
 	return true; \
 
 #define LIST_SET_ELEMENT(data_type) \
+	if (def_hashtable_is_object(DEF_GLOBAL_HASHTABLE, data)) def_critical_error("List, tried to assign class but expected primitive datatype"); \
 	data_type* tmp; \
 	_MALLOC(data_type, 1, tmp); \
 	basic_bin_copy(tmp, data, sizeof(data_type), 0); \
@@ -51,12 +52,36 @@
 			case DEF_STRING: {ptr = String_ctor(data); break; } \
 			default: ptr = NULL; \
 		} \
-		if (!ptr) def_critical_error("List, tried to assign invalid class"); \
+		if (!ptr) def_critical_error("List, tried to assign unsupported class"); \
 		else node->data = ptr->o_IF->clone(data); \
 	} \
 	else ptr = data; \
 	node->data = ptr->o_IF->clone(data); \
 	return; \
+
+#define LIST_APPEND_STRING_PRIMITIVE(data_type, func) \
+	String* tmp1 = func(*((data_type*)List_get(obj, i))); \
+	tmp->_StringIF->append(tmp, "#"); \
+	String* tmp2 = String_size_tToString(i); \
+	tmp->_StringIF->append(tmp, tmp2); \
+	tmp->_StringIF->append(tmp, ": "); \
+	tmp->_StringIF->append(tmp, tmp1); \
+	tmp->_StringIF->append(tmp, "\n"); \
+	delete(tmp1); \
+	delete(tmp2); \
+
+#define LIST_APPEND_STRING_CLASS(data_type) \
+	data_type* ptr = List_get(obj, i); \
+	char* to_string = ptr->o_IF->toString(ptr); \
+	String* tmp1 = String_ctor(to_string); \
+	tmp->_StringIF->append(tmp, "#"); \
+	String* tmp2 = String_size_tToString(i + 1); \
+	tmp->_StringIF->append(tmp, tmp2); \
+	tmp->_StringIF->append(tmp, ": "); \
+	tmp->_StringIF->append(tmp, tmp1); \
+	tmp->_StringIF->append(tmp, "\n"); \
+	delete(tmp1); \
+	delete(tmp2); \
 
 /* function prototypes */
 /* overriding methods */
@@ -121,12 +146,28 @@ private_fun char* List_toString(void* obj)
 	CAST(List, obj, NULL, );
 	CAST_OBJECT(this->super, NULL, 1);
 	_FREE(self1->toString);
-	char* tmp;
-	_MALLOC(char, 100, tmp);
-	basic_memset(tmp, '\0', 100);
-	snprintf(tmp, 100, "This List contains: %zu '%s's", self->length, basic_typeToString(self->type));
-	self1->toString = basic_strcpy(tmp);
-	_FREE(tmp);
+	String* tmp = String_ctor("\nList contains:\n");
+	for (size_t i = 0; i < self->length; ++i) {
+		switch (self->type) {
+			case DEF_BOOLEAN:		{ LIST_APPEND_STRING_PRIMITIVE(boolean, String_booleanToString); break;			  }
+			case DEF_USHORT:		{ LIST_APPEND_STRING_PRIMITIVE(unsigned short, String_ushortToString); break;	  }
+			case DEF_SHORT:			{ LIST_APPEND_STRING_PRIMITIVE(short, String_shortToString); break;			  }
+			case DEF_CHAR:			{ LIST_APPEND_STRING_PRIMITIVE(char, String_charToString); break;			  }
+			case DEF_UINT:			{ LIST_APPEND_STRING_PRIMITIVE(unsigned int, String_uintToString); break;	  }
+			case DEF_INT:			{ LIST_APPEND_STRING_PRIMITIVE(int, String_intToString); break;				  }
+			case DEF_ULONGINT:		{ LIST_APPEND_STRING_PRIMITIVE(unsigned long int, String_ulongintToString); break; }
+			case DEF_LONGINT:		{ LIST_APPEND_STRING_PRIMITIVE(long int, String_longintToString); break; }
+			case DEF_LONGLONGINT:	{ LIST_APPEND_STRING_PRIMITIVE(long long int, String_longlongintToString); break; }
+			case DEF_SIZE_T:		{ LIST_APPEND_STRING_PRIMITIVE(size_t, String_size_tToString); break;			  }
+			case DEF_FLOAT:			{ LIST_APPEND_STRING_PRIMITIVE(float, String_floatToString); break;			  }
+			case DEF_DOUBLE:		{ LIST_APPEND_STRING_PRIMITIVE(double, String_doubleToString); break;			  }
+			case DEF_LONGDOUBLE:	{ LIST_APPEND_STRING_PRIMITIVE(long double, String_longdoubleToString); break;		  }
+			case DEF_STRING:		{ LIST_APPEND_STRING_CLASS(String); break;										  }
+		}
+	}
+	CAST(String, tmp, NULL, 2);
+	self1->toString = basic_strcpy(self2->str);
+	delete(tmp);
 	return self1->toString;
 }
 
@@ -165,7 +206,7 @@ private_fun boolean List_equals(void* obj, void* obj2)
 		case DEF_USHORT:		{ LIST_COMPARE_ELEMENT(unsigned short);	  }
 		case DEF_SHORT:			{ LIST_COMPARE_ELEMENT(short);			  }
 		case DEF_CHAR:			{ LIST_COMPARE_ELEMENT(char);			  }
-		case DEF_UINT:		{ LIST_COMPARE_ELEMENT(unsigned int);	  }
+		case DEF_UINT:			{ LIST_COMPARE_ELEMENT(unsigned int);	  }
 		case DEF_INT:			{ LIST_COMPARE_ELEMENT(int);			  }
 		case DEF_ULONGINT:		{ LIST_COMPARE_ELEMENT(unsigned long int);}
 		case DEF_LONGINT:		{ LIST_COMPARE_ELEMENT(long int);		  }
@@ -197,7 +238,7 @@ private_fun void List_set(void* obj, void* data, size_t index)
 		case DEF_USHORT:		{ LIST_SET_ELEMENT(unsigned short);	  }
 		case DEF_SHORT:			{ LIST_SET_ELEMENT(short);			  }
 		case DEF_CHAR:			{ LIST_SET_ELEMENT(char);			  }
-		case DEF_UINT:		{ LIST_SET_ELEMENT(unsigned int);	  }
+		case DEF_UINT:			{ LIST_SET_ELEMENT(unsigned int);	  }
 		case DEF_INT:			{ LIST_SET_ELEMENT(int);			  }
 		case DEF_ULONGINT:		{ LIST_SET_ELEMENT(unsigned long int);}
 		case DEF_LONGINT:		{ LIST_SET_ELEMENT(long int);		  }
@@ -207,7 +248,7 @@ private_fun void List_set(void* obj, void* data, size_t index)
 		case DEF_DOUBLE:		{ LIST_SET_ELEMENT(double);			  }
 		case DEF_LONGDOUBLE:	{ LIST_SET_ELEMENT(long double);	  }
 		case DEF_STRING:		{ LIST_SET_ELEMENT_CLASS(String);	  }
-		default:				{ return;							}
+		default:				{ return;							  }
 	}
 }
 

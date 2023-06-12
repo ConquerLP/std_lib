@@ -79,11 +79,19 @@ typedef struct {
 
 	void (*append)(void* str1, void* str2);
 	void (*trim)(void* obj, const char* toTrim);
-
-	double (*parseDouble)(void* obj);
-	float (*parseFloat)(void* obj);
+	
+	unsigned short (*parseUShort)(void* obj);
+	short (*parseShort)(void* obj);
+	unsigned int (*parseUInt)(void* obj);
 	int (*parseInt)(void* obj);
+	unsigned long int (*parseULong)(void* obj);
+	long int (*parseLong)(void* obj);
+	long long int (*parseLongLong)(void* obj);
 	size_t(*parseSize_t)(void* obj);
+	float (*parseFloat)(void* obj);
+	double (*parseDouble)(void* obj);
+	long double (*parseLongDouble)(void* obj);
+
 }StringIF;
 
 typedef struct _String {
@@ -98,11 +106,20 @@ typedef struct _String {
 String* String_ctor(const char* text);
 
 /* alternative ctors */
-String* String_doubleToString(double value, int prec);
-String* String_floatToString(float value, int prec);
-String* String_intToString(int value);
-String* String_size_tToString(size_t value);
 String* String_booleanToString(boolean value);
+String* String_ushortToString(unsigned short value);
+String* String_shortToString(short value);
+String* String_charToString(char value);
+String* String_uintToString(unsigned int value);
+String* String_intToString(int value);
+String* String_ulongintToString(unsigned long int value);
+String* String_longintToString(long int value);
+String* String_longlongintToString(long long int value);
+String* String_size_tToString(size_t value);
+String* String_floatToString(float value);
+String* String_doubleToString(double value);
+String* String_longdoubleToString(long double value);
+
 String* String_stringAt(void* obj, size_t index);
 String* String_subString(void* obj, size_t start, size_t end);
 String* String_join(void* obj);

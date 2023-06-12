@@ -16,6 +16,14 @@
 #define TMP_CHAR_LENGTH 20
 char to_trim[] = { "\t\nABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz()[]{}:;^'~%=<>!?&$#@_|\" " };
 
+/* MACROS */
+#define STRING_DATA_TYPE_TO_STRING(format_spez) \
+	char buff[TMP_CHAR_LENGTH] = { 0 }; \
+	snprintf(buff, TMP_CHAR_LENGTH - 1, #format_spez, value); \
+	String* string = String_ctor(buff); \
+	String_trim(string, "\0 "); \
+	return string; \
+
 /* function prototypes */
 /* Helper functions*/
 private_fun boolean String_cmpChar(char a, char b, boolean ignCase);
@@ -100,16 +108,22 @@ private_fun boolean String_isEmpty(void* obj);
 private_fun void String_append(void* str1, void* str2);
 private_fun void String_trim(void* obj, const char* toTrim);
 
-private_fun double String_parseDouble(void* obj);
-private_fun float String_parseFloat(void* obj);
+private_fun unsigned short String_parseUShort(void* obj);
+private_fun short String_parseShort(void* obj);
+private_fun unsigned int String_parseUInt(void* obj);
 private_fun int String_parseInt(void* obj);
+private_fun unsigned long int String_parseULong(void* obj);
+private_fun long int String_parseLong(void* obj);
+private_fun long long int String_parseLongLong(void* obj);
 private_fun size_t String_parseSize_t(void* obj);
-String* String_join(void* obj);
+private_fun float String_parseFloat(void* obj);
+private_fun double String_parseDouble(void* obj);
+private_fun long double String_parseLongDouble(void* obj);
 
 /* public functions */
 String* String_ctor(const char* text)
 {
-	if (!text || *text <= 0) def_critical_error("Could not create new String");
+	if (!text || *text < 0) def_critical_error("Could not create new String");
 	BASIC_CTOR(String);
 
 	this->o_IF->clone = &String_clone;
@@ -187,10 +201,17 @@ String* String_ctor(const char* text)
 	thisIF->append = &String_append;
 	thisIF->trim = &String_trim;
 
-	thisIF->parseDouble = &String_parseDouble;
-	thisIF->parseFloat = &String_parseFloat;
+	thisIF->parseUShort = &String_parseUShort;
+	thisIF->parseShort = &String_parseShort;
+	thisIF->parseUInt = &String_parseUInt;
 	thisIF->parseInt = &String_parseInt;
+	thisIF->parseULong = &String_parseULong;
+	thisIF->parseLong = &String_parseLong;
+	thisIF->parseLongLong = &String_parseLongLong;
 	thisIF->parseSize_t = &String_parseSize_t;
+	thisIF->parseFloat = &String_parseFloat;
+	thisIF->parseDouble = &String_parseDouble;
+	thisIF->parseLongDouble = &String_parseLongDouble;
 	
 	self->sub = NULL;
 	self->length = basic_strlen(text);
@@ -1194,42 +1215,6 @@ private_fun void String_trim(void* obj, const char* toTrim)
 	}
 }
 
-String* String_doubleToString(double value, int prec)
-{
-	char buff[TMP_CHAR_LENGTH] = { 0 };
-	snprintf(buff, TMP_CHAR_LENGTH - 1, "%.*lf", prec, value);
-	String* string = String_ctor(buff);
-	String_trim(string, " ");
-	return string;
-}
-
-String* String_floatToString(float value, int prec)
-{
-	char buff[TMP_CHAR_LENGTH] = { 0 };
-	snprintf(buff, TMP_CHAR_LENGTH - 1, "%.*f", prec, value);
-	String* string = String_ctor(buff);
-	String_trim(string, "\0 ");
-	return string;
-}
-
-String* String_intToString(int value) 
-{
-	char buff[TMP_CHAR_LENGTH] = { 0 };
-	snprintf(buff, TMP_CHAR_LENGTH - 1, "%i", value);
-	String* string = String_ctor(buff);
-	String_trim(string, "\0 ");
-	return string;
-}
-
-String* String_size_tToString(size_t value)
-{
-	char buff[TMP_CHAR_LENGTH] = { 0 };
-	snprintf(buff, TMP_CHAR_LENGTH - 1, "%zu", value);
-	String* string = String_ctor(buff);
-	String_trim(string, "\0 ");
-	return string;
-}
-
 String* String_booleanToString(boolean value)
 {
 	String* string = String_ctor("");
@@ -1238,7 +1223,150 @@ String* String_booleanToString(boolean value)
 	return string;
 }
 
+String* String_ushortToString(unsigned short value)
+{
+	STRING_DATA_TYPE_TO_STRING(%hu);
+}
+
+String* String_shortToString(short value)
+{
+	STRING_DATA_TYPE_TO_STRING(%hi);
+}
+
+String* String_charToString(char value)
+{
+	STRING_DATA_TYPE_TO_STRING(%c);
+}
+
+String* String_uintToString(unsigned int value)
+{
+	STRING_DATA_TYPE_TO_STRING(%ui);
+}
+
+
+String* String_intToString(int value)
+{
+	STRING_DATA_TYPE_TO_STRING(%i);
+}
+
+String* String_ulongintToString(unsigned long int value)
+{
+	STRING_DATA_TYPE_TO_STRING(%ul);
+}
+
+String* String_longintToString(long int value)
+{
+	STRING_DATA_TYPE_TO_STRING(%li);
+}
+
+String* String_longlongintToString(long long int value)
+{
+	STRING_DATA_TYPE_TO_STRING(%lli);
+}
+
+String* String_size_tToString(size_t value)
+{
+	STRING_DATA_TYPE_TO_STRING(%zu);
+}
+
+String* String_floatToString(float value)
+{
+	STRING_DATA_TYPE_TO_STRING(%f);
+}
+
+String* String_doubleToString(double value)
+{
+	STRING_DATA_TYPE_TO_STRING(%lf);
+}
+
+String* String_longdoubleToString(long double value)
+{
+	STRING_DATA_TYPE_TO_STRING(%Lf);
+}
+
+private_fun unsigned short String_parseUShort(void* obj)
+{
+	return (unsigned short)String_parseSize_t(obj);
+}
+
+private_fun short String_parseShort(void* obj)
+{
+	return (short)String_parseLongLong(obj);
+}
+
+private_fun unsigned int String_parseUInt(void* obj)
+{
+	return (unsigned int)String_parseSize_t(obj);
+}
+
+private_fun int String_parseInt(void* obj)
+{
+	return (int)String_parseLongLong(obj);
+}
+
+private_fun unsigned long int String_parseULong(void* obj)
+{
+	return (unsigned long int)String_parseSize_t(obj);
+}
+
+private_fun long int String_parseLong(void* obj)
+{
+	return (long int)String_parseLongLong(obj);
+}
+
+private_fun long long int String_parseLongLong(void* obj)
+{
+	CAST(String, obj, 0, );
+	char to_check[] = { "/*.," };
+	for (size_t i = 0; i < basic_strlen(to_check) - 1; ++i) {
+		if (String_containsChar(obj, to_check[i])) return 0;
+	}
+	char check_doubles[] = { "+" };
+	for (size_t i = 0; i < basic_strlen(check_doubles) - 1; ++i) {
+		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
+	}
+	String* copy = String_clone(obj);
+	CAST(String, copy, 0, 1);
+	String_trim(copy, to_trim);
+	String_trim(copy, "+");
+	delete(copy);
+	return atoll(self1->str);
+}
+
+private_fun size_t String_parseSize_t(void* obj)
+{
+	CAST(String, obj, 0, );
+	char to_check[] = { "/*.,-" };
+	for (size_t i = 0; i < basic_strlen(to_check) - 1; ++i) {
+		if (String_containsChar(obj, to_check[i])) return 0;
+	}
+	char check_doubles[] = { "+" };
+	for (size_t i = 0; i < basic_strlen(check_doubles) - 1; ++i) {
+		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
+	}
+	String* copy = String_clone(obj);
+	CAST(String, copy, 0, 1);
+	String_trim(copy, to_trim);
+	String_trim(copy, "+");
+	size_t result = 0;
+	for (size_t i = 0; i < self1->length - 1; ++i) {
+		result = result * 10 + (self1->str[i] - 48);
+	}
+	delete(copy);
+	return result;
+}
+
+private_fun float String_parseFloat(void* obj)
+{
+	return (float)String_parseLongDouble(obj);
+}
+
 private_fun double String_parseDouble(void* obj)
+{
+	return (float)String_parseLongDouble(obj);
+}
+
+private_fun long double String_parseLongDouble(void* obj)
 {
 	CAST(String, obj, 0.0, );
 	char to_check[] = { "/*" };
@@ -1267,55 +1395,8 @@ private_fun double String_parseDouble(void* obj)
 	}
 	delete(filter);
 	delete(filter_repalcement);
-	double result = atof(self1->str);
-	delete(copy);
-	return result;
-}
-
-private_fun float String_parseFloat(void* obj)
-{
-	return (float)String_parseDouble(obj);
-}
-
-private_fun int String_parseInt(void* obj)
-{
-	CAST(String, obj, 0, );
-	char to_check[] = { "/*.," };
-	for (size_t i = 0; i < basic_strlen(to_check) - 1; ++i) {
-		if (String_containsChar(obj, to_check[i])) return 0;
-	}
-	char check_doubles[] = { "-+" };
-	for (size_t i = 0; i < basic_strlen(check_doubles) - 1; ++i) {
-		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
-	}
-	if (String_containsChar(obj, '+') && String_containsChar(obj, '-')) return 0;
-	String* copy = String_clone(obj);
-	CAST(String, copy, 0, 1);
-	String_trim(copy, to_trim);
-	int result = atoi(self1->str);
-	delete(copy);
-	return result;
-}
-
-private_fun size_t String_parseSize_t(void* obj)
-{
-	CAST(String, obj, 0, );
-	char to_check[] = { "/*.,-" };
-	for (size_t i = 0; i < basic_strlen(to_check) - 1; ++i) {
-		if (String_containsChar(obj, to_check[i])) return 0;
-	}
-	char check_doubles[] = { "+" };
-	for (size_t i = 0; i < basic_strlen(check_doubles) - 1; ++i) {
-		if (String_countOccurencesChar(obj, check_doubles[i]) > 1) return 0;
-	}
-	String* copy = String_clone(obj);
-	CAST(String, copy, 0, 1);
-	String_trim(copy, to_trim);
-	String_trim(copy, "+");
-	size_t result = 0;
-	for (size_t i = 0; i < self1->length - 1; ++i) {
-		result = result * 10 + (self1->str[i] - 48);
-	}
+	char* dummy = "";
+	long double result = strtold(self1->str, &dummy);
 	delete(copy);
 	return result;
 }

@@ -57,6 +57,31 @@
 	} \
 	return true; \
 
+#define ARRAY_APPEND_STRING_PRIMITIVE(data_type, func) \
+	String* tmp1 = func(*((data_type*)Array_get(obj, i))); \
+	tmp->_StringIF->append(tmp, "#"); \
+	String* tmp2 = String_size_tToString(i); \
+	tmp->_StringIF->append(tmp, tmp2); \
+	tmp->_StringIF->append(tmp, ": "); \
+	tmp->_StringIF->append(tmp, tmp1); \
+	tmp->_StringIF->append(tmp, "\n"); \
+	delete(tmp1); \
+	delete(tmp2); \
+
+
+#define ARRAY_APPEND_STRING_CLASS(data_type) \
+	data_type* ptr = Array_get(obj, i); \
+	char* to_string = ptr->o_IF->toString(ptr); \
+	String* tmp1 = String_ctor(to_string); \
+	tmp->_StringIF->append(tmp, "#"); \
+	String* tmp2 = String_size_tToString(i + 1); \
+	tmp->_StringIF->append(tmp, tmp2); \
+	tmp->_StringIF->append(tmp, ": "); \
+	tmp->_StringIF->append(tmp, tmp1); \
+	tmp->_StringIF->append(tmp, "\n"); \
+	delete(tmp1); \
+	delete(tmp2); \
+
 /* function prototypes */
 /* overriding methods */ 
 private_fun char* Array_toString(void* obj);
@@ -107,39 +132,30 @@ Array* Array_ctor(size_t data_type, size_t length)
 private_fun char* Array_toString(void* obj)
 {
 	CAST(Array, obj, NULL, );
-	CAST_OBJECT(this->super, false, 1);
+	CAST_OBJECT(this->super, NULL, 1);
 	_FREE(self1->toString);
-	char* tmp;
-	_MALLOC(char, 100, tmp);
-	basic_memset(tmp, '\0', 100);
-	String* str = String_ctor("");
-	CAST(String, str, NULL, 2);
-	//snprintf(tmp, 100, "This array contains: %zu '%s's.\n", self->length, basic_BATAL_to_string(self->type));
-	str->_StringIF->append(str, tmp);
+	String* tmp = String_ctor("\nList contains:\n");
 	for (size_t i = 0; i < self->length; ++i) {
 		switch (self->type) {
-			/*
-			case DATAL_INT:
-				snprintf(tmp, 100, "Value(%zu): %i\n", i, *((int*)Array_get(obj, i)));
-				break;
-			case DATAL_FLOAT:
-				snprintf(tmp, 100, "Value(%zu): %f\n", i, *((float*)Array_get(obj, i)));
-				break;
-			case DATAL_DOUBLE:
-				snprintf(tmp, 100, "Value(%zu): %lf\n", i, *((double*)Array_get(obj, i)));
-				break;
-			case DATAL_SIZE_T: 
-				snprintf(tmp, 100, "Value(%zu): %zu\n", i, *((size_t*)Array_get(obj, i)));
-				break;
-			default: 
-				break;
-				*/
+		case DEF_BOOLEAN:		{ ARRAY_APPEND_STRING_PRIMITIVE(boolean, String_booleanToString); break;			  }
+		case DEF_USHORT:		{ ARRAY_APPEND_STRING_PRIMITIVE(unsigned short, String_ushortToString); break;	  }
+		case DEF_SHORT:			{ ARRAY_APPEND_STRING_PRIMITIVE(short, String_shortToString); break;			  }
+		case DEF_CHAR:			{ ARRAY_APPEND_STRING_PRIMITIVE(char, String_charToString); break;			  }
+		case DEF_UINT:			{ ARRAY_APPEND_STRING_PRIMITIVE(unsigned int, String_uintToString); break;	  }
+		case DEF_INT:			{ ARRAY_APPEND_STRING_PRIMITIVE(int, String_intToString); break;				  }
+		case DEF_ULONGINT:		{ ARRAY_APPEND_STRING_PRIMITIVE(unsigned long int, String_ulongintToString); break; }
+		case DEF_LONGINT:		{ ARRAY_APPEND_STRING_PRIMITIVE(long int, String_longintToString); break; }
+		case DEF_LONGLONGINT:	{ ARRAY_APPEND_STRING_PRIMITIVE(long long int, String_longlongintToString); break; }
+		case DEF_SIZE_T:		{ ARRAY_APPEND_STRING_PRIMITIVE(size_t, String_size_tToString); break;			  }
+		case DEF_FLOAT:			{ ARRAY_APPEND_STRING_PRIMITIVE(float, String_floatToString); break;			  }
+		case DEF_DOUBLE:		{ ARRAY_APPEND_STRING_PRIMITIVE(double, String_doubleToString); break;			  }
+		case DEF_LONGDOUBLE:	{ ARRAY_APPEND_STRING_PRIMITIVE(long double, String_longdoubleToString); break;		  }
+		case DEF_STRING:		{ ARRAY_APPEND_STRING_CLASS(String); break;										  }
 		}
-		str->_StringIF->append(str, tmp);
 	}
+	CAST(String, tmp, NULL, 2);
 	self1->toString = basic_strcpy(self2->str);
-	delete(str);
-	_FREE(tmp);
+	delete(tmp);
 	return self1->toString;
 }
 

@@ -15,7 +15,7 @@ extern "C"
 #define ARRAY_SIZE(ptr) (sizeof((ptr)) / sizeof((*ptr)))
 
 #define DEF_HASH_TABLE_SIZE 1000000
-#define DEF_DEBUG_MODE true
+#define DEF_DEBUG_MODE false
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -87,9 +87,9 @@ extern char* def_mem_fail;
 #define DEF_CLEAR_MEM def_hashtable_delete(DEF_GLOBAL_HASHTABLE);
 
 #if DEF_DEBUG_MODE
-	#define _PRINT_DEBUG_MEMORY def_hashtable_print(DEF_GLOBAL_HASHTABLE, DEF_GLOBAL_DEBUG_OUTPUT);
+	#define DEF_PRINT_DEBUG_MEMORY def_hashtable_print(DEF_GLOBAL_HASHTABLE, DEF_GLOBAL_DEBUG_OUTPUT);
 #else 
-	#define _PRINT_DEBUG_MEMORY //_PRINT_DEBUG_MEMORY
+	#define DEF_PRINT_DEBUG_MEMORY //_PRINT_DEBUG_MEMORY
 #endif
 
 /*

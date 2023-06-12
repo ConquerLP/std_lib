@@ -1,8 +1,6 @@
 /*
-	Latest Update: 09.06.2023
+	Latest Update: 12.06.2023
 	TODO:
-		toString Array
-		toString List
 		finish Hashtable
 */
 
