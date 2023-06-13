@@ -134,7 +134,7 @@ private_fun char* Array_toString(void* obj)
 	CAST(Array, obj, NULL, );
 	CAST_OBJECT(this->super, NULL, 1);
 	_FREE(self1->toString);
-	String* tmp = String_ctor("\Array contains:\n");
+	String* tmp = String_ctor("Array contains:\n");
 	for (size_t i = 0; i < self->length; ++i) {
 		switch (self->type) {
 		case DEF_BOOLEAN:		{ ARRAY_APPEND_STRING_PRIMITIVE(boolean, String_booleanToString); break;			  }

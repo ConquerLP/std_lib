@@ -86,9 +86,9 @@ Vector* Vector_ctor(size_t data_type, size_t dim, ...)
 	}
 	self->values = tmp;
 	self->type = data_type;
+	self->dim = dim;
 	return this;
 }
-
 
 /* overriding Object methods */
 private_fun char* Vector_toString(void* obj)
@@ -223,6 +223,23 @@ private_fun double Vector_getLength(void* obj)
 		sum += Vector_get(obj, i) * Vector_get(obj, i);
 	}
 	return sqrt(sum);
+}
+
+/* public functions */
+Vector* Vector_sum(size_t data_type, void* vec1, void* vec2)
+{
+	CAST(Vector, vec1, NULL, );
+	CAST(Vector, vec2, NULL, 1);
+
+	if (self->dim != self1->dim) return NULL;
+	long double tmp = 0.0;
+	Vector* sum = Vector_ctor(data_type, 1, 0.0);
+	Vector_setDim(sum, self->dim);
+	for (size_t i = 0; i < self->dim; ++i) {
+		tmp = Vector_get(vec1, i) + Vector_get(vec2, i);
+		Vector_set(sum, i, tmp);
+	}
+	return sum;
 }
 
 /* helper functions */

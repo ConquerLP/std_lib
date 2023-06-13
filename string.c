@@ -17,11 +17,10 @@
 char to_trim[] = { "\t\nABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmlnopqrstuvwxyz()[]{}:;^'~%=<>!?&$#@_|\" " };
 
 /* MACROS */
-#define STRING_DATA_TYPE_TO_STRING(format_spez) \
+#define STRING_DATA_TYPE_TO_STRING(format_spec) \
 	char buff[TMP_CHAR_LENGTH] = { 0 }; \
-	snprintf(buff, TMP_CHAR_LENGTH - 1, #format_spez, value); \
+	snprintf(buff, TMP_CHAR_LENGTH - 1, #format_spec, value); \
 	String* string = String_ctor(buff); \
-	String_trim(string, "\0 "); \
 	return string; \
 
 /* function prototypes */
