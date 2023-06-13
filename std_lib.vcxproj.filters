@@ -86,7 +86,7 @@
     <None Include="vector.r">
       <Filter>Headerdateien\math</Filter>
     </None>
-    <None Include="RUN_ME.bat">
+    <None Include="delete_junk_files.bat">
       <Filter>Quelldateien</Filter>
     </None>
     <None Include="BUILD.bat">

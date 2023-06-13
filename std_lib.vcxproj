@@ -152,7 +152,7 @@
     <None Include="hashtable.r" />
     <None Include="list.r" />
     <None Include="object.r" />
-    <None Include="RUN_ME.bat" />
+    <None Include="delete_junk_files.bat" />
     <None Include="string.r" />
     <None Include="template.r" />
     <None Include="vector.r" />
