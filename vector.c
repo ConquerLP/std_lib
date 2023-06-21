@@ -7,6 +7,9 @@
 #include "string.h"
 #include "string.r"
 
+#include "array.h"
+#include "array.r"
+
 #include "def.h"
 #include "basic.h"
 
@@ -26,6 +29,59 @@
 	} \
 	va_end(arg); 
 
+#define VECTOR_ROTATE_3D(data_type) \
+	data_type x, y, z; \
+	x = _getV(data_type, obj, 0); \
+	y = _getV(data_type, obj, 2); \
+	z = _getV(data_type, obj, 3); \
+	data_type tmp0; \
+	data_type tmp1; \
+	switch (axis) { \
+		case VEC_AXIS_X: { \
+			tmp0 = y * (data_type)cos(std_lib_math_degToRad(angle)) + (-1) * (data_type)cos(std_lib_math_degToRad(angle)) * z; \
+			tmp1 = y * (data_type)sin(std_lib_math_degToRad(angle)) + (data_type)cos(std_lib_math_degToRad(angle)) * z; \
+			self->super->_ArrayIF->set(self->super, &tmp0, 1); \
+			self->super->_ArrayIF->set(self->super, &tmp1, 2); \
+		} break; \
+		case VEC_AXIS_Y: { \
+			tmp0 = x * (data_type)cos(std_lib_math_degToRad(angle)) + (data_type)sin(std_lib_math_degToRad(angle)) * z; \
+			tmp1 = x * (-1) * (data_type)sin(std_lib_math_degToRad(angle)) + (data_type)cos(std_lib_math_degToRad(angle)) * z; \
+			self->super->_ArrayIF->set(self->super, &tmp0, 0); \
+			self->super->_ArrayIF->set(self->super, &tmp1, 2); \
+		} break; \
+		case VEC_AXIS_Z: { \
+			tmp0 = x * (data_type)cos(std_lib_math_degToRad(angle)) + (-1) * (data_type)sin(std_lib_math_degToRad(angle)) * y; \
+			tmp1 = x * (data_type)sin(std_lib_math_degToRad(angle)) + (data_type)cos(std_lib_math_degToRad(angle)) * y; \
+			self->super->_ArrayIF->set(self->super, &tmp0, 0); \
+			self->super->_ArrayIF->set(self->super, &tmp1, 1); \
+		} break; \
+		default:; break; \
+	} 
+
+#define VECTOR_ROTATE_2D(data_type) \
+	data_type x, y; \
+	data_type tmp0, tmp1; \
+	x = _getV(data_type, obj, 0); \
+	y = _getV(data_type, obj, 1); \
+	tmp0 = x * (data_type)cos(std_lib_math_degToRad(angle)) + (-1) * (data_type)sin(std_lib_math_degToRad(angle)) * y; \
+	tmp1 = x * (data_type)sin(std_lib_math_degToRad(angle)) + (data_type)cos(std_lib_math_degToRad(angle)) * y; \
+	self->super->_ArrayIF->set(self->super, &tmp0, 0); \
+	self->super->_ArrayIF->set(self->super, &tmp1, 1); 
+
+#define VECTOR_SUM(data_type) \
+	data_type value; \
+	for (size_t i = 0; i < self2->length; ++i) { \
+		value = _getV(data_type, vec1, i) + _getV(data_type, vec2, i); \
+		self->super->_ArrayIF->set(self->super, &value, i); \
+	} 
+
+#define VECTOR_LENGTH(data_type) \
+	data_type sum = 0; \
+	for (size_t i = 0; i < self1->length; ++i) { \
+		sum += _getV(data_type, obj, i) * _getV(data_type, obj, i); \
+	} \
+	return (double)sqrt((double)sum);
+
 size_t VEC_AXIS[VEC_AXIS_LAST] = {
 	VEC_AXIS_X,
 	VEC_AXIS_Y,
@@ -34,14 +90,10 @@ size_t VEC_AXIS[VEC_AXIS_LAST] = {
 
 /* function prototpyes */
 /* overriding Object methods */
-private_fun char* Vector_toString(void* obj);
 private_fun void* Vector_clone(void* obj);
 private_fun void Vector_dtor(void* obj);
-private_fun boolean Vector_equals(void* obj, void* obj2);
 
 /* Vector methods */
-private_fun long double Vector_get(void* obj, size_t index);
-private_fun void Vector_set(void* obj, size_t index, double value);
 private_fun double Vector_calcDotP(void* vec1, void* vec2);
 private_fun void Vector_rotate3D(void* obj, double angle, size_t axis);
 private_fun void Vector_rotate2D(void* obj, double angle);
@@ -57,12 +109,9 @@ Vector* Vector_ctor(size_t data_type, size_t dim, ...)
 {
 	if (!Vector_isAllowedType(data_type) || dim <= 0)  def_critical_error("Could not create new Vector");
 	BASIC_CTOR(Vector);
-	super->o_IF->toString = &Vector_toString;
+	
 	super->o_IF->clone = &Vector_clone;
 	super->o_IF->dtor = &Vector_dtor;
-	super->o_IF->equals = &Vector_equals;
-	thisIF->get = &Vector_get;
-	thisIF->set = &Vector_set;
 	thisIF->calcDotP = &Vector_calcDotP;
 	thisIF->rotate3D = &Vector_rotate3D;
 	thisIF->rotate2D = &Vector_rotate2D;
@@ -84,40 +133,24 @@ Vector* Vector_ctor(size_t data_type, size_t dim, ...)
 		case DEF_LONGDOUBLE:	{ VECTOR_INIT(long double, DEF_LONGDOUBLE); break; }
 		default:				return NULL;
 	}
-	self->values = tmp;
-	self->type = data_type;
-	self->dim = dim;
+	self->super = tmp;
+	CAST(Array, tmp, NULL, 1);
+	self1->sub = this;
+	this->_ArrayIF = this1->_ArrayIF;
+	super->o_IF->toString = this1->o_IF->toString;
+	super->o_IF->equals = this->o_IF->equals;
 	return this;
 }
 
 /* overriding Object methods */
-private_fun char* Vector_toString(void* obj)
-{
-	CAST(Vector, obj, NULL, );
-	CAST_OBJECT(this->super, NULL, 1);
-	_FREE(self1->toString);
-	String* str = String_ctor("");
-	CAST(String, str, NULL, 2);
-	char* tmp;
-	_MALLOC(char, 100, tmp);
-	basic_memset(tmp, '\0', 100);
-	for (size_t i = 0; i < self->dim; ++i) {
-		snprintf(tmp, 100, "V(%zu): %Lf\n", i, Vector_get(obj, i));
-		str->_StringIF->append(str, tmp);
-	}
-	self1->toString = basic_strcpy(self2->str);
-	delete(str);
-	_FREE(tmp);
-	return self1->toString;
-}
-
 private_fun void* Vector_clone(void* obj)
 {
 	CAST(Vector, obj, NULL, );
-	Vector* tmp = Vector_ctor(self->type, 1, 0.0);
-	Vector_setDim(tmp, self->dim);
-	for (size_t i = 0; i < self->dim; ++i) {
-		Vector_set(tmp, i, Vector_get(obj, i));
+	CAST(Array, self->super, NULL, 1);
+	Vector* tmp = Vector_ctor(self1->type, 1, 0.0);
+	Vector_setDim(tmp, self1->length);
+	for (size_t i = 0; i < self1->length; ++i) {
+		this1->_ArrayIF->set(this1, this1->_ArrayIF->get(this1, i), i);
 	}
 	return tmp;
 }
@@ -126,45 +159,36 @@ private_fun void Vector_dtor(void* obj)
 {
 	CAST(Vector, obj, , );
 	_FREE(this->_VectorIF);
-	_FREE(self->values);
-	delete(self->values);
+	delete(self->super);
 	Object_dtor(this->super);
 	FREE(this);
 }
 
-private_fun boolean Vector_equals(void* obj, void* obj2)
-{
-	CAST(Vector, obj, false, );
-	CAST(Vector, obj2, false, 1);
-	if (self->dim != self1->dim) return false;
-	for (size_t i = 0; i < self->dim; ++i) {
-		if (Vector_get(obj, i) != Vector_get(obj2, i)) return false;
-	}
-	return true;
-}
-
 /* Vector methods */
-private_fun long double Vector_get(void* obj, size_t index)
-{
-	CAST(Vector, obj, 0.0, );
-	long double* result = self->values->_ArrayIF->get(self->values, index);
-	return *result;
-}
-
-private_fun void Vector_set(void* obj, size_t index, double value)
-{
-	CAST(Vector, obj, , );
-	self->values->_ArrayIF->set(self->values, &value, index);
-}
 
 private_fun double Vector_calcDotP(void* vec1, void* vec2)
 {
 	CAST(Vector, vec1, 0.0, );
 	CAST(Vector, vec2, 0.0, 1);
-	if (self->dim != self1->dim) return 0.0;
+	CAST(Array, self->super, 0.0, 2);
+	CAST(Array, self1->super, 0.0, 3);
+	if (self2->length != self3->length) return 0.0;
 	double result = 0.0;
-	for (size_t i = 0; i < self->dim; ++i) {
-		result += Vector_get(vec1, i) * Vector_get(vec2, i);
+	for (size_t i = 0; i < self2->length; ++i) {
+		switch (self2->type) {
+			case DEF_USHORT:		result += _getV(unsigned short, vec1, i) * _getV(unsigned short, vec2, i); break;
+			case DEF_SHORT:			result += _getV(short, vec1, i) * _getV(short, vec2, i); break;
+			case DEF_UINT:			result += _getV(unsigned int, vec1, i) * _getV(unsigned int, vec2, i); break;
+			case DEF_INT:			result += _getV(int, vec1, i) * _getV(int, vec2, i); break;
+			case DEF_ULONGINT:		result += _getV(unsigned long int, vec1, i) * _getV(unsigned long int, vec2, i); break;
+			case DEF_LONGINT:		result += _getV(long int, vec1, i) * _getV(long int, vec2, i); break;
+			case DEF_LONGLONGINT:	result += _getV(long long int, vec1, i) * _getV(long long int, vec2, i); break;
+			case DEF_SIZE_T:		result += _getV(size_t, vec1, i) * _getV(size_t, vec2, i); break;
+			case DEF_FLOAT:			result += _getV(float, vec1, i) * _getV(float, vec2, i); break;
+			case DEF_DOUBLE:		result += _getV(double, vec1, i) * _getV(double, vec2, i); break;
+			case DEF_LONGDOUBLE:	result += _getV(long double, vec1, i) * _getV(long double, vec2, i); break;
+			default:				def_critical_error("Could not calculate the dot product of two vectors");
+		}
 	}
 	return result;
 }
@@ -177,52 +201,66 @@ private_fun double Vector_angle(void* vec1, void* vec2)
 private_fun void Vector_rotate3D(void* obj, double angle, size_t axis)
 {
 	CAST(Vector, obj, , );
-	if (self->dim != 3) return;
-	double tmp0 = 0.0;
-	double tmp1 = 0.0;
-	switch (axis) {
-	case VEC_AXIS_X: {
-		tmp0 = Vector_get(obj, 1) * cos(std_lib_math_degToRad(angle)) + (-1) * cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
-		tmp1 = Vector_get(obj, 1) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
-		Vector_set(obj, 1, tmp0);
-		Vector_set(obj, 2, tmp1);
-	} break;
-	case VEC_AXIS_Y: {
-		tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
-		tmp1 = Vector_get(obj, 0) * (-1) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 2);
-		Vector_set(obj, 0, tmp0);
-		Vector_set(obj, 2, tmp1);
-	} break;
-	case VEC_AXIS_Z: {
-		tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + (-1) * sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
-		tmp1 = Vector_get(obj, 0) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
-		Vector_set(obj, 0, tmp0);
-		Vector_set(obj, 1, tmp1);
-	} break;
-	default:; break;
+	CAST(Array, self->super, , 1);
+	if (self1->length != 3) return;
+	switch (self1->type) {
+		case DEF_USHORT:			{VECTOR_ROTATE_3D(unsigned short); break;}
+		case DEF_SHORT:				{VECTOR_ROTATE_3D(short); break;}
+		case DEF_UINT:				{VECTOR_ROTATE_3D(unsigned int); break;}
+		case DEF_INT:				{VECTOR_ROTATE_3D(int); break;}
+		case DEF_ULONGINT:			{VECTOR_ROTATE_3D(unsigned long int); break;}
+		case DEF_LONGINT:			{VECTOR_ROTATE_3D(long int); break;}
+		case DEF_LONGLONGINT:		{VECTOR_ROTATE_3D(long long int); break;}
+		case DEF_SIZE_T:			{VECTOR_ROTATE_3D(size_t); break;}
+		case DEF_FLOAT:				{VECTOR_ROTATE_3D(float); break;}
+		case DEF_DOUBLE:			{VECTOR_ROTATE_3D(double); break;}
+		case DEF_LONGDOUBLE:		{VECTOR_ROTATE_3D(long double); break; }
+		default:					def_critical_error("Could not rotate a vector");
 	}
 }
 
 private_fun void Vector_rotate2D(void* obj, double angle)
 {
 	CAST(Vector, obj, , );
-	if (self->dim != 2) return;
-	double tmp0 = 0.0;
-	double tmp1 = 0.0;
-	tmp0 = Vector_get(obj, 0) * cos(std_lib_math_degToRad(angle)) + (-1) * sin(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
-	tmp1 = Vector_get(obj, 0) * sin(std_lib_math_degToRad(angle)) + cos(std_lib_math_degToRad(angle)) * Vector_get(obj, 1);
-	Vector_set(obj, 0, tmp0);
-	Vector_set(obj, 1, tmp1);
+	CAST(Array, self->super, , 1);
+	if (self1->length != 2) return;
+
+	long double x = 0.0, y = 0.0;
+	switch (self1->type) {
+		case DEF_USHORT:		{VECTOR_ROTATE_2D(unsigned short); break;}
+		case DEF_SHORT:			{VECTOR_ROTATE_2D(short); break;}
+		case DEF_UINT:			{VECTOR_ROTATE_2D(unsigned int); break;}
+		case DEF_INT:			{VECTOR_ROTATE_2D(int); break;}
+		case DEF_ULONGINT:		{VECTOR_ROTATE_2D(unsigned long int); break;}
+		case DEF_LONGINT:		{VECTOR_ROTATE_2D(long int); break;}
+		case DEF_LONGLONGINT:	{VECTOR_ROTATE_2D(long long int); break;}
+		case DEF_SIZE_T:		{VECTOR_ROTATE_2D(size_t); break;}
+		case DEF_FLOAT:			{VECTOR_ROTATE_2D(float); break;}
+		case DEF_DOUBLE:		{VECTOR_ROTATE_2D(double); break;}
+		case DEF_LONGDOUBLE:	{VECTOR_ROTATE_2D(long double); break; }	
+		default:				def_critical_error("Could not rotate a vector");
+	}
 }
 
 private_fun double Vector_getLength(void* obj)
 {
 	CAST(Vector, obj, 0.0, );
-	double sum = 0.0;
-	for (size_t i = 0; i < self->dim; ++i) {
-		sum += Vector_get(obj, i) * Vector_get(obj, i);
+	CAST(Array, self->super, 0.0, 1);
+	switch (self1->type) {
+		case DEF_USHORT:		{ VECTOR_LENGTH(unsigned short); break; }
+		case DEF_SHORT:			{ VECTOR_LENGTH(short); break; }
+		case DEF_UINT:			{ VECTOR_LENGTH(unsigned int); break; }
+		case DEF_INT:			{ VECTOR_LENGTH(int); break; }
+		case DEF_ULONGINT:		{ VECTOR_LENGTH(unsigned long int); break; }
+		case DEF_LONGINT:		{ VECTOR_LENGTH(long int); break; }
+		case DEF_LONGLONGINT:	{ VECTOR_LENGTH(long long int); break; }
+		case DEF_SIZE_T:		{ VECTOR_LENGTH(size_t); break; }
+		case DEF_FLOAT:			{ VECTOR_LENGTH(float); break; }
+		case DEF_DOUBLE:		{ VECTOR_LENGTH(double); break; }
+		case DEF_LONGDOUBLE:	{ VECTOR_LENGTH(long double); break; }
+		default:				def_critical_error("Could not calculate the length of a vector");
 	}
-	return sqrt(sum);
+	return 0.0;
 }
 
 /* public functions */
@@ -230,14 +268,24 @@ Vector* Vector_sum(size_t data_type, void* vec1, void* vec2)
 {
 	CAST(Vector, vec1, NULL, );
 	CAST(Vector, vec2, NULL, 1);
-
-	if (self->dim != self1->dim) return NULL;
-	long double tmp = 0.0;
+	CAST(Array, self->super, NULL, 2);
+	CAST(Array, self1->super, NULL, 3);
+	if (self2->length != self3->length) return NULL;
 	Vector* sum = Vector_ctor(data_type, 1, 0.0);
-	Vector_setDim(sum, self->dim);
-	for (size_t i = 0; i < self->dim; ++i) {
-		tmp = Vector_get(vec1, i) + Vector_get(vec2, i);
-		Vector_set(sum, i, tmp);
+	Vector_setDim(sum, self2->length);
+	switch (self2->type) {
+		case DEF_USHORT:		{VECTOR_SUM(unsigned short);}
+		case DEF_SHORT:			{VECTOR_SUM(short);}
+		case DEF_UINT:			{VECTOR_SUM(unsigned int);}
+		case DEF_INT:			{VECTOR_SUM(int);}
+		case DEF_ULONGINT:		{VECTOR_SUM(unsigned long int);}
+		case DEF_LONGINT:		{VECTOR_SUM(long int);}
+		case DEF_LONGLONGINT:	{VECTOR_SUM(long long int);}
+		case DEF_SIZE_T:		{VECTOR_SUM(size_t);}
+		case DEF_FLOAT:			{VECTOR_SUM(float);}
+		case DEF_DOUBLE:		{VECTOR_SUM(double);}
+		case DEF_LONGDOUBLE:	{VECTOR_SUM(long double); }
+		default:				def_critical_error("Could not calculate the sum of two vectors");
 	}
 	return sum;
 }
@@ -246,10 +294,10 @@ Vector* Vector_sum(size_t data_type, void* vec1, void* vec2)
 private_fun void Vector_setDim(void* obj, size_t dim)
 {
 	CAST(Vector, obj, , );
+	CAST(Array, self->super, , 1);
 	if (dim <= 0) return;
-	if (dim == self->dim) return;
-	self->values->_ArrayIF->resize(self->values, dim);
-	self->dim = dim;
+	if (dim == self1->length) return;
+	self->super->_ArrayIF->resize(self->super, dim);
 }
 
 boolean Vector_isAllowedType(size_t data_type)

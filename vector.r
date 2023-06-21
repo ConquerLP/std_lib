@@ -9,9 +9,7 @@
 
 typedef struct {
 	void* sub;
-	Array* values;
-	size_t type;
-	size_t dim;
+	Array* super;
 }o_Vector;
 
 #endif

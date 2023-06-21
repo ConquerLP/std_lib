@@ -26,9 +26,9 @@ void def_critical_error(const char* err_msg);
 /* allowed types for list and array */
 enum {
 	DEF_BOOLEAN = 0,
+	DEF_CHAR,
 	DEF_USHORT,
 	DEF_SHORT,
-	DEF_CHAR,
 	DEF_UINT,
 	DEF_INT,
 	DEF_ULONGINT,
