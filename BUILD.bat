@@ -10,7 +10,7 @@ del *.vcxproj.filters
 del *.vcxproj.user
 del *.sln
 del *.txt
-del delte_junk_files.bat
+del delete_junk_files.bat
 
 mkdir files
 move *.c files
